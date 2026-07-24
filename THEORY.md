@@ -39,6 +39,13 @@ One tick reads a complete immutable `WAS/IS` pair, calculates every addressed
 result, and commits the next field together. Iteration order does not create
 chronology inside the tick.
 
+The same surface interaction has two relational descriptions: `ACT` relative
+to its source and `EFFECT` relative to its receiver. These are not separate
+algorithms or independent engine states. The executable calculates the
+same-grain ACT/EFFECT resolution; recursion remains available by applying the
+same rule at another addressed grain. The full dependency argument is in
+[`ACT-AND-EFFECT.md`](ACT-AND-EFFECT.md).
+
 ## Whole fields
 
 At completed level \(n\):
@@ -62,7 +69,7 @@ Six children each present six outward relations:
 
 The normalized signature is identical through every tested completed level.
 
-## Unbounded recursion
+## Unbounded recursive access
 
 The explorer calculates compatible finite queries:
 
@@ -73,3 +80,6 @@ Q_0\subset Q_1\subset Q_2\subset\cdots
 Every frontier remains expandable through inward grain, outward grain, six
 spatial Faces, `WAS`, and `NEXT`. A finite calculation is never presented as a
 boundary of the model.
+
+Recursive access is not an input to the same-grain recurrence. The current
+grain's generated formation is calculated without hidden recursive state.

@@ -33,6 +33,9 @@ implements:
   explanation without mixing Acts or grains.
 - a deterministic renderer-neutral scene graph containing six child wholes,
   nineteen resolved relations and thirty-six causal presentation edges.
+- selectable forward or reverse playback to an observer-chosen moment.
+- per-moment causal field detection and dimensionless Difference, transition
+  and boundary activity counts.
 
 Install the declared frontend dependencies and start the graphical explorer:
 
@@ -81,7 +84,9 @@ pnpm run demo -- --select-projection 2,0,0
 ```
 
 The interpretation boundary is documented in
-[`THEORY.md`](THEORY.md) and [`LIMITATIONS.md`](LIMITATIONS.md).
+[`THEORY.md`](THEORY.md), the detailed
+[`ACT-AND-EFFECT.md`](ACT-AND-EFFECT.md) explanation, and
+[`LIMITATIONS.md`](LIMITATIONS.md).
 Exported frames have a public contract in
 [`schema/explorer-frame.schema.json`](schema/explorer-frame.schema.json).
 

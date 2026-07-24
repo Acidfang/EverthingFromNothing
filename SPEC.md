@@ -11,7 +11,9 @@ result that operation generated:
 \rightarrow
 \text{one shared tick}
 \rightarrow
-\text{recursive Resolution}
+\text{same-grain Resolution}
+\rightarrow
+\text{recursion available}
 }
 \]
 
@@ -42,6 +44,12 @@ NEXT -> absent until calculated
 One tick freezes the complete `WAS/IS` pair, calculates every addressed
 relation from that snapshot, then commits the next complete field together.
 Local iteration order does not create chronology inside the tick.
+
+`ACT` and `EFFECT` are relational descriptions of each surface interaction,
+not two independent update rules. The source presents an ACT; the receiver
+resolves the same interaction as an EFFECT. The kernel executes this within one
+grain. Recursive navigation reuses the kernel at another grain and is not a
+dependency of the current grain's output.
 
 ## Exploration
 
@@ -109,4 +117,3 @@ The public repository is complete only when:
 14. A production build succeeds without runtime network access.
 15. Repository scope, license and public limitations are explicit.
 16. Automated checks run on GitHub.
-
