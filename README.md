@@ -3,6 +3,9 @@
 Public repository:
 [Acidfang/EverthingFromNothing](https://github.com/Acidfang/EverthingFromNothing)
 
+Public web modeller:
+[acidfang.github.io/EverthingFromNothing](https://acidfang.github.io/EverthingFromNothing/)
+
 Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may
 use, study, modify, and redistribute the software for noncommercial purposes.
 Commercial or profit-making use requires separate permission from Acidfang;
