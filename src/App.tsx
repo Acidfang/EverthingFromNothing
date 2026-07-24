@@ -54,9 +54,14 @@ function FieldCanvas({
     [projected],
   )
   const momentPoints = useMemo(() => {
+    const fieldByAddress = new Map(
+      frame.formation.fields.flatMap((field, fieldIndex) =>
+        field.addresses.map((address) => [address, fieldIndex] as const),
+      ),
+    )
     const addresses = frame.chronology.is.map((address) => {
       const [x, y, z] = address.split(",").map(Number)
-      return { address, x, y, z }
+      return { address, fieldIndex: fieldByAddress.get(address) ?? 0, x, y, z }
     })
     const extent = Math.max(
       1,
@@ -67,8 +72,9 @@ function FieldCanvas({
       ]),
     )
     const scale = Math.min(72, 245 / (extent * 2))
-    return addresses.map(({ address, x, y, z }) => ({
+    return addresses.map(({ address, fieldIndex, x, y, z }) => ({
       address,
+      fieldIndex,
       x: 400 + (x - y) * scale,
       y: 260 + (x + y) * scale * 0.48 - z * scale * 0.92,
     }))
@@ -171,6 +177,7 @@ function FieldCanvas({
           {momentPoints.map((point) => (
             <circle
               key={`${frame.observer.act}:${point.address}`}
+              className={`detected-field-${point.fieldIndex % 6}`}
               cx={point.x}
               cy={point.y}
               r={momentPoints.length > 500 ? 1.7 : momentPoints.length > 100 ? 2.3 : 3.4}
@@ -495,6 +502,49 @@ export function App() {
               aria-label="Collapse inspector"
             >›</button>
           </div>
+          <section className="formation-analysis" aria-label="Moment formation analysis">
+            <div className="analysis-heading">
+              <div>
+                <span className="eyebrow">Detected this moment</span>
+                <h3>Fields & model energies</h3>
+              </div>
+              <StatusMark status="GENERATED" />
+            </div>
+            <dl className="formation-metrics">
+              <div><dt>Connected fields</dt><dd>{frame.formation.fieldCount}</dd></div>
+              <div><dt>Largest field</dt><dd>{frame.formation.largestField}</dd></div>
+              <div><dt>Appeared</dt><dd>+{frame.formation.appearedDifferences}</dd></div>
+              <div><dt>Resolved</dt><dd>−{frame.formation.resolvedDifferences}</dd></div>
+            </dl>
+            <div className="energy-grid">
+              <div>
+                <span>Difference</span>
+                <strong>{frame.formation.modelEnergy.difference}</strong>
+              </div>
+              <div>
+                <span>Transition</span>
+                <strong>{frame.formation.modelEnergy.transition}</strong>
+              </div>
+              <div>
+                <span>Boundary</span>
+                <strong>{frame.formation.modelEnergy.boundary}</strong>
+              </div>
+            </div>
+            <ol className="detected-fields">
+              {frame.formation.fields.slice(0, 6).map((field, index) => (
+                <li key={field.id}>
+                  <i className={`field-swatch detected-field-${index % 6}`} />
+                  <span>Field {index + 1}</span>
+                  <strong>{field.activeDifferences} Δ</strong>
+                  <small>{field.boundaryFaces} faces</small>
+                </li>
+              ))}
+            </ol>
+            <p className="energy-qualification">
+              Fields connect through a shared possible resolving source. Exact
+              model counts; no physical unit or external identity is assigned.
+            </p>
+          </section>
           <dl className="metric-list">
             <div><dt>Inward wholes</dt><dd>6</dd></div>
             <div><dt>Presentations</dt><dd>{frame.wholeProjection.presentations}</dd></div>

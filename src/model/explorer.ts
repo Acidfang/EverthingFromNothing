@@ -19,6 +19,10 @@ import {
   type RecursiveQuery,
 } from "./query.ts"
 import { buildWholeScene, type WholeScene } from "./scene.ts"
+import {
+  analyseFormation,
+  type FormationAnalysis,
+} from "./formation.ts"
 
 export type SelectedRelation = Readonly<{
   source: "TICK_LEDGER" | "WHOLE_PROJECTION"
@@ -50,6 +54,7 @@ export type ExplorerFrame = Readonly<{
     next: readonly string[] | null
   }>
   currentLedger: TickLedger | null
+  formation: FormationAnalysis
   wholeProjection: Readonly<{
     presentations: number
     addressedRelations: number
@@ -283,6 +288,7 @@ export class FirstActExplorer {
         next: next ? sorted(next.is) : null,
       }),
       currentLedger,
+      formation: analyseFormation(state.was, state.is),
       wholeProjection: Object.freeze({
         presentations: projection.presentations,
         addressedRelations: projection.entries.length,
