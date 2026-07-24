@@ -624,6 +624,9 @@ export function App() {
       <footer>
         <span>Kernel {frame.kernelVersion}</span>
         <span>One shared Act · complete snapshots · reversible update</span>
+        <a href="https://github.com/Acidfang/EverthingFromNothing/blob/main/ACT-AND-EFFECT.md">
+          ACT / EFFECT
+        </a>
         <a href="https://github.com/Acidfang/EverthingFromNothing">Source and limitations</a>
       </footer>
     </main>
