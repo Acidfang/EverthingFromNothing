@@ -13,7 +13,6 @@ import {
 import type { ScenePoint } from "./model/scene.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
-const PLAYBACK_END = 16
 const PLAYBACK_SPEEDS = [
   { label: "0.5×", milliseconds: 1400 },
   { label: "1×", milliseconds: 700 },
@@ -208,6 +207,9 @@ export function App() {
   const [ledgerOpen, setLedgerOpen] = useState(true)
   const [isPlaying, setIsPlaying] = useState(false)
   const [playbackSpeed, setPlaybackSpeed] = useState(700)
+  const [targetMoment, setTargetMoment] = useState(
+    () => frame.observer.act + 1,
+  )
 
   const update = useCallback((next: ExplorerFrame) => setFrame(next), [])
   const resolve = useCallback(
@@ -243,13 +245,21 @@ export function App() {
 
   useEffect(() => {
     if (!isPlaying) return
-    if (frame.observer.act >= PLAYBACK_END) {
+    if (frame.observer.act === targetMoment) {
       setIsPlaying(false)
       return
     }
-    const timer = window.setTimeout(resolve, playbackSpeed)
+    const advance = frame.observer.act < targetMoment ? resolve : was
+    const timer = window.setTimeout(advance, playbackSpeed)
     return () => window.clearTimeout(timer)
-  }, [frame.observer.act, isPlaying, playbackSpeed, resolve])
+  }, [
+    frame.observer.act,
+    isPlaying,
+    playbackSpeed,
+    resolve,
+    targetMoment,
+    was,
+  ])
 
   useEffect(() => {
     const handleKey = (event: globalThis.KeyboardEvent): void => {
@@ -306,7 +316,7 @@ export function App() {
             className={`play-action ${isPlaying ? "playing" : ""}`}
             type="button"
             onClick={() => {
-              if (frame.observer.act >= PLAYBACK_END) {
+              if (frame.observer.act === targetMoment && targetMoment > 0) {
                 resetPlayback()
                 setIsPlaying(true)
                 return
@@ -314,16 +324,33 @@ export function App() {
               setIsPlaying((playing) => !playing)
             }}
             aria-pressed={isPlaying}
+            disabled={frame.observer.act === 0 && targetMoment === 0}
           >
             <span aria-hidden="true">{isPlaying ? "Ⅱ" : "▶"}</span>
             <span>
               {isPlaying
                 ? "Pause formation"
-                : frame.observer.act >= PLAYBACK_END
-                  ? "Replay formation"
-                  : "Play formation"}
+                : frame.observer.act === targetMoment
+                  ? `Replay to ${targetMoment}`
+                  : `Play to ${targetMoment}`}
             </span>
           </button>
+          <label className="moment-control">
+            <span>Target moment</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={targetMoment}
+              onChange={(event) => {
+                const requested = Number(event.target.value)
+                if (!Number.isSafeInteger(requested) || requested < 0) return
+                setIsPlaying(false)
+                setTargetMoment(requested)
+              }}
+              aria-label="Target moment"
+            />
+          </label>
           <label className="speed-control">
             <span>Speed</span>
             <select
