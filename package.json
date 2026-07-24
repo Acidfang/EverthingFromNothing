@@ -1,0 +1,41 @@
+{
+  "name": "first-act-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "packageManager": "pnpm@11.9.0",
+  "type": "module",
+  "description": "An inspectable executable model of Difference, Resolution, shared ticks, and recursive whole fields.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Acidfang/EverthingFromNothing.git"
+  },
+  "homepage": "https://github.com/Acidfang/EverthingFromNothing#readme",
+  "bugs": {
+    "url": "https://github.com/Acidfang/EverthingFromNothing/issues"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build --configLoader runner",
+    "preview": "vite preview",
+    "demo": "node --experimental-strip-types src/cli.ts",
+    "explore": "node --experimental-strip-types src/terminal.ts",
+    "test:model": "node --experimental-strip-types --test tests/*.test.ts",
+    "audit:release": "node --experimental-strip-types scripts/release-audit.ts"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.2",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7"
+  },
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=11"
+  }
+}

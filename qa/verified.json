@@ -1,0 +1,54 @@
+{
+  "verifiedAt": "2026-07-25",
+  "productionUrl": "http://127.0.0.1:4173/",
+  "buildSource": "dist/",
+  "cleanCheckout": {
+    "temporaryWorkspace": true,
+    "frozenLockfileInstall": true,
+    "modelTestsPassed": 22,
+    "productionBuildPassed": true,
+    "productionModules": 37,
+    "compressedJavaScriptBytes": 67930
+  },
+  "browsers": [
+    {
+      "surface": "Codex in-app browser",
+      "viewport": { "width": 1440, "height": 1000 },
+      "screenshot": "qa/desktop.png",
+      "checks": {
+        "threeColumnLayout": true,
+        "sixChildWholeSources": true,
+        "nineteenSelectableRelations": true,
+        "thirtySixPresentations": true,
+        "sharedTickAdvancedFromZeroToOne": true,
+        "returnToWasBecameEnabled": true,
+        "keyboardRelationSelection": true,
+        "pointerRelationSelection": true,
+        "causalExplanationUpdatedToExactAddress": true,
+        "externalPhysicalComparisonRemainedBlocked": true,
+        "enterWholePreservedSharedAct": true,
+        "enterWholeChangedGrainFromZeroToMinusOne": true,
+        "enterWholeChangedSceneLevelFromOneToTwo": true
+      }
+    },
+    {
+      "surface": "Codex in-app browser",
+      "viewport": { "width": 390, "height": 844 },
+      "screenshot": "qa/mobile.png",
+      "checks": {
+        "narrowBreakpointApplied": true,
+        "noHorizontalOverflow": true,
+        "causalRailCollapsible": true,
+        "fieldVisibleAfterRailCollapse": true,
+        "controlsRemainReachable": true
+      }
+    }
+  ],
+  "console": { "errors": 0, "warnings": 0 },
+  "epistemicBoundary": {
+    "generatedResultsVisible": true,
+    "selectedFormalizationsVisible": true,
+    "unresolvedInterpretationVisible": true,
+    "externalPhysicalComparisonBlocked": true
+  }
+}

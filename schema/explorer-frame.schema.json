@@ -1,0 +1,311 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/first-act/explorer-frame.schema.json",
+  "title": "First Act Explorer Frame",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kernelVersion",
+    "observer",
+    "chronology",
+    "currentLedger",
+    "wholeProjection",
+    "scene",
+    "recursiveQuery",
+    "provenance",
+    "selected",
+    "explanation"
+  ],
+  "properties": {
+    "kernelVersion": {
+      "const": "first-act-gf2-v1"
+    },
+    "observer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "act",
+        "relativeGrain",
+        "relativeWholePath",
+        "spatialAddress",
+        "queryDepth"
+      ],
+      "properties": {
+        "act": { "type": "integer", "minimum": 0 },
+        "relativeGrain": { "type": "integer" },
+        "relativeWholePath": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/address" }
+        },
+        "spatialAddress": { "$ref": "#/$defs/address" },
+        "queryDepth": { "type": "integer", "minimum": 0, "maximum": 4 }
+      }
+    },
+    "chronology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["was", "is", "next"],
+      "properties": {
+        "was": { "$ref": "#/$defs/addressArray" },
+        "is": { "$ref": "#/$defs/addressArray" },
+        "next": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/addressArray" }
+          ]
+        }
+      }
+    },
+    "currentLedger": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/tickLedger" }
+      ]
+    },
+    "wholeProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "presentations",
+        "addressedRelations",
+        "resolvedSame",
+        "outwardDifference",
+        "entries"
+      ],
+      "properties": {
+        "presentations": { "type": "integer", "minimum": 0 },
+        "addressedRelations": { "type": "integer", "minimum": 0 },
+        "resolvedSame": { "type": "integer", "minimum": 0 },
+        "outwardDifference": { "type": "integer", "minimum": 0 },
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/projectionEntry" }
+        }
+      }
+    },
+    "scene": {
+      "type": "object",
+      "required": [
+        "level",
+        "points",
+        "edges",
+        "bounds",
+        "accessibilitySummary"
+      ],
+      "properties": {
+        "level": { "type": "integer", "minimum": 1 },
+        "points": { "type": "array", "minItems": 25 },
+        "edges": { "type": "array", "minItems": 36 },
+        "bounds": { "type": "object" },
+        "accessibilitySummary": { "type": "string", "minLength": 1 }
+      }
+    },
+    "recursiveQuery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eventCount",
+        "relationCount",
+        "frontierCount",
+        "frontierIsExpandable",
+        "query"
+      ],
+      "properties": {
+        "eventCount": { "type": "integer", "minimum": 1 },
+        "relationCount": { "type": "integer", "minimum": 0 },
+        "frontierCount": { "type": "integer", "minimum": 1 },
+        "frontierIsExpandable": { "const": true },
+        "query": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["centre", "radius", "events", "edges", "frontier"],
+          "properties": {
+            "centre": { "$ref": "#/$defs/eventAddress" },
+            "radius": { "type": "integer", "minimum": 0, "maximum": 4 },
+            "events": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/eventAddress" }
+            },
+            "edges": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/relationEdge" }
+            },
+            "frontier": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/eventAddress" }
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/provenanceNode" }
+    },
+    "selected": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "address"],
+          "properties": {
+            "source": {
+              "enum": ["TICK_LEDGER", "WHOLE_PROJECTION"]
+            },
+            "address": { "$ref": "#/$defs/address" }
+          }
+        }
+      ]
+    },
+    "explanation": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/explanation" }
+      ]
+    }
+  },
+  "$defs": {
+    "address": {
+      "type": "string",
+      "pattern": "^-?[0-9]+,-?[0-9]+,-?[0-9]+$"
+    },
+    "eventAddress": {
+      "type": "string",
+      "pattern": "^-?[0-9]+\\|-?[0-9]+\\|-?[0-9]+,-?[0-9]+,-?[0-9]+$"
+    },
+    "addressArray": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/address" },
+      "uniqueItems": true
+    },
+    "arrival": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "face"],
+      "properties": {
+        "source": { "$ref": "#/$defs/address" },
+        "face": { "$ref": "#/$defs/address" }
+      }
+    },
+    "ledgerEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "arrivals",
+        "arrivalCount",
+        "wasDifferent",
+        "remainsDifferent",
+        "result"
+      ],
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "arrivals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/arrival" }
+        },
+        "arrivalCount": { "type": "integer", "minimum": 0 },
+        "wasDifferent": { "type": "boolean" },
+        "remainsDifferent": { "type": "boolean" },
+        "result": { "enum": ["SAME", "DIFFERENT"] }
+      }
+    },
+    "tickLedger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fromAct", "toAct", "entries"],
+      "properties": {
+        "fromAct": { "type": "integer", "minimum": 0 },
+        "toAct": { "type": "integer", "minimum": 1 },
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ledgerEntry" }
+        }
+      }
+    },
+    "projectionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "normalizedAddress",
+        "contributors",
+        "arrivalCount",
+        "result"
+      ],
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "normalizedAddress": { "$ref": "#/$defs/address" },
+        "contributors": { "$ref": "#/$defs/addressArray" },
+        "arrivalCount": { "type": "integer", "minimum": 1 },
+        "result": { "enum": ["SAME", "DIFFERENT"] }
+      }
+    },
+    "relationEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relation", "source", "target"],
+      "properties": {
+        "relation": {
+          "enum": ["INWARD", "OUTWARD", "SPATIAL_FACE", "WAS", "NEXT"]
+        },
+        "source": { "$ref": "#/$defs/eventAddress" },
+        "target": { "$ref": "#/$defs/eventAddress" }
+      }
+    },
+    "provenanceNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "status", "parents", "reason"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "status": {
+          "enum": ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"]
+        },
+        "parents": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "explanation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "status",
+        "ancestryStatuses",
+        "externalComparisonAllowed",
+        "because",
+        "result",
+        "provenanceIds"
+      ],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "status": { "const": "GENERATED" },
+        "ancestryStatuses": {
+          "type": "array",
+          "items": {
+            "enum": ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"]
+          }
+        },
+        "externalComparisonAllowed": { "type": "boolean" },
+        "because": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "result": { "enum": ["SAME", "DIFFERENT"] },
+        "provenanceIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        }
+      }
+    }
+  }
+}
