@@ -103,16 +103,20 @@ button:disabled { cursor: not-allowed; opacity: .38; }
 .reset-action {
   padding: 0 12px; border-color: var(--line); color: var(--muted); background: transparent;
 }
-.speed-control {
+.speed-control, .moment-control {
   display: grid; gap: 3px; padding: 4px 8px; border: 1px solid var(--line);
 }
-.speed-control span {
+.speed-control span, .moment-control span {
   color: var(--muted); font: 600 8px/1 ui-monospace, monospace;
   letter-spacing: .12em; text-transform: uppercase;
 }
 .speed-control select {
   border: 0; color: var(--text); background: var(--surface-1);
   font: 10px/1.2 ui-monospace, monospace;
+}
+.moment-control input {
+  width: 76px; border: 0; padding: 0; color: var(--text);
+  background: var(--surface-1); font: 10px/1.2 ui-monospace, monospace;
 }
 kbd {
   padding: 5px 7px; border: 1px solid rgba(105, 213, 206, .3);
@@ -293,7 +297,8 @@ footer a { color: var(--muted); }
     justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr;
   }
   .play-action { min-width: 0; }
-  .speed-control { min-height: 42px; justify-content: center; }
+  .speed-control, .moment-control { min-height: 42px; justify-content: center; }
+  .moment-control input { width: 100%; }
   .primary-action { justify-content: space-between; }
   .chronology { grid-column: auto; }
   .chronology > div { flex: 1; }
