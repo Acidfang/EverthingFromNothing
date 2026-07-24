@@ -13,6 +13,12 @@ import {
 import type { ScenePoint } from "./model/scene.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
+const PLAYBACK_END = 16
+const PLAYBACK_SPEEDS = [
+  { label: "0.5×", milliseconds: 1400 },
+  { label: "1×", milliseconds: 700 },
+  { label: "2×", milliseconds: 350 },
+] as const
 
 type ProjectedPoint = Readonly<{
   point: ScenePoint
@@ -31,9 +37,11 @@ function compactAddress(address: string): string {
 function FieldCanvas({
   frame,
   onSelect,
+  isPlaying,
 }: Readonly<{
   frame: ExplorerFrame
   onSelect: (address: string) => void
+  isPlaying: boolean
 }>) {
   const projected = useMemo<ProjectedPoint[]>(
     () => frame.scene.points.map((point) => {
@@ -46,6 +54,26 @@ function FieldCanvas({
     () => new Map(projected.map((item) => [item.point.id, item])),
     [projected],
   )
+  const momentPoints = useMemo(() => {
+    const addresses = frame.chronology.is.map((address) => {
+      const [x, y, z] = address.split(",").map(Number)
+      return { address, x, y, z }
+    })
+    const extent = Math.max(
+      1,
+      ...addresses.flatMap(({ x, y, z }) => [
+        Math.abs(x),
+        Math.abs(y),
+        Math.abs(z),
+      ]),
+    )
+    const scale = Math.min(72, 245 / (extent * 2))
+    return addresses.map(({ address, x, y, z }) => ({
+      address,
+      x: 400 + (x - y) * scale,
+      y: 260 + (x + y) * scale * 0.48 - z * scale * 0.92,
+    }))
+  }, [frame.chronology.is])
 
   const selectByKey = (
     event: KeyboardEvent<SVGGElement>,
@@ -58,7 +86,10 @@ function FieldCanvas({
   }
 
   return (
-    <div className="field-wrap">
+    <div
+      className={`field-wrap ${isPlaying ? "is-playing" : ""}`}
+      data-act={frame.observer.act}
+    >
       <svg
         className="field"
         viewBox="0 0 800 520"
@@ -134,6 +165,19 @@ function FieldCanvas({
               )
             })}
         </g>
+        <g
+          className="moment-field"
+          aria-label={`Moment ${frame.observer.act}: ${momentPoints.length} active Differences`}
+        >
+          {momentPoints.map((point) => (
+            <circle
+              key={`${frame.observer.act}:${point.address}`}
+              cx={point.x}
+              cy={point.y}
+              r={momentPoints.length > 500 ? 1.7 : momentPoints.length > 100 ? 2.3 : 3.4}
+            />
+          ))}
+        </g>
         <g className="axis" aria-hidden="true">
           <line x1="400" y1="260" x2="500" y2="309" />
           <line x1="400" y1="260" x2="300" y2="309" />
@@ -144,8 +188,8 @@ function FieldCanvas({
         </g>
       </svg>
       <div className="canvas-caption">
-        <span>Complete whole · level {frame.scene.level}</span>
-        <span>Six sources / 36 presentations / 19 relations</span>
+        <span>Moment {frame.observer.act} · {momentPoints.length} active Differences</span>
+        <span>Completed whole remains beneath as the containing relation</span>
       </div>
     </div>
   )
@@ -162,12 +206,19 @@ export function App() {
   const [leftOpen, setLeftOpen] = useState(true)
   const [rightOpen, setRightOpen] = useState(true)
   const [ledgerOpen, setLedgerOpen] = useState(true)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [playbackSpeed, setPlaybackSpeed] = useState(700)
 
   const update = useCallback((next: ExplorerFrame) => setFrame(next), [])
   const resolve = useCallback(
     () => update(explorer.current!.resolveOneTick()),
     [update],
   )
+  const resetPlayback = useCallback(() => {
+    setIsPlaying(false)
+    explorer.current = new FirstActExplorer()
+    update(explorer.current.frame())
+  }, [update])
   const was = useCallback(
     () => update(explorer.current!.returnToWas()),
     [update],
@@ -191,10 +242,21 @@ export function App() {
   )
 
   useEffect(() => {
+    if (!isPlaying) return
+    if (frame.observer.act >= PLAYBACK_END) {
+      setIsPlaying(false)
+      return
+    }
+    const timer = window.setTimeout(resolve, playbackSpeed)
+    return () => window.clearTimeout(timer)
+  }, [frame.observer.act, isPlaying, playbackSpeed, resolve])
+
+  useEffect(() => {
     const handleKey = (event: globalThis.KeyboardEvent): void => {
       if (event.target instanceof HTMLInputElement) return
       if (event.code === "Space") {
         event.preventDefault()
+        setIsPlaying(false)
         if (event.shiftKey) was()
         else resolve()
       } else if (event.key === "[") {
@@ -239,10 +301,58 @@ export function App() {
             </div>
           ))}
         </div>
-        <button className="primary-action" type="button" onClick={resolve}>
-          <span>Resolve one tick</span>
-          <kbd>Space</kbd>
-        </button>
+        <div className="playback-controls">
+          <button
+            className={`play-action ${isPlaying ? "playing" : ""}`}
+            type="button"
+            onClick={() => {
+              if (frame.observer.act >= PLAYBACK_END) {
+                resetPlayback()
+                setIsPlaying(true)
+                return
+              }
+              setIsPlaying((playing) => !playing)
+            }}
+            aria-pressed={isPlaying}
+          >
+            <span aria-hidden="true">{isPlaying ? "Ⅱ" : "▶"}</span>
+            <span>
+              {isPlaying
+                ? "Pause formation"
+                : frame.observer.act >= PLAYBACK_END
+                  ? "Replay formation"
+                  : "Play formation"}
+            </span>
+          </button>
+          <label className="speed-control">
+            <span>Speed</span>
+            <select
+              value={playbackSpeed}
+              onChange={(event) => setPlaybackSpeed(Number(event.target.value))}
+              aria-label="Playback speed"
+            >
+              {PLAYBACK_SPEEDS.map((speed) => (
+                <option key={speed.label} value={speed.milliseconds}>
+                  {speed.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            className="primary-action"
+            type="button"
+            onClick={() => {
+              setIsPlaying(false)
+              resolve()
+            }}
+          >
+            <span>One tick</span>
+            <kbd>Space</kbd>
+          </button>
+          <button className="reset-action" type="button" onClick={resetPlayback}>
+            Reset
+          </button>
+        </div>
       </header>
 
       <section
@@ -302,7 +412,11 @@ export function App() {
               <button type="button" onClick={enter}>Enter whole</button>
             </div>
           </div>
-          <FieldCanvas frame={frame} onSelect={selectRelation} />
+          <FieldCanvas
+            frame={frame}
+            onSelect={selectRelation}
+            isPlaying={isPlaying}
+          />
           <div className="field-status" aria-live="polite">
             <div>
               <span className="eyebrow">Observer</span>
