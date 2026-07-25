@@ -6,6 +6,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
 } from "react"
 import {
   FirstActExplorer,
@@ -1563,6 +1564,103 @@ function StatusMark({ status }: Readonly<{ status: string }>) {
   return <span className={`status-mark status-${status.toLowerCase()}`}>{status}</span>
 }
 
+type PageExplanation = Readonly<{
+  title: string
+  whatItIs: string
+  whatItAllows: string
+  x: number
+  y: number
+}>
+
+const INFO_TARGETS = [
+  "button", "a", "input", "select", "label", "[role='img']", "figure",
+  "h1", "h2", "h3", ".eyebrow", "dt", "dd", "strong", "p", "li",
+  ".status-mark", ".field-status > div", ".energy-grid > div",
+  ".grain-route > div", ".grain-conditions > div",
+].join(",")
+
+function explainPageTarget(
+  target: HTMLElement,
+  x: number,
+  y: number,
+): PageExplanation {
+  const text = (
+    target.getAttribute("aria-label")
+    ?? (target instanceof HTMLInputElement ? target.value : target.textContent)
+    ?? target.tagName
+  ).replace(/\s+/g, " ").trim().slice(0, 180)
+  const title = text || "Model information"
+  if (target.matches("button")) {
+    return {
+      title,
+      whatItIs: `A model control labelled “${title}”.`,
+      whatItAllows: "It allows ME to change the selected view or advance the declared resolution without changing the underlying causal history.",
+      x, y,
+    }
+  }
+  if (target.matches("input, select, label")) {
+    return {
+      title,
+      whatItIs: "An observer-controlled constraint on what the modeller calculates or displays.",
+      whatItAllows: "Changing it reconstructs the visible result from the same declared rules at the newly selected constraint.",
+      x, y,
+    }
+  }
+  if (target.matches("a")) {
+    return {
+      title,
+      whatItIs: `A path from this model to “${title}”.`,
+      whatItAllows: "It allows the explanation or source behind this part of the model to be inspected directly.",
+      x, y,
+    }
+  }
+  if (target.matches("[role='img'], figure, svg")) {
+    return {
+      title,
+      whatItIs: "A rendered projection of the currently resolved field. It is a view of model state, not the complete state itself.",
+      whatItAllows: "It allows spatial relations, symmetry, paths, and changes between moments to be seen from this observer position.",
+      x, y,
+    }
+  }
+  if (target.matches("dt, dd, strong, .status-mark, .field-status > div, .energy-grid > div")) {
+    return {
+      title,
+      whatItIs: `A current model value or qualification: “${title}”.`,
+      whatItAllows: "It allows the visible state to be checked against the calculation and its declared causal limits.",
+      x, y,
+    }
+  }
+  return {
+    title,
+    whatItIs: `This part of the explanation states: “${title}”.`,
+    whatItAllows: "It identifies the role this statement plays in reconstructing the current model view.",
+    x, y,
+  }
+}
+
+function PageInfoBubble({
+  explanation,
+  onClose,
+}: Readonly<{
+  explanation: PageExplanation
+  onClose: () => void
+}>) {
+  return (
+    <aside
+      className="page-info-bubble"
+      role="dialog"
+      aria-label={`Explanation: ${explanation.title}`}
+      style={{ left: explanation.x, top: explanation.y }}
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button type="button" className="page-info-close" onClick={onClose} aria-label="Close explanation">×</button>
+      <strong>{explanation.title}</strong>
+      <div><span>WHAT IT IS</span><p>{explanation.whatItIs}</p></div>
+      <div><span>WHAT IT ALLOWS</span><p>{explanation.whatItAllows}</p></div>
+    </aside>
+  )
+}
+
 export function App() {
   const explorer = useRef<FirstActExplorer | null>(null)
   if (explorer.current === null) explorer.current = new FirstActExplorer()
@@ -1572,6 +1670,7 @@ export function App() {
   const [ledgerOpen, setLedgerOpen] = useState(true)
   const [isPlaying, setIsPlaying] = useState(false)
   const [playbackSpeed, setPlaybackSpeed] = useState(700)
+  const [pageExplanation, setPageExplanation] = useState<PageExplanation | null>(null)
   const [targetMoment, setTargetMoment] = useState(
     () => frame.observer.act + 1,
   )
@@ -1644,6 +1743,29 @@ export function App() {
     return () => window.removeEventListener("keydown", handleKey)
   }, [frame.observer.queryDepth, resolve, setDepth, was])
 
+  const explainClick = useCallback((event: ReactMouseEvent<HTMLElement>) => {
+    const origin = event.target
+    if (!(origin instanceof HTMLElement) || origin.closest(".page-info-bubble")) return
+    const target = origin.closest<HTMLElement>(INFO_TARGETS)
+    if (!target) {
+      setPageExplanation(null)
+      return
+    }
+    const bubbleWidth = Math.min(360, window.innerWidth - 24)
+    const x = Math.max(12, Math.min(event.clientX + 14, window.innerWidth - bubbleWidth - 12))
+    const y = Math.max(12, Math.min(event.clientY + 14, window.innerHeight - 290))
+    setPageExplanation(explainPageTarget(target, x, y))
+  }, [])
+
+  useEffect(() => {
+    if (pageExplanation === null) return
+    const closeOnEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setPageExplanation(null)
+    }
+    window.addEventListener("keydown", closeOnEscape)
+    return () => window.removeEventListener("keydown", closeOnEscape)
+  }, [pageExplanation])
+
   const chronology = [
     { label: "WAS", value: frame.chronology.was.length },
     { label: "IS", value: frame.chronology.is.length },
@@ -1659,7 +1781,11 @@ export function App() {
     : null
 
   return (
-    <main className="app-shell">
+    <main className="app-shell info-enabled" onClickCapture={explainClick}>
+      <div className="page-info-hint">CLICK ANY LABEL · VALUE · CONTROL · VIEW FOR ITS EXPLANATION</div>
+      {pageExplanation ? (
+        <PageInfoBubble explanation={pageExplanation} onClose={() => setPageExplanation(null)} />
+      ) : null}
       <header className="topbar">
         <div className="identity">
           <span className="binary-mark" aria-hidden="true">01</span>
