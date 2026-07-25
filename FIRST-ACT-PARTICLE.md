@@ -161,8 +161,13 @@ completion is simultaneously the condition that allows the next inward grain:
 
 `G(g) @ 36 -> G(g - 1) @ 1`
 
-An animation may omit grain images to keep a long recursive descent watchable.
-If the skip is `s`, displayed frames are separated by `s + 1` grains. This is
-only a rendering choice: every intermediate handoff remains in the causal
-count, the final requested grain is always rendered, and its `CAME FROM` value
-still names the immediately preceding causal grain.
+An animation omits a grain image when its change is smaller than one pixel in
+the observer's currently available pixel map. These sub-pixel differences are
+not calculated as separate animation frames. They accumulate against the last
+rendered grain until:
+
+`pixelSpan * |scale(last rendered) - scale(current)| >= 1`
+
+Every intermediate handoff remains in the causal count. A rendered grain's
+`CAME FROM` value still names its immediately preceding causal grain, not merely
+the previously rendered grain.
