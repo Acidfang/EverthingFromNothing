@@ -86,3 +86,28 @@ simultaneous six-Face total at every intermediate moment.
 These values are dimensionless model-force components. They are not SI forces:
 the derivation introduces neither measured mass nor an external physical
 constant.
+
+## Complete transform ancestry
+
+The force totals do not replace their inputs. Each Face retains all 36 ordered
+transform records, producing `6 x 36 = 216` preserved steps for the particle:
+
+```text
+WAS[n] -> ROTATE AND RESOLVE -> IS[n]
+IS[n]  = WAS[n+1]
+```
+
+Every record stores its Face address, moment, causal phase, parent identifier,
+next identifier, complete WAS vector, complete IS vector, transfer vector,
+change-in-transfer vector, and created force components. The three causal
+phases each preserve twelve transforms:
+
+```text
+1..12   DIRECTION ALLOWED
+13..24  FACE PRESENTED
+25..36  ADDRESS RESOLVED
+```
+
+The interface can select any of the six Face paths and any individual
+transform without reconstructing it from the final particle. The result is
+therefore an inspectable transformation history, not an endpoint-only trace.

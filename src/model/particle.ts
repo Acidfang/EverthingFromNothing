@@ -27,6 +27,25 @@ export type ParticleForceMoment = Readonly<{
   sixFaceResultant: number
 }>
 
+export type ParticleTransformStep = Readonly<{
+  id: string
+  parentId: string | null
+  nextId: string | null
+  faceAddress: string
+  moment: number
+  phase: "DIRECTION ALLOWED" | "FACE PRESENTED" | "ADDRESS RESOLVED"
+  was: ParticleVector
+  operator: "ROTATE AND RESOLVE"
+  is: ParticleVector
+  transfer: ParticleVector
+  changeInTransfer: ParticleVector
+  outwardTransfer: number
+  inwardTurningForce: number
+  rotationalForce: number
+  axialForce: number
+  resultantForce: number
+}>
+
 export type FirstActParticle = Readonly<{
   firstDifference: Field
   facePresentations: number
@@ -39,6 +58,8 @@ export type FirstActParticle = Readonly<{
   mergeRecoversParticle: boolean
   causalTraces: readonly ParticleCausalTrace[]
   forceMoments: readonly ParticleForceMoment[]
+  transformPaths: ReadonlyMap<string, readonly ParticleTransformStep[]>
+  transformStepCount: number
 }>
 
 export type ParticleCausalTrace = Readonly<{
@@ -173,6 +194,46 @@ export function calculateParticleForceMoments(
   }))
 }
 
+export function calculateParticleTransformPath(
+  address: string,
+  moments = PARTICLE_MOMENTS_PER_ACT,
+): readonly ParticleTransformStep[] {
+  const positions = sampleParticleHelix(address, moments)
+  const forces = new Map(
+    calculateParticleForceMoments(address, moments)
+      .map((force) => [force.moment, force] as const),
+  )
+  return Object.freeze(positions.slice(1).map((position, index) => {
+    const moment = index + 1
+    const id = `${address}@${moment}`
+    const force = forces.get(moment)
+    const was = positions[moment - 1]
+    const transfer = subtract(position, was)
+    return Object.freeze({
+      id,
+      parentId: moment === 1 ? null : `${address}@${moment - 1}`,
+      nextId: moment === moments ? null : `${address}@${moment + 1}`,
+      faceAddress: address,
+      moment,
+      phase: moment <= moments / 3
+        ? "DIRECTION ALLOWED" as const
+        : moment <= moments * 2 / 3
+          ? "FACE PRESENTED" as const
+          : "ADDRESS RESOLVED" as const,
+      was,
+      operator: "ROTATE AND RESOLVE" as const,
+      is: position,
+      transfer,
+      changeInTransfer: force?.changeInTransfer ?? { x: 0, y: 0, z: 0 },
+      outwardTransfer: force?.outwardTransfer ?? dot(transfer, normalize(fromKey(address))),
+      inwardTurningForce: force?.inwardTurningForce ?? 0,
+      rotationalForce: force?.rotationalForce ?? 0,
+      axialForce: force?.axialForce ?? 0,
+      resultantForce: force?.resultantForce ?? 0,
+    })
+  }))
+}
+
 export function deriveFirstActParticle(): FirstActParticle {
   const initial = firstDifference()
   const potential = analysePotential(initial.was, initial.is)
@@ -201,6 +262,12 @@ export function deriveFirstActParticle(): FirstActParticle {
       ]) as ParticleCausalTrace["subcauses"],
     })),
   )
+  const transformPaths = new Map(
+    causalTraces.map((trace) => [
+      trace.to,
+      calculateParticleTransformPath(trace.to),
+    ] as const),
+  )
   return Object.freeze({
     firstDifference: initial.is,
     facePresentations: potential.presentationCount,
@@ -215,5 +282,8 @@ export function deriveFirstActParticle(): FirstActParticle {
     mergeRecoversParticle: sameField(mergedField, resolved.is),
     causalTraces,
     forceMoments: calculateParticleForceMoments(causalTraces[0].to),
+    transformPaths,
+    transformStepCount: [...transformPaths.values()]
+      .reduce((total, path) => total + path.length, 0),
   })
 }
