@@ -91,6 +91,12 @@ test("the full transform path preserves every WAS to IS handoff", () => {
     assert.equal(path[index - 1].nextId, path[index].id)
     assert.deepEqual(path[index].was, path[index - 1].is)
   }
+  assert.equal(path[0].axisOffset.symbol, "ε = 0…01")
+  assert.ok(Math.abs(Math.hypot(
+    path[0].axisOffset.direction.x,
+    path[0].axisOffset.direction.y,
+    path[0].axisOffset.direction.z,
+  ) - 1) < 1e-12)
 })
 
 test("the particle retains all 216 six-Face transforms", () => {
