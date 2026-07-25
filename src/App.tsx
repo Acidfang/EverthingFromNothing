@@ -703,27 +703,53 @@ function ParticleTraceFrame({
         <div className="nested-grain-body">
           <svg viewBox="0 0 180 140" role="img" aria-label={`Nested grain ${nestedGrain.childGrain} at moment ${selectedMoment}`}>
             <rect width="180" height="140" />
+            <polyline
+              className="nested-carrier-path"
+              points={nestedMoment.carrierPath
+                .map((point) => {
+                  const projected = project(point)
+                  return `${projected.x},${projected.y}`
+                })
+                .join(" ")}
+            />
             {nestedMoment.states.map((state) => {
               const displayOffset = {
                 x: state.axisOffset.direction.x * 0.08,
                 y: state.axisOffset.direction.y * 0.08,
                 z: state.axisOffset.direction.z * 0.08,
               }
-              const axisOrigin = project(displayOffset)
+              const axisOrigin = project({
+                x: nestedMoment.carrierPosition.x + displayOffset.x,
+                y: nestedMoment.carrierPosition.y + displayOffset.y,
+                z: nestedMoment.carrierPosition.z + displayOffset.z,
+              })
               const point = project({
-                x: state.localPosition.x + displayOffset.x,
-                y: state.localPosition.y + displayOffset.y,
-                z: state.localPosition.z + displayOffset.z,
+                x: state.parentPosition.x + displayOffset.x,
+                y: state.parentPosition.y + displayOffset.y,
+                z: state.parentPosition.z + displayOffset.z,
               })
               return (
                 <g key={state.face}>
+                  <polyline
+                    className="nested-standing-wave"
+                    points={state.standingWavePath
+                      .map((wavePoint) => {
+                        const projected = project(wavePoint)
+                        return `${projected.x},${projected.y}`
+                      })
+                      .join(" ")}
+                  />
                   <line x1={axisOrigin.x} y1={axisOrigin.y} x2={point.x} y2={point.y} />
                   <circle className="nested-axis-origin" cx={axisOrigin.x} cy={axisOrigin.y} r="1.8" />
                   <circle className="nested-emission" cx={point.x} cy={point.y} r="5" />
                 </g>
               )
             })}
-            <circle className="nested-me" cx="90" cy="70" r="7" />
+            <circle className="nested-cube-origin" cx="90" cy="70" r="3" />
+            {(() => {
+              const carrier = project(nestedMoment.carrierPosition)
+              return <circle className="nested-me" cx={carrier.x} cy={carrier.y} r="7" />
+            })()}
           </svg>
           <div className="nested-grain-resolution">
             <div className="nested-handoff">
@@ -738,6 +764,7 @@ function ParticleTraceFrame({
               <div><span>What it becomes</span><strong>{nestedMoment.states.length} child states</strong></div>
               <div><span>What comes off</span><strong>{formatForce(nestedMoment.totalEmittedMagnitude)}</strong></div>
               <div><span>Force created</span><strong>{formatForce(nestedMoment.totalCreatedForce)}</strong></div>
+              <div><span>Standing amplitude</span><strong>{formatForce(nestedMoment.totalStandingAmplitude)}</strong></div>
             </div>
             <ol>
               {nestedMoment.states.map((state) => (
@@ -757,7 +784,10 @@ function ParticleTraceFrame({
           parent grain at scale 1/2, so the display shows both what the ME
           becomes internally and the Difference it expresses outward as it goes.
           Axis offsets are retained symbolically as ε = 0…01; their visible
-          separation is exaggerated only so they can be seen.
+          separation is exaggerated only so they can be seen. The amber carrier
+          is the parent spiral; each cyan child path is the equal outward/return
+          superposition, producing fixed standing-wave nodes while the carrier
+          itself spirals.
         </p>
       </div>
     </figure>

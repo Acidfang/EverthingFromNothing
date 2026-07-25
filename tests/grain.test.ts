@@ -53,3 +53,32 @@ test("every nested moment exposes all six outward transfers", () => {
     ))
   }
 })
+
+test("the child spiral rides the parent spiral while preserving standing nodes", () => {
+  const nested = deriveNestedGrain("1,0,0")
+  assert.notDeepEqual(
+    nested.moments[0].carrierPosition,
+    nested.moments[17].carrierPosition,
+  )
+  assert.ok(nested.moments[8].totalStandingAmplitude < 1e-12)
+  for (const moment of nested.moments) {
+    for (const state of moment.states) {
+      assert.equal(state.standingWavePath.length, 37)
+    }
+  }
+  const firstNode = nested.moments[0].states[0].standingWavePath[9]
+  const laterNode = nested.moments[17].states[0].standingWavePath[9]
+  const firstRelative = {
+    x: firstNode.x - nested.moments[0].carrierPosition.x,
+    y: firstNode.y - nested.moments[0].carrierPosition.y,
+    z: firstNode.z - nested.moments[0].carrierPosition.z,
+  }
+  const laterRelative = {
+    x: laterNode.x - nested.moments[17].carrierPosition.x,
+    y: laterNode.y - nested.moments[17].carrierPosition.y,
+    z: laterNode.z - nested.moments[17].carrierPosition.z,
+  }
+  for (const coordinate of ["x", "y", "z"] as const) {
+    assert.ok(Math.abs(firstRelative[coordinate] - laterRelative[coordinate]) < 1e-12)
+  }
+})
