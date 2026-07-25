@@ -6,6 +6,7 @@ import { fromKey, type Address } from "./address.ts"
 export const PARTICLE_MOMENTS_PER_ACT = 36
 export const PARTICLE_ROTATIONS_PER_ACT = 1
 export const PARTICLE_MAX_SPIRAL_RADIUS = 1 / 6
+export const PARTICLE_AXIS_OFFSET_SYMBOL = "ε = 0…01"
 
 export type ParticleVector = Readonly<{
   x: number
@@ -27,6 +28,11 @@ export type ParticleForceMoment = Readonly<{
   sixFaceResultant: number
 }>
 
+export type ParticleAxisOffset = Readonly<{
+  symbol: typeof PARTICLE_AXIS_OFFSET_SYMBOL
+  direction: ParticleVector
+}>
+
 export type ParticleTransformStep = Readonly<{
   id: string
   parentId: string | null
@@ -36,6 +42,7 @@ export type ParticleTransformStep = Readonly<{
   phase: "DIRECTION ALLOWED" | "FACE PRESENTED" | "ADDRESS RESOLVED"
   was: ParticleVector
   operator: "ROTATE AND RESOLVE"
+  axisOffset: ParticleAxisOffset
   is: ParticleVector
   transfer: ParticleVector
   changeInTransfer: ParticleVector
@@ -136,6 +143,13 @@ function traceBasis(axis: Address): Readonly<{
   }
 }
 
+export function particleAxisOffset(address: string): ParticleAxisOffset {
+  return Object.freeze({
+    symbol: PARTICLE_AXIS_OFFSET_SYMBOL,
+    direction: Object.freeze(traceBasis(fromKey(address)).radial),
+  })
+}
+
 export function sampleParticleHelix(
   address: string,
   moments = PARTICLE_MOMENTS_PER_ACT,
@@ -199,6 +213,7 @@ export function calculateParticleTransformPath(
   moments = PARTICLE_MOMENTS_PER_ACT,
 ): readonly ParticleTransformStep[] {
   const positions = sampleParticleHelix(address, moments)
+  const axisOffset = particleAxisOffset(address)
   const forces = new Map(
     calculateParticleForceMoments(address, moments)
       .map((force) => [force.moment, force] as const),
@@ -222,6 +237,7 @@ export function calculateParticleTransformPath(
           : "ADDRESS RESOLVED" as const,
       was,
       operator: "ROTATE AND RESOLVE" as const,
+      axisOffset,
       is: position,
       transfer,
       changeInTransfer: force?.changeInTransfer ?? { x: 0, y: 0, z: 0 },

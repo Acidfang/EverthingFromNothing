@@ -35,6 +35,7 @@ import {
   type ThoughtResolution,
 } from "./model/thought.ts"
 import type { ScenePoint } from "./model/scene.ts"
+import { deriveNestedGrain } from "./model/grain.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
 const PLAYBACK_SPEEDS = [
@@ -484,6 +485,8 @@ function ParticleTraceFrame({
     }
   })
   const selectedTransform = transformPaths.get(selectedFace)?.[selectedMoment - 1]
+  const nestedGrain = useMemo(() => deriveNestedGrain(selectedFace), [selectedFace])
+  const nestedMoment = nestedGrain.moments[selectedMoment - 1]
   const selectedForce = forceMoments[selectedMoment - 2]
   const forceValue = {
     outwardTransfer: selectedForce?.outwardTransfer ?? selectedTransform?.outwardTransfer ?? 0,
@@ -674,6 +677,7 @@ function ParticleTraceFrame({
               <span>{selectedTransform.phase}</span>
               <b>ROTATE + RESOLVE</b>
               <small>Δ {formatVector(selectedTransform.transfer)}</small>
+              <small>AXIS + {selectedTransform.axisOffset.symbol} {formatVector(selectedTransform.axisOffset.direction)}</small>
             </div>
             <div>
               <span>IS · {selectedTransform.id}</span>
@@ -688,6 +692,74 @@ function ParticleTraceFrame({
           </div>
         </div>
       ) : null}
+      <div className="nested-grain-inspector">
+        <div className="nested-grain-heading">
+          <div>
+            <span className="eyebrow">That ME · grain in grain</span>
+            <strong>Grain 0 → Grain {nestedGrain.childGrain}</strong>
+          </div>
+          <span>spiral begins · moment {nestedGrain.spiralStartsAt.moment}</span>
+        </div>
+        <div className="nested-grain-body">
+          <svg viewBox="0 0 180 140" role="img" aria-label={`Nested grain ${nestedGrain.childGrain} at moment ${selectedMoment}`}>
+            <rect width="180" height="140" />
+            {nestedMoment.states.map((state) => {
+              const displayOffset = {
+                x: state.axisOffset.direction.x * 0.08,
+                y: state.axisOffset.direction.y * 0.08,
+                z: state.axisOffset.direction.z * 0.08,
+              }
+              const axisOrigin = project(displayOffset)
+              const point = project({
+                x: state.localPosition.x + displayOffset.x,
+                y: state.localPosition.y + displayOffset.y,
+                z: state.localPosition.z + displayOffset.z,
+              })
+              return (
+                <g key={state.face}>
+                  <line x1={axisOrigin.x} y1={axisOrigin.y} x2={point.x} y2={point.y} />
+                  <circle className="nested-axis-origin" cx={axisOrigin.x} cy={axisOrigin.y} r="1.8" />
+                  <circle className="nested-emission" cx={point.x} cy={point.y} r="5" />
+                </g>
+              )
+            })}
+            <circle className="nested-me" cx="90" cy="70" r="7" />
+          </svg>
+          <div className="nested-grain-resolution">
+            <div className="nested-handoff">
+              <span>PARENT ME</span>
+              <strong>{selectedFace} @ grain 0</strong>
+              <b>→</b>
+              <span>CHILD ORIGIN</span>
+              <strong>0,0,0 @ grain {nestedGrain.childGrain}</strong>
+            </div>
+            <div className="nested-metrics">
+              <div><span>Moment</span><strong>{selectedMoment} / {PARTICLE_MOMENTS_PER_ACT}</strong></div>
+              <div><span>What it becomes</span><strong>{nestedMoment.states.length} child states</strong></div>
+              <div><span>What comes off</span><strong>{formatForce(nestedMoment.totalEmittedMagnitude)}</strong></div>
+              <div><span>Force created</span><strong>{formatForce(nestedMoment.totalCreatedForce)}</strong></div>
+            </div>
+            <ol>
+              {nestedMoment.states.map((state) => (
+                <li key={state.face}>
+                  <span>{state.face}</span>
+                  <code>OUT {formatVector(state.emittedTransfer)}</code>
+                  <strong>|Δ| {formatForce(state.emittedMagnitude)}</strong>
+                  <small>{state.axisOffset.symbol}</small>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+        <p>
+          The parent address is retained as the child grain origin. At each
+          selected moment, all six local transforms are embedded back into the
+          parent grain at scale 1/2, so the display shows both what the ME
+          becomes internally and the Difference it expresses outward as it goes.
+          Axis offsets are retained symbolically as ε = 0…01; their visible
+          separation is exaggerated only so they can be seen.
+        </p>
+      </div>
     </figure>
   )
 }

@@ -111,3 +111,19 @@ phases each preserve twelve transforms:
 The interface can select any of the six Face paths and any individual
 transform without reconstructing it from the final particle. The result is
 therefore an inspectable transformation history, not an endpoint-only trace.
+
+## Infinitesimal axis distinction
+
+The rotational axis is not identified with the cube origin. Each Face path
+retains a symbolic offset:
+
+```text
+axis origin = cube origin + epsilon U
+epsilon = 0...01
+```
+
+`U` is the locally derived perpendicular direction for that Face. Epsilon is
+not replaced with a floating-point approximation. It belongs to the first
+cube-to-axis handoff and remains constant along the path, so it cancels from
+later second differences. The renderer exaggerates the separation only to
+make the otherwise infinitesimal distinction visible.
