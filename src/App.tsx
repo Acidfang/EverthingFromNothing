@@ -1671,6 +1671,7 @@ const BREAKDOWN_LEVELS = ["EVERYTHING", "FIELD", "MEDIUM", "PARTICLE", "ATOM", "
 function EverythingBreakdown({
   frame,
   isPlaying,
+  resolutionPhase,
   onEnter,
   onOutward,
   onSelect,
@@ -1678,6 +1679,7 @@ function EverythingBreakdown({
 }: Readonly<{
   frame: ExplorerFrame
   isPlaying: boolean
+  resolutionPhase: number
   onEnter: () => void
   onOutward: () => void
   onSelect: (address: string) => void
@@ -1717,10 +1719,10 @@ function EverythingBreakdown({
     }
   }, [frame.wholeProjection.entries])
   const selected = frame.selected?.address ?? projection.visible[0]?.address ?? "0,0,0"
-  const discoveryMoment = frame.observer.act === 0
+  const discoveryMoment = resolutionPhase === 0
     ? null
     : INITIAL_SPIRAL_DISCOVERY.moments[
-      Math.min(frame.observer.act, ATOM_FIELD_MOMENT) - 1
+      Math.min(resolutionPhase, ATOM_FIELD_MOMENT) - 1
     ]
   const projectDiscovery = (point: Readonly<{ x: number; y: number; z: number }>) => ({
     x: 360 + (point.x - point.y) * 115,
@@ -1729,7 +1731,7 @@ function EverythingBreakdown({
   const causalRender = useMemo(() => {
     const activeMoments = INITIAL_SPIRAL_DISCOVERY.moments.slice(
       0,
-      Math.min(frame.observer.act, ATOM_FIELD_MOMENT),
+      Math.min(resolutionPhase, ATOM_FIELD_MOMENT),
     )
     const paths = activeMoments.flatMap((moment) =>
       moment.states.map((state) => state.standingWavePath.map(projectDiscovery)),
@@ -1746,9 +1748,9 @@ function EverythingBreakdown({
       visiblePaths,
       omittedPaths: paths.length - visiblePaths.length,
       radius: Math.min(210, radius),
-      closed: frame.observer.act >= ATOM_FIELD_MOMENT,
+      closed: resolutionPhase >= ATOM_FIELD_MOMENT,
     }
-  }, [frame.observer.act])
+  }, [resolutionPhase])
 
   return (
     <section className="everything-breakdown" aria-labelledby="everything-title">
@@ -1784,36 +1786,36 @@ function EverythingBreakdown({
           </div>
           <div className="everything-actions">
             <button type="button" onClick={onTogglePlay}>{isPlaying ? "PAUSE" : "PLAY"}</button>
-            <strong>MOMENT {frame.observer.act}</strong>
+            <strong>MOMENT {frame.observer.act} · RESOLUTION {resolutionPhase}/{ATOM_FIELD_MOMENT}</strong>
           </div>
         </div>
         <div className="spiral-discovery" aria-label="Detected spiral chronology">
-          <div className={frame.observer.act === 0 ? "current" : "resolved"}>
+          <div className={resolutionPhase === 0 ? "current" : "resolved"}>
             <span>FIRST DIFFERENCE · GRAIN {INITIAL_SPIRAL_DISCOVERY.initialState.grain} · MOMENT 0</span>
             <strong>NO SPIRAL → NO SPIRAL</strong>
             <small>Existence is already distinguished. NOTHING has no playable duration.</small>
           </div>
           <b>→</b>
-          <div className={frame.observer.act === 1 ? "current" : frame.observer.act > 1 ? "resolved" : ""}>
-            <span>MOMENT 1</span>
+          <div className={resolutionPhase === 1 ? "current" : resolutionPhase > 1 ? "resolved" : ""}>
+            <span>MOMENT {frame.observer.act} · RESOLUTION 1</span>
             <strong>MOVEMENT → NO DETECTED SPIRAL</strong>
             <small>One transfer cannot establish a turn.</small>
           </div>
           <b>→</b>
-          <div className={frame.observer.act === INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.moment ? "current" : ""}>
-            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.grain} · MOMENT {INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.moment}</span>
+          <div className={resolutionPhase === INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.moment ? "current" : ""}>
+            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.grain} · RESOLUTION {INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.moment}</span>
             <strong>FIRST SPIRAL</strong>
             <small>Successive transfers become non-collinear.</small>
           </div>
           <b>→</b>
-          <div className={frame.observer.act === INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment ? "current" : ""}>
-            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.grain} · MOMENT {INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment}</span>
+          <div className={resolutionPhase === INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment ? "current" : ""}>
+            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.grain} · RESOLUTION {INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment}</span>
             <strong>SPIRALING SPIRAL</strong>
             <small>The child turn is carried by the parent turn.</small>
           </div>
           <b>→</b>
           <div className={causalRender.closed ? "current" : ""}>
-            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.childGrain} · MOMENT {ATOM_FIELD_MOMENT}</span>
+            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.childGrain} · RESOLUTION {ATOM_FIELD_MOMENT}</span>
             <strong>CLOSED ATOM FIELD</strong>
             <small>The accumulated spiral has swept the complete rendered envelope.</small>
           </div>
@@ -1858,7 +1860,7 @@ function EverythingBreakdown({
               r={causalRender.radius}
             />
           ) : null}
-          <g className={`spiral-finding-stage moment-${frame.observer.act}`}>
+          <g className={`spiral-finding-stage moment-${resolutionPhase}`}>
             <circle className="first-difference-point" cx="360" cy="230" r="5" />
             {discoveryMoment ? (
               <>
@@ -1869,7 +1871,7 @@ function EverythingBreakdown({
                     ...discoveryMoment.carrierPath.map(projectDiscovery),
                   ].map((point) => `${point.x},${point.y}`).join(" ")}
                 />
-                {frame.observer.act >= INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment
+                {resolutionPhase >= INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment
                   ? causalRender.visiblePaths.map((path, index) => (
                     <polyline
                       key={`causal:${index}`}
@@ -1977,6 +1979,7 @@ export function App() {
   const [atNothingBoundary, setAtNothingBoundary] = useState(true)
   const [boundaryCycle, setBoundaryCycle] = useState(0)
   const [playbackSpeed, setPlaybackSpeed] = useState(120)
+  const [resolutionPhase, setResolutionPhase] = useState(0)
   const [pageExplanation, setPageExplanation] = useState<PageExplanation | null>(null)
   const [targetMoment, setTargetMoment] = useState(
     () => ATOM_FIELD_MOMENT,
@@ -1991,6 +1994,7 @@ export function App() {
     setIsPlaying(false)
     setAtNothingBoundary(true)
     setBoundaryCycle((cycle) => cycle + 1)
+    setResolutionPhase(0)
     setTargetMoment(ATOM_FIELD_MOMENT)
     explorer.current = new FirstActExplorer()
     update(explorer.current.frame())
@@ -2028,20 +2032,27 @@ export function App() {
 
   useEffect(() => {
     if (!isPlaying) return
-    if (frame.observer.act === targetMoment) {
+    if (frame.observer.act === 0) {
+      const firstDifference = window.setTimeout(resolve, playbackSpeed)
+      return () => window.clearTimeout(firstDifference)
+    }
+    if (resolutionPhase === targetMoment) {
       setIsPlaying(false)
       return
     }
-    const advance = frame.observer.act < targetMoment ? resolve : was
-    const timer = window.setTimeout(advance, playbackSpeed)
+    const direction = resolutionPhase < targetMoment ? 1 : -1
+    const timer = window.setTimeout(
+      () => setResolutionPhase((phase) => phase + direction),
+      playbackSpeed,
+    )
     return () => window.clearTimeout(timer)
   }, [
     frame.observer.act,
     isPlaying,
     playbackSpeed,
     resolve,
+    resolutionPhase,
     targetMoment,
-    was,
   ])
 
   useEffect(() => {
@@ -2050,8 +2061,13 @@ export function App() {
       if (event.code === "Space") {
         event.preventDefault()
         setIsPlaying(false)
-        if (event.shiftKey) was()
-        else resolve()
+        if (event.shiftKey) {
+          setResolutionPhase((phase) => Math.max(0, phase - 1))
+        } else if (frame.observer.act === 0) {
+          resolve()
+        } else {
+          setResolutionPhase((phase) => Math.min(ATOM_FIELD_MOMENT, phase + 1))
+        }
       } else if (event.key === "[") {
         setDepth(Math.max(0, frame.observer.queryDepth - 1))
       } else if (event.key === "]") {
@@ -2060,7 +2076,7 @@ export function App() {
     }
     window.addEventListener("keydown", handleKey)
     return () => window.removeEventListener("keydown", handleKey)
-  }, [frame.observer.queryDepth, resolve, setDepth, was])
+  }, [frame.observer.act, frame.observer.queryDepth, resolve, setDepth])
 
   const explainClick = useCallback((event: ReactMouseEvent<HTMLElement>) => {
     const origin = event.target
@@ -2128,7 +2144,7 @@ export function App() {
             className={`play-action ${isPlaying ? "playing" : ""}`}
             type="button"
             onClick={() => {
-              if (frame.observer.act === targetMoment && targetMoment > 0) {
+              if (resolutionPhase === targetMoment && targetMoment > 0) {
                 resetPlayback()
                 setIsPlaying(true)
                 return
@@ -2136,31 +2152,32 @@ export function App() {
               setIsPlaying((playing) => !playing)
             }}
             aria-pressed={isPlaying}
-            disabled={frame.observer.act === 0 && targetMoment === 0}
+            disabled={resolutionPhase === 0 && targetMoment === 0}
           >
             <span aria-hidden="true">{isPlaying ? "Ⅱ" : "▶"}</span>
             <span>
               {isPlaying
                 ? "Pause formation"
-                : frame.observer.act === targetMoment
-                  ? `Replay to ${targetMoment}`
-                  : `Play to ${targetMoment}`}
+                : resolutionPhase === targetMoment
+                  ? `Replay resolution ${targetMoment}`
+                  : `Resolve to ${targetMoment}`}
             </span>
           </button>
           <label className="moment-control">
-            <span>Target moment</span>
+            <span>Resolution phase</span>
             <input
               type="number"
               min="0"
+              max={ATOM_FIELD_MOMENT}
               step="1"
               value={targetMoment}
               onChange={(event) => {
                 const requested = Number(event.target.value)
                 if (!Number.isSafeInteger(requested) || requested < 0) return
                 setIsPlaying(false)
-                setTargetMoment(requested)
+                setTargetMoment(Math.min(requested, ATOM_FIELD_MOMENT))
               }}
-              aria-label="Target moment"
+              aria-label="Resolution phase"
             />
           </label>
           <label className="speed-control">
@@ -2182,10 +2199,11 @@ export function App() {
             type="button"
             onClick={() => {
               setIsPlaying(false)
-              resolve()
+              if (frame.observer.act === 0) resolve()
+              else setResolutionPhase((phase) => Math.min(ATOM_FIELD_MOMENT, phase + 1))
             }}
           >
-            <span>One tick</span>
+            <span>One resolution</span>
             <kbd>Space</kbd>
           </button>
           <button className="reset-action" type="button" onClick={resetPlayback}>
@@ -2197,6 +2215,7 @@ export function App() {
       <EverythingBreakdown
         frame={frame}
         isPlaying={isPlaying}
+        resolutionPhase={resolutionPhase}
         onEnter={enter}
         onOutward={outward}
         onSelect={selectRelation}
