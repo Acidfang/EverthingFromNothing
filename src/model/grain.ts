@@ -40,6 +40,8 @@ export type NestedGrainResolution = Readonly<{
   initialState: Readonly<{
     grain: number
     moment: 0
+    origin: "FIRST DIFFERENCE"
+    nothingHasDuration: false
     carrier: "NO SPIRAL"
     child: "NO SPIRAL"
   }>
@@ -177,6 +179,8 @@ export function deriveNestedGrain(
     initialState: Object.freeze({
       grain: parentGrain,
       moment: 0 as const,
+      origin: "FIRST DIFFERENCE" as const,
+      nothingHasDuration: false as const,
       carrier: "NO SPIRAL" as const,
       child: "NO SPIRAL" as const,
     }),

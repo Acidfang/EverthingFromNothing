@@ -14,6 +14,8 @@ test("a resolved ME becomes the next child-grain origin", () => {
   assert.deepEqual(nested.initialState, {
     grain: 0,
     moment: 0,
+    origin: "FIRST DIFFERENCE",
+    nothingHasDuration: false,
     carrier: "NO SPIRAL",
     child: "NO SPIRAL",
   })

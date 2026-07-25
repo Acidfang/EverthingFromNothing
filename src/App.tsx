@@ -1756,9 +1756,9 @@ function EverythingBreakdown({
         </div>
         <div className="spiral-discovery" aria-label="Detected spiral chronology">
           <div className={frame.observer.act === 0 ? "current" : "resolved"}>
-            <span>START · GRAIN {INITIAL_SPIRAL_DISCOVERY.initialState.grain} · MOMENT 0</span>
+            <span>FIRST DIFFERENCE · GRAIN {INITIAL_SPIRAL_DISCOVERY.initialState.grain} · MOMENT 0</span>
             <strong>NO SPIRAL → NO SPIRAL</strong>
-            <small>No turn exists on either plane.</small>
+            <small>Existence is already distinguished. NOTHING has no playable duration.</small>
           </div>
           <b>→</b>
           <div className={frame.observer.act === 1 ? "current" : frame.observer.act > 1 ? "resolved" : ""}>
@@ -1878,7 +1878,7 @@ function EverythingBreakdown({
           </p>
         </section>
         <div className="breakdown-route">
-          <span>CAME FROM<strong>{levelIndex === 0 ? "NOTHING" : BREAKDOWN_LEVELS[levelIndex - 1]}</strong></span>
+          <span>CAME FROM<strong>{levelIndex === 0 ? "FIRST DIFFERENCE" : BREAKDOWN_LEVELS[levelIndex - 1]}</strong></span>
           <b>→</b>
           <span>IS<strong>{level}</strong></span>
           <b>→</b>
