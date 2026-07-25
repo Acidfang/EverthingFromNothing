@@ -147,3 +147,22 @@ out(s,t) + return(s,t) = 2 A(s) cos(2 pi s) cos(2 pi t)
 The standing nodes remain fixed relative to the moving parent carrier while
 the amplitude changes through the Act. The renderer therefore shows a spiral
 resolving inside a spiral, rather than two unrelated rotations.
+
+## Recursive grain playback
+
+The modeller treats a spiral as a completed transform path, not as an isolated
+shape. At grain `g`, playback begins when the parent state has resolved enough
+to hand the same act inward:
+
+`G(g + 1) complete -> G(g) starts`
+
+The grain stops after its 36th moment, when its own spiral is complete. That
+completion is simultaneously the condition that allows the next inward grain:
+
+`G(g) @ 36 -> G(g - 1) @ 1`
+
+An animation may omit grain images to keep a long recursive descent watchable.
+If the skip is `s`, displayed frames are separated by `s + 1` grains. This is
+only a rendering choice: every intermediate handoff remains in the causal
+count, the final requested grain is always rendered, and its `CAME FROM` value
+still names the immediately preceding causal grain.
