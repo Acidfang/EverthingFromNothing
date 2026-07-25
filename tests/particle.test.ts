@@ -1,7 +1,12 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { deriveFirstActParticle } from "../src/model/particle.ts"
+import {
+  PARTICLE_MOMENTS_PER_ACT,
+  calculateParticleForceMoments,
+  deriveFirstActParticle,
+  sampleParticleHelix,
+} from "../src/model/particle.ts"
 
 test("one First Act produces the complete six-Face model particle", () => {
   const particle = deriveFirstActParticle()
@@ -35,5 +40,34 @@ test("no single Face observer contains the complete particle", () => {
   for (const view of particle.observerViews.values()) {
     assert.equal(view.length, 5)
     assert.notDeepEqual(view, particle.particleAddresses)
+  }
+})
+
+test("the drawn helix and force calculation share the same 36 moments", () => {
+  const samples = sampleParticleHelix("1,0,0")
+  const forces = calculateParticleForceMoments("1,0,0")
+  assert.equal(samples.length, PARTICLE_MOMENTS_PER_ACT + 1)
+  assert.equal(forces.length, PARTICLE_MOMENTS_PER_ACT - 1)
+  assert.deepEqual(samples[0], { x: 0, y: 0, z: 0 })
+  assert.ok(Math.abs(samples.at(-1)!.x - 1) < 1e-12)
+  assert.ok(Math.abs(samples.at(-1)!.y) < 1e-12)
+  assert.ok(Math.abs(samples.at(-1)!.z) < 1e-12)
+  for (const force of forces) {
+    assert.ok(Number.isFinite(force.resultantForce))
+    assert.ok(Math.abs(force.outwardTransfer - 1 / PARTICLE_MOMENTS_PER_ACT) < 1e-12)
+    assert.ok(Math.abs(force.axialForce) < 1e-12)
+    assert.ok(Math.abs(force.sixFaceResultant - force.resultantForce * 6) < 1e-12)
+  }
+})
+
+test("all six Faces generate equal force magnitudes at every moment", () => {
+  const particle = deriveFirstActParticle()
+  const signatures = particle.causalTraces.map((trace) =>
+    calculateParticleForceMoments(trace.to).map((force) =>
+      force.resultantForce.toFixed(12),
+    ),
+  )
+  for (const signature of signatures.slice(1)) {
+    assert.deepEqual(signature, signatures[0])
   }
 })

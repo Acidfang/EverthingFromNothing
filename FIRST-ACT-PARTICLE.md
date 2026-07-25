@@ -56,3 +56,33 @@ particle =
 The later `5 -> 1 -> 5` model atom is a chronological closure. The particle is
 the complete spatial presentation at a moment; the atom is the recurring
 resolution that reforms a particle-equivalent presentation through time.
+
+## Between-moment force calculation
+
+The rendered transport path and calculator use one shared normalized helix.
+One Face distance is `1`, one Act contains one rotation, the maximum spiral
+radius is `1/6`, and the display resolves the Act into `36 = 6 x 6`
+calculation moments:
+
+```text
+p(t) = tA + (1/6)sin(pi t)[U cos(2 pi t) + V sin(2 pi t)]
+```
+
+`A` is the selected Face axis. `U` and `V` are perpendicular unit directions
+around that axis. At each finite moment:
+
+```text
+transfer[n]          = p[n] - p[n-1]
+changeInTransfer[n]  = transfer[n] - transfer[n-1]
+resultant[n]         = |changeInTransfer[n]|
+sixFaceResultant[n]  = 6 x resultant[n]
+```
+
+The change vector is projected onto the local axis, inward radial direction,
+and rotational tangent. The model therefore exposes outward transfer, inward
+turning, rotational change, axial change, the per-Face resultant, and the
+simultaneous six-Face total at every intermediate moment.
+
+These values are dimensionless model-force components. They are not SI forces:
+the derivation introduces neither measured mass nor an external physical
+constant.

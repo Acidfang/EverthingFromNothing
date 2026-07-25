@@ -21,8 +21,12 @@ import { generateLineageLevel, lineageCount } from "./model/lineage.ts"
 import { analysePotential } from "./model/potential.ts"
 import { searchAtomInvariants } from "./model/atom-search.ts"
 import {
+  PARTICLE_MOMENTS_PER_ACT,
+  PARTICLE_ROTATIONS_PER_ACT,
   deriveFirstActParticle,
+  sampleParticleHelix,
   type ParticleCausalTrace,
+  type ParticleForceMoment,
 } from "./model/particle.ts"
 import {
   emptyThoughtState,
@@ -424,58 +428,43 @@ function MotifFrame({
 
 function ParticleTraceFrame({
   traces,
+  forceMoments,
   isPlaying,
 }: Readonly<{
   traces: readonly ParticleCausalTrace[]
+  forceMoments: readonly ParticleForceMoment[]
   isPlaying: boolean
 }>) {
+  const [selectedMoment, setSelectedMoment] = useState(2)
+  const [isForcePlaying, setIsForcePlaying] = useState(false)
+  useEffect(() => {
+    if (!isForcePlaying) return
+    if (selectedMoment >= PARTICLE_MOMENTS_PER_ACT) {
+      setIsForcePlaying(false)
+      return
+    }
+    const timer = window.setTimeout(
+      () => setSelectedMoment((moment) => moment + 1),
+      110,
+    )
+    return () => window.clearTimeout(timer)
+  }, [isForcePlaying, selectedMoment])
   const centre = { x: 90, y: 70 }
   const project = ({ x, y, z }: Readonly<{ x: number; y: number; z: number }>) => ({
     x: 90 + (x - y) * 28,
     y: 70 + (x + y) * 14 - z * 26,
   })
   const paths = traces.map((trace) => {
-    const axis = fromKey(trace.to)
-    const reference = Math.abs(axis.z) < 0.9
-      ? { x: 0, y: 0, z: 1 }
-      : { x: 0, y: 1, z: 0 }
-    const perpendicular = {
-      x: axis.y * reference.z - axis.z * reference.y,
-      y: axis.z * reference.x - axis.x * reference.z,
-      z: axis.x * reference.y - axis.y * reference.x,
-    }
-    const perpendicularLength = Math.hypot(
-      perpendicular.x,
-      perpendicular.y,
-      perpendicular.z,
-    )
-    const u = {
-      x: perpendicular.x / perpendicularLength,
-      y: perpendicular.y / perpendicularLength,
-      z: perpendicular.z / perpendicularLength,
-    }
-    const v = {
-      x: axis.y * u.z - axis.z * u.y,
-      y: axis.z * u.x - axis.x * u.z,
-      z: axis.x * u.y - axis.y * u.x,
-    }
-    const helix = Array.from({ length: 37 }, (_, step) => {
-      const progress = step / 36
-      const radius = 0.22 * Math.sin(Math.PI * progress)
-      const angle = Math.PI * 2 * 1.25 * progress
-      return project({
-        x: axis.x * progress + radius * (u.x * Math.cos(angle) + v.x * Math.sin(angle)),
-        y: axis.y * progress + radius * (u.y * Math.cos(angle) + v.y * Math.sin(angle)),
-        z: axis.z * progress + radius * (u.z * Math.cos(angle) + v.z * Math.sin(angle)),
-      })
-    })
-    const endpoint = project(axis)
+    const helix = sampleParticleHelix(trace.to).map(project)
+    const endpoint = helix[helix.length - 1]
+    const momentsPerStage = PARTICLE_MOMENTS_PER_ACT / trace.subcauses.length
     return {
       ...trace,
       ...endpoint,
+      selectedPoint: helix[selectedMoment],
       stages: trace.subcauses.map((label, index) => {
-        const endIndex = (index + 1) * 12
-        const startIndex = index * 12
+        const endIndex = (index + 1) * momentsPerStage
+        const startIndex = index * momentsPerStage
         return {
           label,
           x: helix[endIndex].x,
@@ -488,8 +477,10 @@ function ParticleTraceFrame({
       }),
     }
   })
+  const selectedForce = forceMoments[selectedMoment - 2]
+  const formatForce = (value: number) => value.toExponential(4)
   return (
-    <figure className={`particle-trace-frame ${isPlaying ? "is-playing" : ""}`}>
+    <figure className={`particle-trace-frame ${isPlaying || isForcePlaying ? "is-playing" : ""}`}>
       <figcaption>WHAT ALLOWED THE PARTICLE TO BE</figcaption>
       <svg viewBox="0 0 180 140" role="img" aria-label="Six causal traces from the First Difference to the complete particle">
         <defs>
@@ -530,6 +521,12 @@ function ParticleTraceFrame({
               )
             })}
             <circle className="allowed-address" cx={trace.x} cy={trace.y} r="6" />
+            <circle
+              className="force-moment-marker"
+              cx={trace.selectedPoint.x}
+              cy={trace.selectedPoint.y}
+              r="3.2"
+            />
           </g>
         ))}
         <circle className="first-difference-node" cx={centre.x} cy={centre.y} r="7" />
@@ -548,6 +545,72 @@ function ParticleTraceFrame({
           </li>
         ))}
       </ol>
+      <div className="force-moment-calculator">
+        <div className="force-calculator-heading">
+          <div>
+            <span className="eyebrow">Between-moment calculation</span>
+            <strong>Moment {selectedMoment} / {PARTICLE_MOMENTS_PER_ACT}</strong>
+          </div>
+          <div className="force-step-actions">
+            <button
+              type="button"
+              aria-label="Previous force moment"
+              disabled={selectedMoment <= 2}
+              onClick={() => {
+                setIsForcePlaying(false)
+                setSelectedMoment((moment) => Math.max(2, moment - 1))
+              }}
+            >−</button>
+            <button
+              type="button"
+              onClick={() => {
+                if (selectedMoment >= PARTICLE_MOMENTS_PER_ACT) setSelectedMoment(2)
+                setIsForcePlaying((playing) => !playing)
+              }}
+            >
+              {isForcePlaying ? "Pause forces" : "Play forces"}
+            </button>
+            <button
+              type="button"
+              aria-label="Next force moment"
+              disabled={selectedMoment >= PARTICLE_MOMENTS_PER_ACT}
+              onClick={() => {
+                setIsForcePlaying(false)
+                setSelectedMoment((moment) => Math.min(PARTICLE_MOMENTS_PER_ACT, moment + 1))
+              }}
+            >+</button>
+          </div>
+        </div>
+        <input
+          aria-label="Particle force moment"
+          type="range"
+          min="2"
+          max={PARTICLE_MOMENTS_PER_ACT}
+          value={selectedMoment}
+          onChange={(event) => {
+            setIsForcePlaying(false)
+            setSelectedMoment(Number(event.target.value))
+          }}
+        />
+        <div className="force-equation">
+          <code>Δp = pₙ − pₙ₋₁</code>
+          <code>Δ²p = Δpₙ − Δpₙ₋₁</code>
+          <span>{PARTICLE_ROTATIONS_PER_ACT} rotation · 6 faces · normalized</span>
+        </div>
+        <dl>
+          <div><dt>Outward transfer</dt><dd>{formatForce(selectedForce.outwardTransfer)}</dd></div>
+          <div><dt>Inward turning</dt><dd>{formatForce(selectedForce.inwardTurningForce)}</dd></div>
+          <div><dt>Rotational</dt><dd>{formatForce(selectedForce.rotationalForce)}</dd></div>
+          <div><dt>Axial change</dt><dd>{formatForce(selectedForce.axialForce)}</dd></div>
+          <div><dt>Resultant / Face</dt><dd>{formatForce(selectedForce.resultantForce)}</dd></div>
+          <div><dt>Six-Face total</dt><dd>{formatForce(selectedForce.sixFaceResultant)}</dd></div>
+        </dl>
+        <p>
+          These are dimensionless resolution-force components generated by the
+          difference between consecutive model moments. They are not SI-force
+          claims; no mass or measured constant has been introduced.
+        </p>
+      </div>
     </figure>
   )
 }
@@ -572,7 +635,11 @@ function FirstActParticleResolution({ isPlaying }: Readonly<{ isPlaying: boolean
         </div>
         <MotifFrame addresses={particle.particleAddresses} label="SIX-FACE FIELD" />
       </div>
-      <ParticleTraceFrame traces={particle.causalTraces} isPlaying={isPlaying} />
+      <ParticleTraceFrame
+        traces={particle.causalTraces}
+        forceMoments={particle.forceMoments}
+        isPlaying={isPlaying}
+      />
       <div className="particle-observer-heading">
         <div>
           <span className="eyebrow">What each ME receives</span>

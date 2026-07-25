@@ -355,6 +355,10 @@ kbd {
 .particle-trace-frame .first-difference-node {
   fill: var(--selected); stroke: #ffe0a6; stroke-width: 1.3;
 }
+.particle-trace-frame .force-moment-marker {
+  fill: #fff6dc; stroke: var(--selected); stroke-width: 1.2;
+  filter: drop-shadow(0 0 3px rgba(255, 224, 166, .8));
+}
 .particle-trace-frame.is-playing .causal-trace {
   stroke-dasharray: 5 4; animation: trace-flow .7s linear infinite;
   animation-delay: calc((var(--trace-index) * 70ms) + (var(--sub-trace-index, 0) * 90ms));
@@ -380,6 +384,50 @@ kbd {
 }
 .particle-trace-frame li b { color: var(--selected); }
 .particle-trace-frame li strong { color: var(--generated); font-weight: 500; }
+.force-moment-calculator {
+  grid-column: 1 / -1; padding: 10px; border-top: 1px solid var(--line-soft);
+  background: rgba(12, 18, 19, .7);
+}
+.force-calculator-heading {
+  display: flex; align-items: end; justify-content: space-between; gap: 12px;
+}
+.force-calculator-heading strong {
+  display: block; margin-top: 5px; color: var(--selected);
+  font: 12px/1 ui-monospace, monospace;
+}
+.force-step-actions { display: flex; align-items: center; gap: 5px; }
+.force-calculator-heading button {
+  padding: 6px 10px; border: 1px solid rgba(229, 173, 86, .35);
+  color: var(--selected); background: transparent; font: 8px/1 ui-monospace, monospace;
+}
+.force-calculator-heading button:disabled { opacity: .32; }
+.force-moment-calculator > input { width: 100%; margin: 10px 0 8px; accent-color: var(--selected); }
+.force-equation {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 7px 12px; margin-bottom: 8px;
+}
+.force-equation code {
+  padding: 5px 7px; border: 1px solid var(--line-soft); color: #d6dedd;
+  font: 8px/1 ui-monospace, monospace;
+}
+.force-equation span {
+  margin-left: auto; color: var(--muted); font: 7px/1 ui-monospace, monospace;
+}
+.force-moment-calculator dl {
+  display: grid; grid-template-columns: repeat(6, 1fr); margin: 0;
+  border: 1px solid var(--line-soft);
+}
+.force-moment-calculator dl > div { min-width: 0; padding: 8px; border-right: 1px solid var(--line-soft); }
+.force-moment-calculator dl > div:last-child { border-right: 0; }
+.force-moment-calculator dt {
+  color: var(--muted); font: 7px/1.2 ui-monospace, monospace; text-transform: uppercase;
+}
+.force-moment-calculator dd {
+  margin: 6px 0 0; overflow-wrap: anywhere; color: var(--generated);
+  font: 9px/1 ui-monospace, monospace;
+}
+.force-moment-calculator p {
+  margin: 8px 0 0; color: #798381; font: 8px/1.45 ui-monospace, monospace;
+}
 .particle-observer-heading {
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 7px;
 }
@@ -813,6 +861,9 @@ footer a { color: var(--muted); }
   .particle-act { grid-template-columns: 1fr; }
   .particle-trace-frame { grid-template-columns: 1fr; }
   .particle-trace-frame svg { grid-row: auto; }
+  .force-moment-calculator dl { grid-template-columns: repeat(2, 1fr); }
+  .force-moment-calculator dl > div { border-bottom: 1px solid var(--line-soft); }
+  .force-equation span { width: 100%; margin-left: 0; }
   .particle-observer-heading { grid-template-columns: 1fr; }
   .particle-views { grid-template-columns: repeat(2, 1fr); }
   .particle-merge { grid-template-columns: 1fr; justify-items: stretch; text-align: center; }
