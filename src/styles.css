@@ -677,7 +677,7 @@ kbd {
   margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
 }
 .spiral-discovery {
-  display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr;
   align-items: stretch; gap: 7px; margin-top: 18px;
 }
 .spiral-discovery > div {
@@ -725,6 +725,15 @@ kbd {
   background: #000; cursor: none;
 }
 .spiral-finding-stage { pointer-events: none; }
+.atom-field-envelope {
+  fill: rgba(105,213,206,.025); stroke: rgba(105,213,206,.3);
+  stroke-width: 1; stroke-dasharray: 3 7; pointer-events: none;
+}
+.atom-field-envelope.closed {
+  fill: rgba(105,213,206,.075); stroke: rgba(186,241,237,.8);
+  stroke-width: 1.5; stroke-dasharray: none;
+  filter: drop-shadow(0 0 12px rgba(105,213,206,.38));
+}
 .first-difference-point {
   fill: var(--selected); stroke: #ffe0ac; stroke-width: 1;
   filter: drop-shadow(0 0 8px rgba(234,178,101,.65));

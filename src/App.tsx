@@ -41,11 +41,12 @@ import { buildGrainPlayback, GRAIN_PLAYBACK_MOMENTS } from "./model/grain-playba
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
 const PLAYBACK_SPEEDS = [
-  { label: "0.5×", milliseconds: 1400 },
-  { label: "1×", milliseconds: 700 },
-  { label: "2×", milliseconds: 350 },
+  { label: "0.5×", milliseconds: 240 },
+  { label: "1×", milliseconds: 120 },
+  { label: "2×", milliseconds: 60 },
 ] as const
 const INITIAL_SPIRAL_DISCOVERY = deriveNestedGrain("1,0,0", 0)
+const ATOM_FIELD_MOMENT = INITIAL_SPIRAL_DISCOVERY.moments.length
 
 type ProjectedPoint = Readonly<{
   point: ScenePoint
@@ -1719,15 +1720,35 @@ function EverythingBreakdown({
   const discoveryMoment = frame.observer.act === 0
     ? null
     : INITIAL_SPIRAL_DISCOVERY.moments[
-      Math.min(
-        frame.observer.act,
-        INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment,
-      ) - 1
+      Math.min(frame.observer.act, ATOM_FIELD_MOMENT) - 1
     ]
   const projectDiscovery = (point: Readonly<{ x: number; y: number; z: number }>) => ({
     x: 360 + (point.x - point.y) * 115,
     y: 230 + (point.x + point.y) * 55 - point.z * 95,
   })
+  const causalRender = useMemo(() => {
+    const activeMoments = INITIAL_SPIRAL_DISCOVERY.moments.slice(
+      0,
+      Math.min(frame.observer.act, ATOM_FIELD_MOMENT),
+    )
+    const paths = activeMoments.flatMap((moment) =>
+      moment.states.map((state) => state.standingWavePath.map(projectDiscovery)),
+    )
+    const inViewport = (point: Readonly<{ x: number; y: number }>) =>
+      point.x >= 0 && point.x <= 720 && point.y >= 0 && point.y <= 460
+    const visiblePaths = paths.filter((path) => path.some(inViewport))
+    const visiblePoints = visiblePaths.flatMap((path) => path.filter(inViewport))
+    const radius = visiblePoints.reduce(
+      (largest, point) => Math.max(largest, Math.hypot(point.x - 360, point.y - 230)),
+      0,
+    )
+    return {
+      visiblePaths,
+      omittedPaths: paths.length - visiblePaths.length,
+      radius: Math.min(210, radius),
+      closed: frame.observer.act >= ATOM_FIELD_MOMENT,
+    }
+  }, [frame.observer.act])
 
   return (
     <section className="everything-breakdown" aria-labelledby="everything-title">
@@ -1790,6 +1811,12 @@ function EverythingBreakdown({
             <strong>SPIRALING SPIRAL</strong>
             <small>The child turn is carried by the parent turn.</small>
           </div>
+          <b>→</b>
+          <div className={causalRender.closed ? "current" : ""}>
+            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.childGrain} · MOMENT {ATOM_FIELD_MOMENT}</span>
+            <strong>CLOSED ATOM FIELD</strong>
+            <small>The accumulated spiral has swept the complete rendered envelope.</small>
+          </div>
         </div>
         <div className="all-levels-map" aria-label="All recursive levels shown together">
           {BREAKDOWN_LEVELS.map((item, index) => {
@@ -1823,6 +1850,14 @@ function EverythingBreakdown({
           <circle className="field-aura" cx="360" cy="230" r="210" />
           <circle className="field-orbit" cx="360" cy="230" r="150" />
           <circle className="field-orbit inner" cx="360" cy="230" r="82" />
+          {causalRender.radius > 0 ? (
+            <circle
+              className={`atom-field-envelope ${causalRender.closed ? "closed" : ""}`}
+              cx="360"
+              cy="230"
+              r={causalRender.radius}
+            />
+          ) : null}
           <g className={`spiral-finding-stage moment-${frame.observer.act}`}>
             <circle className="first-difference-point" cx="360" cy="230" r="5" />
             {discoveryMoment ? (
@@ -1835,12 +1870,11 @@ function EverythingBreakdown({
                   ].map((point) => `${point.x},${point.y}`).join(" ")}
                 />
                 {frame.observer.act >= INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment
-                  ? discoveryMoment.states.map((state) => (
+                  ? causalRender.visiblePaths.map((path, index) => (
                     <polyline
-                      key={state.face}
+                      key={`causal:${index}`}
                       className="detected-child-spiral"
-                      points={state.standingWavePath
-                        .map(projectDiscovery)
+                      points={path
                         .map((point) => `${point.x},${point.y}`)
                         .join(" ")}
                     />
@@ -1878,7 +1912,10 @@ function EverythingBreakdown({
         </svg>
         <div className="observer-resolution">
           <div><span>VISIBLE AT THIS GRAIN</span><strong>{projection.visible.length} calculated</strong></div>
-          <div><span>BELOW ONE PIXEL</span><strong>{projection.hidden} not rendered</strong></div>
+          <div>
+            <span>OUTSIDE / BELOW PIXEL</span>
+            <strong>{projection.hidden + causalRender.omittedPaths} not rendered</strong>
+          </div>
           <label>
             <span>OUT</span>
             <input
@@ -1939,10 +1976,10 @@ export function App() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [atNothingBoundary, setAtNothingBoundary] = useState(true)
   const [boundaryCycle, setBoundaryCycle] = useState(0)
-  const [playbackSpeed, setPlaybackSpeed] = useState(700)
+  const [playbackSpeed, setPlaybackSpeed] = useState(120)
   const [pageExplanation, setPageExplanation] = useState<PageExplanation | null>(null)
   const [targetMoment, setTargetMoment] = useState(
-    () => INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment,
+    () => ATOM_FIELD_MOMENT,
   )
 
   const update = useCallback((next: ExplorerFrame) => setFrame(next), [])
@@ -1954,7 +1991,7 @@ export function App() {
     setIsPlaying(false)
     setAtNothingBoundary(true)
     setBoundaryCycle((cycle) => cycle + 1)
-    setTargetMoment(INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment)
+    setTargetMoment(ATOM_FIELD_MOMENT)
     explorer.current = new FirstActExplorer()
     update(explorer.current.frame())
   }, [update])
