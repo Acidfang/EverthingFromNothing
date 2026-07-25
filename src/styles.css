@@ -672,6 +672,30 @@ kbd {
   font: 8px/1 ui-monospace, monospace;
 }
 .everything-canvas > svg { display: block; width: 100%; height: min(58vh,540px); margin-top: 8px; }
+.all-levels-map {
+  position: relative; display: grid; grid-template-columns: repeat(6,1fr);
+  margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.all-levels-map::before {
+  content: ""; position: absolute; left: 8%; right: 8%; top: 42px;
+  height: 1px; background: rgba(105,213,206,.18);
+}
+.all-levels-map button {
+  position: relative; z-index: 1; display: grid; justify-items: center;
+  gap: 2px; padding: 8px 4px 10px; border: 0; border-right: 1px solid var(--line-soft);
+  background: #080b0c; color: #697371;
+}
+.all-levels-map button:last-child { border-right: 0; }
+.all-levels-map button svg { width: 64px; height: 64px; }
+.all-levels-map .level-boundary { fill: #080b0c; stroke: rgba(105,213,206,.15); }
+.all-levels-map .level-field { fill: rgba(105,213,206,.025); stroke: rgba(105,213,206,.42); }
+.all-levels-map .level-me { fill: var(--selected); }
+.all-levels-map path { fill: none; stroke: rgba(234,178,101,.62); stroke-width: 1.2; }
+.all-levels-map button span { font: 7px/1 ui-monospace,monospace; letter-spacing: .05em; }
+.all-levels-map button small { color: #4f5957; font: 6px/1 ui-monospace,monospace; }
+.all-levels-map button.selected { color: var(--generated); background: rgba(105,213,206,.045); }
+.all-levels-map button.selected svg { filter: drop-shadow(0 0 8px rgba(105,213,206,.18)); }
+.everything-canvas > svg { height: min(42vh,410px); }
 .field-aura { fill: url(#field-fade); }
 .field-orbit { fill: none; stroke: rgba(105,213,206,.12); stroke-width: 1; stroke-dasharray: 2 8; }
 .field-orbit.inner { stroke: rgba(234,178,101,.18); stroke-dasharray: 1 5; }
@@ -1099,6 +1123,7 @@ footer a { color: var(--muted); }
   .breakdown-rail li { min-width: 108px; }
   .everything-canvas { padding: 20px 16px; }
   .everything-canvas > svg { height: 48vh; }
+  .all-levels-map { grid-template-columns: repeat(6,104px); overflow-x: auto; }
   .how-it-is { border-left: 0; border-top: 1px solid var(--line); padding: 20px 16px; }
   .observer-resolution { grid-template-columns: 1fr 1fr; }
   .observer-resolution label { grid-column: 1 / -1; }

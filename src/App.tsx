@@ -1750,6 +1750,28 @@ function EverythingBreakdown({
             <strong>MOMENT {frame.observer.act}</strong>
           </div>
         </div>
+        <div className="all-levels-map" aria-label="All recursive levels shown together">
+          {BREAKDOWN_LEVELS.map((item, index) => {
+            const radius = Math.max(8, 31 - index * 4)
+            return (
+              <button
+                type="button"
+                key={item}
+                className={index === levelIndex ? "selected" : ""}
+                aria-label={`${item}, grain ${-index}, shown in the complete sequence`}
+              >
+                <svg viewBox="0 0 74 74" aria-hidden="true">
+                  <circle cx="37" cy="37" r={radius + 8} className="level-boundary" />
+                  <circle cx="37" cy="37" r={radius} className="level-field" />
+                  <circle cx="37" cy="37" r="3" className="level-me" />
+                  <path d={`M37 ${37 - radius} A${radius} ${radius} 0 0 1 ${37 + radius} 37`} />
+                </svg>
+                <span>{item}</span>
+                <small>grain {-index}</small>
+              </button>
+            )
+          })}
+        </div>
         <svg viewBox="0 0 720 460" role="img" aria-label={`${level} field with ${projection.visible.length} visible relations`}>
           <defs>
             <radialGradient id="field-fade">
