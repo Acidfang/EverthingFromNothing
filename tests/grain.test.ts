@@ -11,7 +11,16 @@ test("a resolved ME becomes the next child-grain origin", () => {
   assert.equal(nested.parentGrain, 0)
   assert.equal(nested.childGrain, -1)
   assert.equal(nested.childScale, CHILD_GRAIN_SCALE)
-  assert.deepEqual(nested.spiralStartsAt, { grain: -1, moment: 1 })
+  assert.deepEqual(nested.initialState, {
+    grain: 0,
+    moment: 0,
+    origin: "FIRST DIFFERENCE",
+    nothingHasDuration: false,
+    carrier: "NO SPIRAL",
+    child: "NO SPIRAL",
+  })
+  assert.deepEqual(nested.spiralStartsAt, { grain: 0, moment: 2 })
+  assert.deepEqual(nested.spiralingSpiralStartsAt, { grain: -1, moment: 2 })
   assert.equal(nested.moments.length, 36)
   assert.equal(nested.moments[0].states.length, 6)
 })

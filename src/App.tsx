@@ -45,6 +45,7 @@ const PLAYBACK_SPEEDS = [
   { label: "1×", milliseconds: 700 },
   { label: "2×", milliseconds: 350 },
 ] as const
+const INITIAL_SPIRAL_DISCOVERY = deriveNestedGrain("1,0,0", 0)
 
 type ProjectedPoint = Readonly<{
   point: ScenePoint
@@ -700,7 +701,10 @@ function ParticleTraceFrame({
             <span className="eyebrow">That ME · grain in grain</span>
             <strong>Grain 0 → Grain {nestedGrain.childGrain}</strong>
           </div>
-          <span>spiral begins · moment {nestedGrain.spiralStartsAt.moment}</span>
+          <span>
+            carrier spiral · moment {nestedGrain.spiralStartsAt.moment}
+            {" "}· spiral-of-spiral · grain {nestedGrain.spiralingSpiralStartsAt.grain}
+          </span>
         </div>
         <div className="nested-grain-body">
           <svg viewBox="0 0 180 140" role="img" aria-label={`Nested grain ${nestedGrain.childGrain} at moment ${selectedMoment}`}>
@@ -1750,6 +1754,31 @@ function EverythingBreakdown({
             <strong>MOMENT {frame.observer.act}</strong>
           </div>
         </div>
+        <div className="spiral-discovery" aria-label="Detected spiral chronology">
+          <div className={frame.observer.act === 0 ? "current" : "resolved"}>
+            <span>FIRST DIFFERENCE · GRAIN {INITIAL_SPIRAL_DISCOVERY.initialState.grain} · MOMENT 0</span>
+            <strong>NO SPIRAL → NO SPIRAL</strong>
+            <small>Existence is already distinguished. NOTHING has no playable duration.</small>
+          </div>
+          <b>→</b>
+          <div className={frame.observer.act === 1 ? "current" : frame.observer.act > 1 ? "resolved" : ""}>
+            <span>MOMENT 1</span>
+            <strong>MOVEMENT → NO DETECTED SPIRAL</strong>
+            <small>One transfer cannot establish a turn.</small>
+          </div>
+          <b>→</b>
+          <div className={frame.observer.act === INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.moment ? "current" : ""}>
+            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.grain} · MOMENT {INITIAL_SPIRAL_DISCOVERY.spiralStartsAt.moment}</span>
+            <strong>FIRST SPIRAL</strong>
+            <small>Successive transfers become non-collinear.</small>
+          </div>
+          <b>→</b>
+          <div className={frame.observer.act === INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment ? "current" : ""}>
+            <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.grain} · MOMENT {INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment}</span>
+            <strong>SPIRALING SPIRAL</strong>
+            <small>The child turn is carried by the parent turn.</small>
+          </div>
+        </div>
         <div className="all-levels-map" aria-label="All recursive levels shown together">
           {BREAKDOWN_LEVELS.map((item, index) => {
             const radius = Math.max(8, 31 - index * 4)
@@ -1849,7 +1878,7 @@ function EverythingBreakdown({
           </p>
         </section>
         <div className="breakdown-route">
-          <span>CAME FROM<strong>{levelIndex === 0 ? "NOTHING" : BREAKDOWN_LEVELS[levelIndex - 1]}</strong></span>
+          <span>CAME FROM<strong>{levelIndex === 0 ? "FIRST DIFFERENCE" : BREAKDOWN_LEVELS[levelIndex - 1]}</strong></span>
           <b>→</b>
           <span>IS<strong>{level}</strong></span>
           <b>→</b>
@@ -1873,7 +1902,7 @@ export function App() {
   const [playbackSpeed, setPlaybackSpeed] = useState(700)
   const [pageExplanation, setPageExplanation] = useState<PageExplanation | null>(null)
   const [targetMoment, setTargetMoment] = useState(
-    () => frame.observer.act + 1,
+    () => INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment,
   )
 
   const update = useCallback((next: ExplorerFrame) => setFrame(next), [])

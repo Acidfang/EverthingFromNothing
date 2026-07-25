@@ -4,6 +4,7 @@ import {
   calculateParticleTransformPath,
   sampleParticleHelix,
   type ParticleAxisOffset,
+  type ParticleTransformStep,
   type ParticleVector,
 } from "./particle.ts"
 
@@ -36,7 +37,16 @@ export type NestedGrainResolution = Readonly<{
   childGrain: number
   parentAddress: string
   childScale: number
-  spiralStartsAt: Readonly<{ grain: number; moment: 1 }>
+  initialState: Readonly<{
+    grain: number
+    moment: 0
+    origin: "FIRST DIFFERENCE"
+    nothingHasDuration: false
+    carrier: "NO SPIRAL"
+    child: "NO SPIRAL"
+  }>
+  spiralStartsAt: Readonly<{ grain: number; moment: number }>
+  spiralingSpiralStartsAt: Readonly<{ grain: number; moment: number }>
   moments: readonly NestedGrainMoment[]
   finalParentPositions: readonly ParticleVector[]
 }>
@@ -69,6 +79,23 @@ function canonicalZero(value: number): number {
   return Object.is(value, -0) ? 0 : value
 }
 
+function crossMagnitude(left: ParticleVector, right: ParticleVector): number {
+  return Math.hypot(
+    left.y * right.z - left.z * right.y,
+    left.z * right.x - left.x * right.z,
+    left.x * right.y - left.y * right.x,
+  )
+}
+
+function firstDetectedTurn(path: readonly ParticleTransformStep[]): number {
+  for (let index = 1; index < path.length; index += 1) {
+    if (crossMagnitude(path[index - 1].transfer, path[index].transfer) > 1e-12) {
+      return path[index].moment
+    }
+  }
+  throw new Error("No spiral turn was detected in the transform path")
+}
+
 export function deriveNestedGrain(
   parentAddress: string,
   parentGrain = 0,
@@ -82,6 +109,11 @@ export function deriveNestedGrain(
     const faceAddress = key(face)
     return [faceAddress, calculateParticleTransformPath(faceAddress)] as const
   }))
+  const spiralMoment = firstDetectedTurn(parentPath)
+  const spiralingSpiralMoment = Math.max(
+    spiralMoment,
+    ...[...paths.values()].map(firstDetectedTurn),
+  )
   const moments = Object.freeze(Array.from(
     { length: PARTICLE_MOMENTS_PER_ACT },
     (_, index): NestedGrainMoment => {
@@ -144,7 +176,19 @@ export function deriveNestedGrain(
     childGrain: parentGrain - 1,
     parentAddress,
     childScale: CHILD_GRAIN_SCALE,
-    spiralStartsAt: Object.freeze({ grain: parentGrain - 1, moment: 1 as const }),
+    initialState: Object.freeze({
+      grain: parentGrain,
+      moment: 0 as const,
+      origin: "FIRST DIFFERENCE" as const,
+      nothingHasDuration: false as const,
+      carrier: "NO SPIRAL" as const,
+      child: "NO SPIRAL" as const,
+    }),
+    spiralStartsAt: Object.freeze({ grain: parentGrain, moment: spiralMoment }),
+    spiralingSpiralStartsAt: Object.freeze({
+      grain: parentGrain - 1,
+      moment: spiralingSpiralMoment,
+    }),
     moments,
     finalParentPositions: Object.freeze(
       moments.at(-1)!.states.map((state) => add(
