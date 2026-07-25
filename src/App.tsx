@@ -1573,14 +1573,14 @@ type PageExplanation = Readonly<{
 }>
 
 const INFO_TARGETS = [
-  "button", "a", "input", "select", "label", "[role='img']", "figure",
+  "button", "[role='button']", "a", "input", "select", "label", "[role='img']", "figure",
   "h1", "h2", "h3", ".eyebrow", "dt", "dd", "strong", "p", "li",
   ".status-mark", ".field-status > div", ".energy-grid > div",
   ".grain-route > div", ".grain-conditions > div",
 ].join(",")
 
 function explainPageTarget(
-  target: HTMLElement,
+  target: Element,
   x: number,
   y: number,
 ): PageExplanation {
@@ -1590,7 +1590,7 @@ function explainPageTarget(
     ?? target.tagName
   ).replace(/\s+/g, " ").trim().slice(0, 180)
   const title = text || "Model information"
-  if (target.matches("button")) {
+  if (target.matches("button, [role='button']")) {
     return {
       title,
       whatItIs: `A model control labelled “${title}”.`,
@@ -1658,6 +1658,185 @@ function PageInfoBubble({
       <div><span>WHAT IT IS</span><p>{explanation.whatItIs}</p></div>
       <div><span>WHAT IT ALLOWS</span><p>{explanation.whatItAllows}</p></div>
     </aside>
+  )
+}
+
+const BREAKDOWN_LEVELS = ["EVERYTHING", "FIELD", "MEDIUM", "PARTICLE", "ATOM", "INSIDE"] as const
+
+function EverythingBreakdown({
+  frame,
+  isPlaying,
+  onEnter,
+  onOutward,
+  onSelect,
+  onTogglePlay,
+}: Readonly<{
+  frame: ExplorerFrame
+  isPlaying: boolean
+  onEnter: () => void
+  onOutward: () => void
+  onSelect: (address: string) => void
+  onTogglePlay: () => void
+}>) {
+  const levelIndex = Math.min(
+    BREAKDOWN_LEVELS.length - 1,
+    Math.abs(frame.observer.relativeGrain),
+  )
+  const level = BREAKDOWN_LEVELS[levelIndex]
+  const projection = useMemo(() => {
+    const entries = frame.wholeProjection.entries
+    const extent = Math.max(1, ...entries.flatMap((entry) => {
+      const point = fromKey(entry.normalizedAddress)
+      return [Math.abs(point.x), Math.abs(point.y), Math.abs(point.z)]
+    }))
+    const occupied = new Set<string>()
+    const visible: Array<{
+      address: string
+      x: number
+      y: number
+      result: string
+    }> = []
+    for (const entry of entries) {
+      const point = fromKey(entry.normalizedAddress)
+      const x = 360 + ((point.x - point.y) / (extent * 2 + 1)) * 270
+      const y = 230 + ((point.x + point.y - point.z * 1.6) / (extent * 3 + 1)) * 180
+      const pixel = `${Math.round(x)},${Math.round(y)}`
+      if (occupied.has(pixel)) continue
+      occupied.add(pixel)
+      visible.push({ address: entry.normalizedAddress, x, y, result: entry.result })
+    }
+    return {
+      visible,
+      hidden: entries.length - visible.length,
+      total: entries.length,
+    }
+  }, [frame.wholeProjection.entries])
+  const selected = frame.selected?.address ?? projection.visible[0]?.address ?? "0,0,0"
+
+  return (
+    <section className="everything-breakdown" aria-labelledby="everything-title">
+      <nav className="breakdown-rail" aria-label="Break down the whole">
+        <h2>BREAK DOWN</h2>
+        <ol>
+          {BREAKDOWN_LEVELS.map((item, index) => (
+            <li key={item} className={index === levelIndex ? "selected" : index < levelIndex ? "passed" : ""}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (index > levelIndex) onEnter()
+                  else if (index < levelIndex) onOutward()
+                }}
+                aria-current={index === levelIndex ? "step" : undefined}
+              >
+                <span>{String(index).padStart(2, "0")}</span>
+                <strong>{item}</strong>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <div className="everything-canvas">
+        <div className="everything-heading">
+          <div>
+            <h2 id="everything-title">{level}</h2>
+            <p>{levelIndex === 0
+              ? "The complete field available to this observer."
+              : `The ${level.toLowerCase()} now visible from grain ${frame.observer.relativeGrain}.`}
+            </p>
+          </div>
+          <div className="everything-actions">
+            <button type="button" onClick={onTogglePlay}>{isPlaying ? "PAUSE" : "PLAY"}</button>
+            <strong>MOMENT {frame.observer.act}</strong>
+          </div>
+        </div>
+        <svg viewBox="0 0 720 460" role="img" aria-label={`${level} field with ${projection.visible.length} visible relations`}>
+          <defs>
+            <radialGradient id="field-fade">
+              <stop offset="0" stopColor="#69d5ce" stopOpacity=".16" />
+              <stop offset="1" stopColor="#69d5ce" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <circle className="field-aura" cx="360" cy="230" r="210" />
+          <circle className="field-orbit" cx="360" cy="230" r="150" />
+          <circle className="field-orbit inner" cx="360" cy="230" r="82" />
+          {projection.visible.map((point, index) => {
+            const next = projection.visible[(index + 1) % projection.visible.length]
+            return next ? (
+              <line
+                key={`line:${point.address}`}
+                x1={point.x}
+                y1={point.y}
+                x2={next.x}
+                y2={next.y}
+                className="field-thread"
+              />
+            ) : null
+          })}
+          {projection.visible.map((point) => (
+            <circle
+              key={point.address}
+              cx={point.x}
+              cy={point.y}
+              r={point.address === selected ? 7 : 3.5}
+              className={point.address === selected ? "field-node selected" : "field-node"}
+              role="button"
+              tabIndex={0}
+              aria-label={`Relation ${point.address}: ${point.result}`}
+              onClick={() => onSelect(point.address)}
+            />
+          ))}
+        </svg>
+        <div className="observer-resolution">
+          <div><span>VISIBLE AT THIS GRAIN</span><strong>{projection.visible.length} calculated</strong></div>
+          <div><span>BELOW ONE PIXEL</span><strong>{projection.hidden} not rendered</strong></div>
+          <label>
+            <span>OUT</span>
+            <input
+              type="range"
+              min="0"
+              max={BREAKDOWN_LEVELS.length - 1}
+              value={levelIndex}
+              onChange={(event) => {
+                const requested = Number(event.target.value)
+                if (requested > levelIndex) onEnter()
+                else if (requested < levelIndex) onOutward()
+              }}
+              aria-label="Observer grain"
+            />
+            <span>IN</span>
+          </label>
+        </div>
+      </div>
+
+      <aside className="how-it-is" aria-label="How the selected whole is">
+        <h2>HOW IT IS</h2>
+        <section>
+          <span>WHAT IT IS</span>
+          <p>
+            {levelIndex === 0
+              ? "One complete resolved field presented from the current observer grain."
+              : `A ${level.toLowerCase()} is the currently visible part of the containing field.`}
+          </p>
+        </section>
+        <section>
+          <span>WHAT IT ALLOWS</span>
+          <p>
+            Selecting a visible difference allows its containing structure to
+            be entered and reconstructed at the next grain.
+          </p>
+        </section>
+        <div className="breakdown-route">
+          <span>CAME FROM<strong>{levelIndex === 0 ? "NOTHING" : BREAKDOWN_LEVELS[levelIndex - 1]}</strong></span>
+          <b>→</b>
+          <span>IS<strong>{level}</strong></span>
+          <b>→</b>
+          <span>GOES TO<strong>{BREAKDOWN_LEVELS[Math.min(levelIndex + 1, BREAKDOWN_LEVELS.length - 1)]}</strong></span>
+        </div>
+        <button type="button" className="enter-selected" onClick={onEnter}>ENTER SELECTED FIELD</button>
+        <small>Selected relation · {selected}</small>
+      </aside>
+    </section>
   )
 }
 
@@ -1745,8 +1924,8 @@ export function App() {
 
   const explainClick = useCallback((event: ReactMouseEvent<HTMLElement>) => {
     const origin = event.target
-    if (!(origin instanceof HTMLElement) || origin.closest(".page-info-bubble")) return
-    const target = origin.closest<HTMLElement>(INFO_TARGETS)
+    if (!(origin instanceof Element) || origin.closest(".page-info-bubble")) return
+    const target = origin.closest(INFO_TARGETS)
     if (!target) {
       setPageExplanation(null)
       return
@@ -1873,6 +2052,20 @@ export function App() {
         </div>
       </header>
 
+      <EverythingBreakdown
+        frame={frame}
+        isPlaying={isPlaying}
+        onEnter={enter}
+        onOutward={outward}
+        onSelect={selectRelation}
+        onTogglePlay={() => setIsPlaying((playing) => !playing)}
+      />
+
+      <details className="technical-breakdown">
+        <summary>
+          <span>COMPLETE TECHNICAL BREAKDOWN</span>
+          <small>Open every derivation, observer view, force path, lineage, and causal ledger</small>
+        </summary>
       <section
         className={`workspace ${leftOpen ? "" : "left-closed"} ${
           rightOpen ? "" : "right-closed"
@@ -2111,6 +2304,7 @@ export function App() {
           </div>
         ) : null}
       </section>
+      </details>
       <footer>
         <span>Kernel {frame.kernelVersion}</span>
         <span>One shared Act · complete snapshots · reversible update</span>
