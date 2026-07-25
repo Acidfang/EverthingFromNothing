@@ -689,6 +689,10 @@ kbd {
   box-shadow: inset 0 2px 0 rgba(234,178,101,.5);
 }
 .spiral-discovery > div.resolved { border-color: rgba(105,213,206,.28); }
+.spiral-discovery > div.unresolved {
+  border-color: var(--unresolved); background: rgba(215,125,103,.045);
+}
+.spiral-discovery > div.unresolved strong { color: var(--unresolved); }
 .spiral-discovery span { display: block; color: var(--muted); font: 6px/1.2 ui-monospace,monospace; }
 .spiral-discovery strong { display: block; margin-top: 7px; color: #cbd4d2; font: 8px/1.3 ui-monospace,monospace; }
 .spiral-discovery .current strong { color: var(--selected); }
