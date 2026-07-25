@@ -37,6 +37,7 @@ import {
 } from "./model/thought.ts"
 import type { ScenePoint } from "./model/scene.ts"
 import { deriveNestedGrain } from "./model/grain.ts"
+import { verifySphericalClosure } from "./model/field-closure.ts"
 import { buildGrainPlayback, GRAIN_PLAYBACK_MOMENTS } from "./model/grain-playback.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
@@ -1740,15 +1741,15 @@ function EverythingBreakdown({
       point.x >= 0 && point.x <= 720 && point.y >= 0 && point.y <= 460
     const visiblePaths = paths.filter((path) => path.some(inViewport))
     const visiblePoints = visiblePaths.flatMap((path) => path.filter(inViewport))
-    const radius = visiblePoints.reduce(
-      (largest, point) => Math.max(largest, Math.hypot(point.x - 360, point.y - 230)),
-      0,
+    const closure = verifySphericalClosure(
+      activeMoments.flatMap((moment) =>
+        moment.states.flatMap((state) => state.standingWavePath),
+      ),
     )
     return {
       visiblePaths,
       omittedPaths: paths.length - visiblePaths.length,
-      radius: Math.min(210, radius),
-      closed: resolutionPhase >= ATOM_FIELD_MOMENT,
+      closure,
     }
   }, [resolutionPhase])
 
@@ -1814,10 +1815,13 @@ function EverythingBreakdown({
             <small>The child turn is carried by the parent turn.</small>
           </div>
           <b>→</b>
-          <div className={causalRender.closed ? "current" : ""}>
+          <div className={resolutionPhase >= ATOM_FIELD_MOMENT ? "current unresolved" : ""}>
             <span>GRAIN {INITIAL_SPIRAL_DISCOVERY.childGrain} · RESOLUTION {ATOM_FIELD_MOMENT}</span>
-            <strong>CLOSED ATOM FIELD</strong>
-            <small>The accumulated spiral has swept the complete rendered envelope.</small>
+            <strong>{causalRender.closure.closed ? "SPHERICAL FIELD VERIFIED" : "FIELD REMAINS OPEN"}</strong>
+            <small>
+              Direction {Math.round(causalRender.closure.directionalCoverage * 100)}%
+              {" · "}radial uniformity {Math.round(causalRender.closure.radialUniformity * 100)}%.
+            </small>
           </div>
         </div>
         <div className="all-levels-map" aria-label="All recursive levels shown together">
@@ -1852,12 +1856,12 @@ function EverythingBreakdown({
           <circle className="field-aura" cx="360" cy="230" r="210" />
           <circle className="field-orbit" cx="360" cy="230" r="150" />
           <circle className="field-orbit inner" cx="360" cy="230" r="82" />
-          {causalRender.radius > 0 ? (
+          {causalRender.closure.closed ? (
             <circle
-              className={`atom-field-envelope ${causalRender.closed ? "closed" : ""}`}
+              className="atom-field-envelope closed"
               cx="360"
               cy="230"
-              r={causalRender.radius}
+              r="190"
             />
           ) : null}
           <g className={`spiral-finding-stage moment-${resolutionPhase}`}>
