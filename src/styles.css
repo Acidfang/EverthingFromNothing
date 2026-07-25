@@ -720,6 +720,36 @@ kbd {
 .field-thread { stroke: rgba(105,213,206,.14); stroke-width: .7; }
 .field-node { fill: #69d5ce; stroke: #baf1ed; stroke-width: .6; cursor: pointer; }
 .field-node.selected { fill: #eab265; stroke: #ffe0ac; filter: drop-shadow(0 0 7px rgba(234,178,101,.72)); }
+.nothing-boundary {
+  position: fixed; inset: 0; width: 100vw; height: 100vh;
+  background: #000; cursor: none;
+}
+.spiral-finding-stage { pointer-events: none; }
+.first-difference-point {
+  fill: var(--selected); stroke: #ffe0ac; stroke-width: 1;
+  filter: drop-shadow(0 0 8px rgba(234,178,101,.65));
+}
+.detected-carrier,
+.detected-child-spiral {
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+}
+.detected-carrier {
+  stroke: var(--selected); stroke-width: 3;
+  filter: drop-shadow(0 0 5px rgba(234,178,101,.7));
+}
+.detected-child-spiral {
+  stroke: var(--generated); stroke-width: 1.25; opacity: .72;
+  stroke-dasharray: 900; stroke-dashoffset: 900;
+  animation: reveal-detected-spiral 900ms ease-out forwards;
+}
+.moment-1 .detected-carrier { opacity: .58; }
+.moment-2 .detected-carrier {
+  stroke-dasharray: 80; stroke-dashoffset: 80;
+  animation: reveal-detected-spiral 500ms ease-out forwards;
+}
+@keyframes reveal-detected-spiral {
+  to { stroke-dashoffset: 0; }
+}
 .observer-resolution {
   display: grid; grid-template-columns: auto auto minmax(190px,1fr);
   align-items: center; gap: 18px; padding-top: 14px; border-top: 1px solid var(--line);

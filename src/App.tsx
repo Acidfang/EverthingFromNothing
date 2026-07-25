@@ -1716,6 +1716,18 @@ function EverythingBreakdown({
     }
   }, [frame.wholeProjection.entries])
   const selected = frame.selected?.address ?? projection.visible[0]?.address ?? "0,0,0"
+  const discoveryMoment = frame.observer.act === 0
+    ? null
+    : INITIAL_SPIRAL_DISCOVERY.moments[
+      Math.min(
+        frame.observer.act,
+        INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment,
+      ) - 1
+    ]
+  const projectDiscovery = (point: Readonly<{ x: number; y: number; z: number }>) => ({
+    x: 360 + (point.x - point.y) * 115,
+    y: 230 + (point.x + point.y) * 55 - point.z * 95,
+  })
 
   return (
     <section className="everything-breakdown" aria-labelledby="everything-title">
@@ -1811,6 +1823,32 @@ function EverythingBreakdown({
           <circle className="field-aura" cx="360" cy="230" r="210" />
           <circle className="field-orbit" cx="360" cy="230" r="150" />
           <circle className="field-orbit inner" cx="360" cy="230" r="82" />
+          <g className={`spiral-finding-stage moment-${frame.observer.act}`}>
+            <circle className="first-difference-point" cx="360" cy="230" r="5" />
+            {discoveryMoment ? (
+              <>
+                <polyline
+                  className="detected-carrier"
+                  points={[
+                    { x: 360, y: 230 },
+                    ...discoveryMoment.carrierPath.map(projectDiscovery),
+                  ].map((point) => `${point.x},${point.y}`).join(" ")}
+                />
+                {frame.observer.act >= INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment
+                  ? discoveryMoment.states.map((state) => (
+                    <polyline
+                      key={state.face}
+                      className="detected-child-spiral"
+                      points={state.standingWavePath
+                        .map(projectDiscovery)
+                        .map((point) => `${point.x},${point.y}`)
+                        .join(" ")}
+                    />
+                  ))
+                  : null}
+              </>
+            ) : null}
+          </g>
           {projection.visible.map((point, index) => {
             const next = projection.visible[(index + 1) % projection.visible.length]
             return next ? (
@@ -1899,6 +1937,8 @@ export function App() {
   const [rightOpen, setRightOpen] = useState(true)
   const [ledgerOpen, setLedgerOpen] = useState(true)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [atNothingBoundary, setAtNothingBoundary] = useState(true)
+  const [boundaryCycle, setBoundaryCycle] = useState(0)
   const [playbackSpeed, setPlaybackSpeed] = useState(700)
   const [pageExplanation, setPageExplanation] = useState<PageExplanation | null>(null)
   const [targetMoment, setTargetMoment] = useState(
@@ -1912,6 +1952,9 @@ export function App() {
   )
   const resetPlayback = useCallback(() => {
     setIsPlaying(false)
+    setAtNothingBoundary(true)
+    setBoundaryCycle((cycle) => cycle + 1)
+    setTargetMoment(INITIAL_SPIRAL_DISCOVERY.spiralingSpiralStartsAt.moment)
     explorer.current = new FirstActExplorer()
     update(explorer.current.frame())
   }, [update])
@@ -1936,6 +1979,15 @@ export function App() {
       update(explorer.current!.selectProjectionRelation(address)),
     [update],
   )
+
+  useEffect(() => {
+    if (!atNothingBoundary) return
+    const boundaryFrame = window.requestAnimationFrame(() => {
+      setAtNothingBoundary(false)
+      setIsPlaying(true)
+    })
+    return () => window.cancelAnimationFrame(boundaryFrame)
+  }, [atNothingBoundary, boundaryCycle])
 
   useEffect(() => {
     if (!isPlaying) return
@@ -2009,6 +2061,8 @@ export function App() {
       (entry) => entry.normalizedAddress === frame.selected?.address,
     )
     : null
+
+  if (atNothingBoundary) return <main className="nothing-boundary" />
 
   return (
     <main className="app-shell info-enabled" onClickCapture={explainClick}>
