@@ -36,6 +36,7 @@ import {
 } from "./model/thought.ts"
 import type { ScenePoint } from "./model/scene.ts"
 import { deriveNestedGrain } from "./model/grain.ts"
+import { buildGrainPlayback, GRAIN_PLAYBACK_MOMENTS } from "./model/grain-playback.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
 const PLAYBACK_SPEEDS = [
@@ -863,6 +864,116 @@ function FirstActParticleResolution({ isPlaying }: Readonly<{ isPlaying: boolean
       <p className="particle-proof">
         Merge audit: {particle.mergeRecoversParticle ? "COMPLETE PARTICLE RECOVERED" : "INCOMPLETE"}
       </p>
+      <RecursiveGrainPlayback />
+    </section>
+  )
+}
+
+function RecursiveGrainPlayback() {
+  const [stopGrain, setStopGrain] = useState(-6)
+  const [grainSkip, setGrainSkip] = useState(0)
+  const [frameIndex, setFrameIndex] = useState(0)
+  const [moment, setMoment] = useState(1)
+  const [playing, setPlaying] = useState(false)
+  const playback = useMemo(
+    () => buildGrainPlayback(0, stopGrain, grainSkip),
+    [grainSkip, stopGrain],
+  )
+  const frame = playback.frames[Math.min(frameIndex, playback.frames.length - 1)]
+  useEffect(() => {
+    setFrameIndex(0)
+    setMoment(1)
+    setPlaying(false)
+  }, [grainSkip, stopGrain])
+  useEffect(() => {
+    if (!playing) return
+    const atFinal = frameIndex === playback.frames.length - 1
+      && moment === GRAIN_PLAYBACK_MOMENTS
+    if (atFinal) {
+      setPlaying(false)
+      return
+    }
+    const timer = window.setTimeout(() => {
+      if (moment < GRAIN_PLAYBACK_MOMENTS) setMoment((value) => value + 1)
+      else {
+        setFrameIndex((value) => value + 1)
+        setMoment(1)
+      }
+    }, 80)
+    return () => window.clearTimeout(timer)
+  }, [frameIndex, moment, playback.frames.length, playing])
+  const visibleSpiral = frame.spiral.slice(0, moment + 1)
+  const points = visibleSpiral.map((point) => ({
+    x: 90 + (point.x - point.y) * 44,
+    y: 70 + (point.x + point.y) * 22 - point.z * 40,
+  }))
+  return (
+    <section className="grain-playback" aria-labelledby="grain-playback-title">
+      <div className="grain-playback-heading">
+        <div>
+          <span className="eyebrow">Recursive transport player</span>
+          <h3 id="grain-playback-title">Where the spiral starts · stops · goes</h3>
+        </div>
+        <strong>GRAIN {frame.grain} · MOMENT {moment}</strong>
+      </div>
+      <div className="grain-playback-controls">
+        <label>Stop grain
+          <select value={stopGrain} onChange={(event) => setStopGrain(Number(event.target.value))}>
+            {[-2, -3, -6, -9, -12].map((grain) => <option key={grain} value={grain}>{grain}</option>)}
+          </select>
+        </label>
+        <label>Skip for animation
+          <select value={grainSkip} onChange={(event) => setGrainSkip(Number(event.target.value))}>
+            {[0, 1, 2, 3].map((skip) => <option key={skip} value={skip}>{skip} grain{skip === 1 ? "" : "s"}</option>)}
+          </select>
+        </label>
+        <button type="button" onClick={() => {
+          if (frameIndex === playback.frames.length - 1 && moment === GRAIN_PLAYBACK_MOMENTS) {
+            setFrameIndex(0)
+            setMoment(1)
+          }
+          setPlaying((value) => !value)
+        }}>{playing ? "Pause grain playback" : "Play grain playback"}</button>
+      </div>
+      <div className="grain-playback-body">
+        <svg viewBox="0 0 180 140" role="img" aria-label={`Spiral playback at grain ${frame.grain} moment ${moment}`}>
+          <rect width="180" height="140" />
+          <polyline points={points.map((point) => `${point.x},${point.y}`).join(" ")} />
+          <circle cx={points.at(-1)!.x} cy={points.at(-1)!.y} r="5" />
+        </svg>
+        <div className="grain-route">
+          <div><span>CAME FROM</span><strong>{frame.sourceGrain === null ? "FIRST DIFFERENCE" : `grain ${frame.sourceGrain}`}</strong></div>
+          <b>→</b>
+          <div><span>IS RESOLVING</span><strong>grain {frame.grain}</strong><small>scale {frame.scale.toExponential(3)}</small></div>
+          <b>→</b>
+          <div><span>GOES TO</span><strong>grain {frame.destinationGrain}</strong></div>
+        </div>
+      </div>
+      <div className="grain-conditions">
+        <div><span>START CONDITION</span><strong>{frame.startCondition}</strong></div>
+        <div><span>STOP CONDITION</span><strong>{frame.stopCondition} · moment {GRAIN_PLAYBACK_MOMENTS}</strong></div>
+        <div><span>CAUSAL GRAINS</span><strong>{playback.causalGrainCount}</strong></div>
+        <div><span>RENDERED</span><strong>{playback.renderedGrainCount}</strong></div>
+        <div><span>HIDDEN, PRESERVED</span><strong>{playback.hiddenGrainCount}</strong></div>
+      </div>
+      <div className="grain-frame-strip">
+        {playback.frames.map((item, index) => (
+          <button
+            type="button"
+            key={item.grain}
+            className={index === frameIndex ? "selected" : ""}
+            onClick={() => {
+              setPlaying(false)
+              setFrameIndex(index)
+              setMoment(1)
+            }}
+          >
+            G{item.grain}
+            {item.hiddenGrainsBefore > 0 ? <small>+{item.hiddenGrainsBefore} hidden</small> : null}
+          </button>
+        ))}
+      </div>
+      <p>Skipping changes only which grains are rendered. Every omitted handoff remains counted in the causal route.</p>
     </section>
   )
 }
