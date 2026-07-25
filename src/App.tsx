@@ -871,20 +871,30 @@ function FirstActParticleResolution({ isPlaying }: Readonly<{ isPlaying: boolean
 
 function RecursiveGrainPlayback() {
   const [stopGrain, setStopGrain] = useState(-6)
-  const [grainSkip, setGrainSkip] = useState(0)
+  const [pixelSpan, setPixelSpan] = useState(180)
   const [frameIndex, setFrameIndex] = useState(0)
   const [moment, setMoment] = useState(1)
   const [playing, setPlaying] = useState(false)
+  const spiralMapRef = useRef<SVGSVGElement>(null)
   const playback = useMemo(
-    () => buildGrainPlayback(0, stopGrain, grainSkip),
-    [grainSkip, stopGrain],
+    () => buildGrainPlayback(0, stopGrain, pixelSpan),
+    [pixelSpan, stopGrain],
   )
   const frame = playback.frames[Math.min(frameIndex, playback.frames.length - 1)]
   useEffect(() => {
     setFrameIndex(0)
     setMoment(1)
     setPlaying(false)
-  }, [grainSkip, stopGrain])
+  }, [pixelSpan, stopGrain])
+  useEffect(() => {
+    const element = spiralMapRef.current
+    if (!element) return
+    const updatePixelSpan = () => setPixelSpan(Math.max(1, element.clientWidth))
+    updatePixelSpan()
+    const observer = new ResizeObserver(updatePixelSpan)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
   useEffect(() => {
     if (!playing) return
     const atFinal = frameIndex === playback.frames.length - 1
@@ -922,11 +932,10 @@ function RecursiveGrainPlayback() {
             {[-2, -3, -6, -9, -12].map((grain) => <option key={grain} value={grain}>{grain}</option>)}
           </select>
         </label>
-        <label>Skip for animation
-          <select value={grainSkip} onChange={(event) => setGrainSkip(Number(event.target.value))}>
-            {[0, 1, 2, 3].map((skip) => <option key={skip} value={skip}>{skip} grain{skip === 1 ? "" : "s"}</option>)}
-          </select>
-        </label>
+        <div className="pixel-map-rule">
+          <span>AVAILABLE PIXEL MAP</span>
+          <strong>{Math.round(playback.pixelSpan)} px · resolve at ≥ {playback.pixelThreshold} px</strong>
+        </div>
         <button type="button" onClick={() => {
           if (frameIndex === playback.frames.length - 1 && moment === GRAIN_PLAYBACK_MOMENTS) {
             setFrameIndex(0)
@@ -936,7 +945,7 @@ function RecursiveGrainPlayback() {
         }}>{playing ? "Pause grain playback" : "Play grain playback"}</button>
       </div>
       <div className="grain-playback-body">
-        <svg viewBox="0 0 180 140" role="img" aria-label={`Spiral playback at grain ${frame.grain} moment ${moment}`}>
+        <svg ref={spiralMapRef} viewBox="0 0 180 140" role="img" aria-label={`Spiral playback at grain ${frame.grain} moment ${moment}`}>
           <rect width="180" height="140" />
           <polyline points={points.map((point) => `${point.x},${point.y}`).join(" ")} />
           <circle cx={points.at(-1)!.x} cy={points.at(-1)!.y} r="5" />
@@ -944,7 +953,7 @@ function RecursiveGrainPlayback() {
         <div className="grain-route">
           <div><span>CAME FROM</span><strong>{frame.sourceGrain === null ? "FIRST DIFFERENCE" : `grain ${frame.sourceGrain}`}</strong></div>
           <b>→</b>
-          <div><span>IS RESOLVING</span><strong>grain {frame.grain}</strong><small>scale {frame.scale.toExponential(3)}</small></div>
+          <div><span>IS RESOLVING</span><strong>grain {frame.grain}</strong><small>scale {frame.scale.toExponential(3)} · Δ {frame.projectedChangePixels.toFixed(2)} px</small></div>
           <b>→</b>
           <div><span>GOES TO</span><strong>grain {frame.destinationGrain}</strong></div>
         </div>
@@ -973,7 +982,7 @@ function RecursiveGrainPlayback() {
           </button>
         ))}
       </div>
-      <p>Skipping changes only which grains are rendered. Every omitted handoff remains counted in the causal route.</p>
+      <p>Sub-pixel changes are not calculated as animation frames. Their difference accumulates until it reaches one available pixel; every omitted handoff remains counted in the causal route.</p>
     </section>
   )
 }
