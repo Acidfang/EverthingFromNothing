@@ -86,6 +86,16 @@ pnpm run demo -- --select-projection 2,0,0
 The interpretation boundary is documented in
 [`THEORY.md`](THEORY.md), the detailed
 [`ACT-AND-EFFECT.md`](ACT-AND-EFFECT.md) explanation, and
+the [`SIX-FACE-RESOLUTION.md`](SIX-FACE-RESOLUTION.md) observer law.
+The executable observer-state interpretation of thought, learning, memory, and
+causal lineage is described in [`THOUGHT-RESOLUTION.md`](THOUGHT-RESOLUTION.md).
+The deterministic `WAS -> IS -> WILL BE` address-flow calculation is described
+in [`POTENTIAL-FLOW.md`](POTENTIAL-FLOW.md).
+The exhaustive cube-canonical search and first `5 -> 1 -> 5` closed invariant
+are documented in [`ATOM-SEARCH.md`](ATOM-SEARCH.md).
+The direct `1 -> 6` derivation and six-view merged model particle are documented
+in [`FIRST-ACT-PARTICLE.md`](FIRST-ACT-PARTICLE.md).
+Current comparison limits are stated in
 [`LIMITATIONS.md`](LIMITATIONS.md).
 Exported frames have a public contract in
 [`schema/explorer-frame.schema.json`](schema/explorer-frame.schema.json).

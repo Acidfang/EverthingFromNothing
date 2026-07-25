@@ -134,7 +134,7 @@ function explainProjection(entry: ProjectionEntry): CausalExplanation {
     ancestryStatuses: statuses,
     externalComparisonAllowed: externalComparisonAllowed(statuses),
     because: Object.freeze([
-      `${entry.contributors.length} complete child-whole presentation${entry.contributors.length === 1 ? "" : "s"} meet here.`,
+      `${entry.contributors.length} complete child-whole presentation${entry.contributors.length === 1 ? "" : "s"} are shown at this normalized relation; their causal histories remain distinct.`,
       `Contributors: ${entry.contributors.join(" · ")}.`,
       entry.arrivalCount % 2 === 1
         ? "The selected parity algebra retains an outward Difference."

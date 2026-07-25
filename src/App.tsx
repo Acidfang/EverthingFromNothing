@@ -4,12 +4,31 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent,
 } from "react"
 import {
   FirstActExplorer,
   type ExplorerFrame,
 } from "./model/explorer.ts"
+import {
+  combineFaceViews,
+  observeFromSixFaces,
+  type ObserverFace,
+} from "./model/observation.ts"
+import { fromKey } from "./model/address.ts"
+import { generateLineageLevel, lineageCount } from "./model/lineage.ts"
+import { analysePotential } from "./model/potential.ts"
+import { searchAtomInvariants } from "./model/atom-search.ts"
+import {
+  deriveFirstActParticle,
+  type ParticleCausalTrace,
+} from "./model/particle.ts"
+import {
+  emptyThoughtState,
+  resolveThought,
+  type ThoughtResolution,
+} from "./model/thought.ts"
 import type { ScenePoint } from "./model/scene.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
@@ -198,6 +217,977 @@ function FieldCanvas({
         <span>Completed whole remains beneath as the containing relation</span>
       </div>
     </div>
+  )
+}
+
+function faceProjection(
+  face: ObserverFace,
+  address: string,
+  extent: number,
+): readonly [number, number] {
+  const { x, y, z } = fromKey(address)
+  const scale = 38 / Math.max(1, extent)
+  const [horizontal, vertical] = {
+    "-X": [y, z],
+    "+X": [-y, z],
+    "-Y": [x, z],
+    "+Y": [-x, z],
+    "-Z": [x, y],
+    "+Z": [x, -y],
+  }[face]
+  return [50 + horizontal * scale, 50 - vertical * scale]
+}
+
+function combinations<T>(values: readonly T[], size: number): readonly (readonly T[])[] {
+  const result: T[][] = []
+  const visit = (start: number, selected: T[]): void => {
+    if (selected.length === size) {
+      result.push([...selected])
+      return
+    }
+    for (
+      let index = start;
+      index <= values.length - (size - selected.length);
+      index += 1
+    ) {
+      selected.push(values[index])
+      visit(index + 1, selected)
+      selected.pop()
+    }
+  }
+  visit(0, [])
+  return result
+}
+
+function PotentialFlowResolution({
+  frame,
+  isPlaying,
+}: Readonly<{ frame: ExplorerFrame; isPlaying: boolean }>) {
+  const potential = useMemo(
+    () => analysePotential(
+      new Set(frame.chronology.was),
+      new Set(frame.chronology.is),
+    ),
+    [frame.chronology.is, frame.chronology.was],
+  )
+  const geometry = useMemo(() => {
+    const addresses = new Set([
+      ...potential.presentations.flatMap((presentation) => [
+        presentation.source,
+        presentation.target,
+      ]),
+      ...potential.cells.map((cell) => cell.address),
+    ])
+    const extent = Math.max(
+      1,
+      ...[...addresses].flatMap((address) => {
+        const { x, y, z } = fromKey(address)
+        return [Math.abs(x), Math.abs(y), Math.abs(z)]
+      }),
+    )
+    const scale = Math.min(32, 108 / (extent * 2))
+    const points = new Map([...addresses].map((address) => {
+      const { x, y, z } = fromKey(address)
+      return [address, {
+        x: 160 + (x - y) * scale,
+        y: 112 + (x + y) * scale * .48 - z * scale * .92,
+      }] as const
+    }))
+    return { points }
+  }, [potential])
+
+  return (
+    <section
+      className={`potential-flow ${isPlaying ? "is-playing" : ""}`}
+      aria-labelledby="potential-flow-title"
+      data-potential-moment={frame.observer.act + 1}
+    >
+      <div className="potential-heading">
+        <div>
+          <span className="eyebrow">IS resolves into WILL BE</span>
+          <h2 id="potential-flow-title">Potential flow resolution</h2>
+        </div>
+        <strong>moment {frame.observer.act} → {frame.observer.act + 1}</strong>
+      </div>
+      <div className="potential-body">
+        <svg
+          key={`potential:${frame.observer.act}`}
+          className="potential-canvas"
+          viewBox="0 0 320 224"
+          role="img"
+          aria-label={`${potential.presentationCount} potential Face presentations resolve into ${potential.willBeDifferences} WILL BE Differences`}
+        >
+          <defs>
+            <marker
+              id={`potential-arrow-${frame.observer.act}`}
+              viewBox="0 0 6 6"
+              refX="5"
+              refY="3"
+              markerWidth="4"
+              markerHeight="4"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 6 3 L 0 6 z" />
+            </marker>
+          </defs>
+          <rect width="320" height="224" />
+          {potential.presentations.slice(0, 900).map((presentation, index) => {
+            const source = geometry.points.get(presentation.source)
+            const target = geometry.points.get(presentation.target)
+            if (!source || !target) return null
+            return (
+              <line
+                key={`${presentation.source}:${presentation.face}:${index}`}
+                x1={source.x}
+                y1={source.y}
+                x2={target.x}
+                y2={target.y}
+                markerEnd={`url(#potential-arrow-${frame.observer.act})`}
+              />
+            )
+          })}
+          {potential.cells.map((cell) => {
+            const point = geometry.points.get(cell.address)
+            if (!point) return null
+            return (
+              <circle
+                key={cell.address}
+                cx={point.x}
+                cy={point.y}
+                r={cell.arrivalCount > 2 ? 4 : 3}
+                className={cell.willBeDifferent ? "will-be-different" : "will-be-same"}
+              />
+            )
+          })}
+        </svg>
+        <div className="potential-metrics">
+          <div><span>WAS Differences</span><strong>{frame.chronology.was.length}</strong></div>
+          <div><span>IS Differences</span><strong>{frame.chronology.is.length}</strong></div>
+          <div><span>Face presentations</span><strong>{potential.presentationCount}</strong></div>
+          <div><span>Addressed potential</span><strong>{potential.addressedPotential}</strong></div>
+          <div><span>Convergence excess</span><strong>{potential.convergenceExcess}</strong></div>
+          <div><span>Opposing pairs</span><strong>{potential.opposingPairs}</strong></div>
+          <div><span>Directional remainder</span><strong>{potential.directionalRemainder}</strong></div>
+          <div className="will-be"><span>WILL BE Differences</span><strong>{potential.willBeDifferences}</strong></div>
+        </div>
+      </div>
+      <div className="allowance-copy">
+        <div>
+          <span className="eyebrow">What it is</span>
+          <p>
+            Every IS Difference presents to all six Faces. Shared target
+            addresses retain every incoming direction before the selected
+            resolution rule is applied.
+          </p>
+        </div>
+        <div>
+          <span className="eyebrow">What it allows</span>
+          <p>
+            WILL BE is calculated without committing the next moment. When
+            playback advances, this exact field becomes IS and a new potential
+            field is resolved alongside it.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function MotifFrame({
+  addresses,
+  label,
+}: Readonly<{ addresses: readonly string[]; label: string }>) {
+  const points = addresses.map((address) => {
+    const { x, y, z } = fromKey(address)
+    return {
+      address,
+      x: 90 + (x - y) * 28,
+      y: 70 + (x + y) * 14 - z * 26,
+    }
+  })
+  return (
+    <figure className="motif-frame">
+      <figcaption>{label}</figcaption>
+      <svg viewBox="0 0 180 140" role="img" aria-label={`${label}: ${addresses.length} Differences`}>
+        <rect width="180" height="140" />
+        <line x1="90" y1="70" x2="150" y2="100" />
+        <line x1="90" y1="70" x2="30" y2="100" />
+        <line x1="90" y1="70" x2="90" y2="15" />
+        {points.map((point) => (
+          <circle key={point.address} cx={point.x} cy={point.y} r="6" />
+        ))}
+      </svg>
+      <strong>{addresses.length} Δ</strong>
+    </figure>
+  )
+}
+
+function ParticleTraceFrame({
+  traces,
+  isPlaying,
+}: Readonly<{
+  traces: readonly ParticleCausalTrace[]
+  isPlaying: boolean
+}>) {
+  const centre = { x: 90, y: 70 }
+  const project = ({ x, y, z }: Readonly<{ x: number; y: number; z: number }>) => ({
+    x: 90 + (x - y) * 28,
+    y: 70 + (x + y) * 14 - z * 26,
+  })
+  const paths = traces.map((trace) => {
+    const axis = fromKey(trace.to)
+    const reference = Math.abs(axis.z) < 0.9
+      ? { x: 0, y: 0, z: 1 }
+      : { x: 0, y: 1, z: 0 }
+    const perpendicular = {
+      x: axis.y * reference.z - axis.z * reference.y,
+      y: axis.z * reference.x - axis.x * reference.z,
+      z: axis.x * reference.y - axis.y * reference.x,
+    }
+    const perpendicularLength = Math.hypot(
+      perpendicular.x,
+      perpendicular.y,
+      perpendicular.z,
+    )
+    const u = {
+      x: perpendicular.x / perpendicularLength,
+      y: perpendicular.y / perpendicularLength,
+      z: perpendicular.z / perpendicularLength,
+    }
+    const v = {
+      x: axis.y * u.z - axis.z * u.y,
+      y: axis.z * u.x - axis.x * u.z,
+      z: axis.x * u.y - axis.y * u.x,
+    }
+    const helix = Array.from({ length: 37 }, (_, step) => {
+      const progress = step / 36
+      const radius = 0.22 * Math.sin(Math.PI * progress)
+      const angle = Math.PI * 2 * 1.25 * progress
+      return project({
+        x: axis.x * progress + radius * (u.x * Math.cos(angle) + v.x * Math.sin(angle)),
+        y: axis.y * progress + radius * (u.y * Math.cos(angle) + v.y * Math.sin(angle)),
+        z: axis.z * progress + radius * (u.z * Math.cos(angle) + v.z * Math.sin(angle)),
+      })
+    })
+    const endpoint = project(axis)
+    return {
+      ...trace,
+      ...endpoint,
+      stages: trace.subcauses.map((label, index) => {
+        const endIndex = (index + 1) * 12
+        const startIndex = index * 12
+        return {
+          label,
+          x: helix[endIndex].x,
+          y: helix[endIndex].y,
+          points: helix
+            .slice(startIndex, endIndex + 1)
+            .map((point) => `${point.x},${point.y}`)
+            .join(" "),
+        }
+      }),
+    }
+  })
+  return (
+    <figure className={`particle-trace-frame ${isPlaying ? "is-playing" : ""}`}>
+      <figcaption>WHAT ALLOWED THE PARTICLE TO BE</figcaption>
+      <svg viewBox="0 0 180 140" role="img" aria-label="Six causal traces from the First Difference to the complete particle">
+        <defs>
+          <marker id="particle-trace-arrow" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 0 0 L 6 3 L 0 6 z" />
+          </marker>
+        </defs>
+        <rect width="180" height="140" />
+        {paths.map((trace, index) => (
+          <g key={trace.to} style={{ "--trace-index": index } as CSSProperties}>
+            <line
+              className="causal-axis"
+              x1={centre.x}
+              y1={centre.y}
+              x2={trace.x}
+              y2={trace.y}
+            />
+            {trace.stages.map((stage, stageIndex) => {
+              return (
+                <g
+                  key={stage.label}
+                  style={{ "--sub-trace-index": stageIndex } as CSSProperties}
+                >
+                  <polyline
+                    className={`causal-trace sub-trace sub-trace-${stageIndex + 1}`}
+                    points={stage.points}
+                    markerEnd={stageIndex === trace.stages.length - 1 ? "url(#particle-trace-arrow)" : undefined}
+                  />
+                  {stageIndex < trace.stages.length - 1 ? (
+                    <circle
+                      className={`sub-cause-node sub-cause-node-${stageIndex + 1}`}
+                      cx={stage.x}
+                      cy={stage.y}
+                      r="2.25"
+                    />
+                  ) : null}
+                </g>
+              )
+            })}
+            <circle className="allowed-address" cx={trace.x} cy={trace.y} r="6" />
+          </g>
+        ))}
+        <circle className="first-difference-node" cx={centre.x} cy={centre.y} r="7" />
+      </svg>
+      <div className="trace-key">
+        <span><i className="trace-source" />FIRST DIFFERENCE</span>
+        <span><i className="trace-path" />SUB-CAUSAL RESOLUTION</span>
+        <span><i className="trace-result" />PARTICLE ADDRESS</span>
+      </div>
+      <ol aria-label="Particle causal trace addresses">
+        {traces.map((trace) => (
+          <li key={trace.to}>
+            <span>{trace.from}</span>
+            <b>→ · → · →</b>
+            <strong>{trace.to}</strong>
+          </li>
+        ))}
+      </ol>
+    </figure>
+  )
+}
+
+function FirstActParticleResolution({ isPlaying }: Readonly<{ isPlaying: boolean }>) {
+  const particle = useMemo(deriveFirstActParticle, [])
+  return (
+    <section className="particle-resolution" aria-labelledby="particle-title">
+      <div className="particle-heading">
+        <div>
+          <span className="eyebrow">Derived directly from the First Difference</span>
+          <h2 id="particle-title">Particle from one Act</h2>
+        </div>
+        <strong>1 → 6 → PARTICLE</strong>
+      </div>
+      <div className="particle-act">
+        <MotifFrame addresses={[...particle.firstDifference]} label="FIRST DIFFERENCE" />
+        <div className="particle-operation">
+          <span>ONE ACT</span>
+          <strong>{particle.facePresentations}</strong>
+          <small>six-Face presentations</small>
+        </div>
+        <MotifFrame addresses={particle.particleAddresses} label="SIX-FACE FIELD" />
+      </div>
+      <ParticleTraceFrame traces={particle.causalTraces} isPlaying={isPlaying} />
+      <div className="particle-observer-heading">
+        <div>
+          <span className="eyebrow">What each ME receives</span>
+          <strong>{particle.observerSignature}</strong>
+        </div>
+        <div>
+          <span className="eyebrow">What their merge resolves</span>
+          <strong>{particle.mergedCount} complete addresses</strong>
+        </div>
+      </div>
+      <div className="particle-views">
+        {[...particle.observerViews].map(([face, addresses]) => (
+          <MotifFrame key={face} addresses={addresses} label={face} />
+        ))}
+      </div>
+      <div className="particle-merge">
+        <span>MERGE ALL SIX VIEWS</span>
+        <strong>→</strong>
+        <MotifFrame addresses={[...particle.mergedField]} label="COMPLETE PARTICLE" />
+      </div>
+      <div className="allowance-copy">
+        <div>
+          <span className="eyebrow">What it is</span>
+          <p>
+            The centre presents through all six Faces in one Act. The resulting
+            field contains six distinct addresses. Every individual Face
+            observer receives five because one axial address is hidden by its
+            opposite presentation.
+          </p>
+        </div>
+        <div>
+          <span className="eyebrow">What it allows</span>
+          <p>
+            Combining all six observer states recovers all six generated
+            addresses exactly. The complete merged six-Face state is therefore
+            the model particle produced by the First Act.
+          </p>
+        </div>
+      </div>
+      <p className="particle-proof">
+        Merge audit: {particle.mergeRecoversParticle ? "COMPLETE PARTICLE RECOVERED" : "INCOMPLETE"}
+      </p>
+    </section>
+  )
+}
+
+function AtomInvariantSearch() {
+  const search = useMemo(() => searchAtomInvariants(12, 1, 1), [])
+  const atom = search.strongest
+  if (!atom) {
+    return (
+      <section className="atom-search">
+        <span className="eyebrow">WAS → IS → WILL BE search</span>
+        <h2>No closed local invariant through moment {search.searchedThroughMoment}</h2>
+      </section>
+    )
+  }
+  const resolutionField = atom.resolutionSignature.length === 0
+    ? []
+    : atom.resolutionSignature.split(";")
+  return (
+    <section className="atom-search" aria-labelledby="atom-search-title">
+      <div className="atom-heading">
+        <div>
+          <span className="eyebrow">Exhaustive local closure search</span>
+          <h2 id="atom-search-title">First model-atom invariant</h2>
+        </div>
+        <strong>FOUND · moment {atom.firstMoment}</strong>
+      </div>
+      <div className="atom-cycle">
+        <MotifFrame addresses={atom.exampleField} label="WAS" />
+        <div className="cycle-arrow">→</div>
+        <MotifFrame addresses={resolutionField} label="IS" />
+        <div className="cycle-arrow">→</div>
+        <MotifFrame addresses={atom.exampleField} label="WILL BE" />
+      </div>
+      <div className="atom-metrics">
+        <div><span>Closure</span><strong>{atom.motifSize} → {resolutionField.length} → {atom.motifSize}</strong></div>
+        <div><span>Cube observer signature</span><strong>{atom.observerSignature}</strong></div>
+        <div><span>Closure span</span><strong>{atom.closureSpan} moments</strong></div>
+        <div><span>Recurrence-step GCD</span><strong>{atom.recurrenceStepGcd}</strong></div>
+        <div><span>Found moments</span><strong>{atom.uniqueMoments.join(" · ")}</strong></div>
+        <div><span>Exact occurrences</span><strong>{atom.occurrences.length}</strong></div>
+      </div>
+      <div className="allowance-copy">
+        <div>
+          <span className="eyebrow">What it is</span>
+          <p>
+            A five-Difference local field returns cube-equivalent in WILL BE
+            after resolving through one IS Difference one Face-step away. All
+            six observer views receive five addresses.
+          </p>
+        </div>
+        <div>
+          <span className="eyebrow">What it allows</span>
+          <p>
+            This is the smallest nontrivial chronologically closed invariant
+            found under the declared radius-1 and one-Face-transfer search. It
+            gives the modeller an exact internal definition of a model atom.
+          </p>
+        </div>
+      </div>
+      <p className="atom-qualification">
+        Search result of the selected recurrence—not a visual resemblance.
+        Relationships to observed atoms require a separately declared mapping.
+      </p>
+    </section>
+  )
+}
+
+function SixObserverResolution({
+  frame,
+}: Readonly<{ frame: ExplorerFrame }>) {
+  const resolution = useMemo(
+    () => observeFromSixFaces(new Set(frame.chronology.is)),
+    [frame.chronology.is],
+  )
+  const extent = Math.max(
+    1,
+    ...frame.chronology.is.flatMap((address) => {
+      const { x, y, z } = fromKey(address)
+      return [Math.abs(x), Math.abs(y), Math.abs(z)]
+    }),
+  )
+
+  return (
+    <section className="six-observer" aria-labelledby="six-observer-title">
+      <div className="six-observer-heading">
+        <div>
+          <span className="eyebrow">Six simultaneous MEs · moment {frame.observer.act}</span>
+          <h2 id="six-observer-title">Cube-face resolution</h2>
+        </div>
+        <div className="observer-equation" aria-label="Observer radius">
+          <span>Equal radius</span>
+          <strong>{resolution.radius}</strong>
+        </div>
+      </div>
+      <div className="face-views">
+        {resolution.observers.map((observer) => {
+          const view = resolution.views.get(observer.id) ?? []
+          const shown = view.length > 450
+            ? view.filter((_, index) => index % Math.ceil(view.length / 450) === 0)
+            : view
+          return (
+            <figure className="face-view" key={observer.id}>
+              <figcaption>
+                <strong>{observer.id}</strong>
+                <span>{view.length} received</span>
+              </figcaption>
+              <svg
+                viewBox="0 0 100 100"
+                role="img"
+                aria-label={`${observer.id} observer received ${view.length} Differences`}
+              >
+                <rect x="1" y="1" width="98" height="98" />
+                <line x1="50" y1="4" x2="50" y2="96" />
+                <line x1="4" y1="50" x2="96" y2="50" />
+                {shown.map((sight) => {
+                  const [x, y] = faceProjection(observer.id, sight.address, extent)
+                  const visibility = resolution.visibility.get(sight.address) ?? 0
+                  return (
+                    <circle
+                      key={sight.address}
+                      cx={x}
+                      cy={y}
+                      r={view.length > 150 ? 1.1 : 1.8}
+                      className={`visibility-${visibility}`}
+                    />
+                  )
+                })}
+              </svg>
+            </figure>
+          )
+        })}
+      </div>
+      <div className="combined-resolution" aria-live="polite">
+        <div>
+          <span>Whole field</span>
+          <strong>{frame.chronology.is.length}</strong>
+        </div>
+        <div>
+          <span>Seen by any ME</span>
+          <strong>{resolution.visibleFromAnyFace.length}</strong>
+        </div>
+        <div>
+          <span>Seen by all six</span>
+          <strong>{resolution.visibleFromEveryFace.length}</strong>
+        </div>
+        <div>
+          <span>Interior unresolved</span>
+          <strong>{resolution.hiddenFromEveryFace.length}</strong>
+        </div>
+      </div>
+      <p>
+        Every view is resolved independently from the same distance and shared
+        moment. Colour records how many of the six observers receive the same
+        field address. Hidden addresses remain in the generated whole; they are
+        not invented by the combined view.
+      </p>
+    </section>
+  )
+}
+
+function ProgressiveObserverResolution({
+  frame,
+  isPlaying,
+}: Readonly<{ frame: ExplorerFrame; isPlaying: boolean }>) {
+  const [observerStage, setObserverStage] = useState(1)
+  const [variantIndex, setVariantIndex] = useState(0)
+  const [mergedMode, setMergedMode] = useState<
+    "COMPLETE" | "ANY" | "EVERY" | "DEPENDENT" | "UNRECEIVED"
+  >("COMPLETE")
+  const field = useMemo(
+    () => new Set(frame.chronology.is),
+    [frame.chronology.is],
+  )
+  const resolution = useMemo(
+    () => observeFromSixFaces(field),
+    [field],
+  )
+  const variants = useMemo(
+    () => combinations(
+      resolution.observers.map((observer) => observer.id),
+      observerStage,
+    ).map((faces) => combineFaceViews(field, resolution, faces)),
+    [field, observerStage, resolution],
+  )
+  const selectedIndex = Math.min(variantIndex, variants.length - 1)
+  const selectedVariant = variants[selectedIndex]
+  const extent = Math.max(
+    1,
+    ...frame.chronology.is.flatMap((address) => {
+      const { x, y, z } = fromKey(address)
+      return [Math.abs(x), Math.abs(y), Math.abs(z)]
+    }),
+  )
+  const mergedPoints = useMemo(() => {
+    const addresses = {
+      COMPLETE: [...field],
+      ANY: selectedVariant.receivedByAny,
+      EVERY: selectedVariant.receivedByEvery,
+      DEPENDENT: selectedVariant.observerDependent,
+      UNRECEIVED: selectedVariant.unreceived,
+    }[mergedMode]
+    const selectedViews = selectedVariant.faces.map((face) =>
+      new Set((resolution.views.get(face) ?? []).map((sight) => sight.address)),
+    )
+    const mergedExtent = Math.max(
+      1,
+      ...[...field].flatMap((address) => {
+        const { x, y, z } = fromKey(address)
+        return [Math.abs(x), Math.abs(y), Math.abs(z)]
+      }),
+    )
+    const scale = Math.min(34, 102 / (mergedExtent * 2))
+    return addresses.map((address) => {
+      const { x, y, z } = fromKey(address)
+      return {
+        address,
+        visibility: selectedViews.reduce(
+          (total, view) => total + Number(view.has(address)),
+          0,
+        ),
+        x: 160 + (x - y) * scale,
+        y: 112 + (x + y) * scale * .48 - z * scale * .92,
+      }
+    })
+  }, [field, mergedMode, resolution.views, selectedVariant])
+
+  return (
+    <section
+      className={`six-observer progressive ${isPlaying ? "is-playing" : ""}`}
+      aria-labelledby="progressive-observer-title"
+      data-shared-moment={frame.observer.act}
+    >
+      <div className="six-observer-heading">
+        <div>
+          <span className="eyebrow">Progressive observers · moment {frame.observer.act}</span>
+          <h2 id="progressive-observer-title">
+            Cube-face resolution · stage {observerStage}
+          </h2>
+        </div>
+        <div className="observer-equation" aria-label="Observer radius">
+          <span>Equal radius</span>
+          <strong>{resolution.radius}</strong>
+        </div>
+      </div>
+      <div className="observer-stages" aria-label="Observer stages">
+        {[1, 2, 3, 4, 5, 6].map((stage) => (
+          <button
+            type="button"
+            key={stage}
+            className={observerStage === stage ? "selected" : ""}
+            aria-pressed={observerStage === stage}
+            onClick={() => {
+              setObserverStage(stage)
+              setVariantIndex(0)
+            }}
+          >
+            <span>{stage}</span>
+            <small>{stage === 1 ? "ME" : `${stage} MEs`}</small>
+          </button>
+        ))}
+      </div>
+      <div className="allowance-copy">
+        <div>
+          <span className="eyebrow">What it is</span>
+          <p>
+            {observerStage} independently centred
+            {observerStage === 1 ? " observer resolves" : " observers resolve"} the
+            same field at one shared moment and equal radius.
+          </p>
+        </div>
+        <div>
+          <span className="eyebrow">What it allows</span>
+          <p>
+            This configuration distinguishes {selectedVariant.receivedByAny.length} received
+            addresses, {selectedVariant.observerDependent.length} observer-dependent
+            addresses, and {selectedVariant.unreceived.length} addresses not received
+            by these views.
+          </p>
+        </div>
+      </div>
+      <div className="view-variants" aria-label={`${observerStage}-observer configurations`}>
+        {variants.map((variant, index) => (
+          <button
+            type="button"
+            key={variant.faces.join(":")}
+            className={index === selectedIndex ? "selected" : ""}
+            aria-pressed={index === selectedIndex}
+            onClick={() => setVariantIndex(index)}
+          >
+            <strong>{variant.faces.join(" · ")}</strong>
+            <span>
+              any {variant.receivedByAny.length} · every {variant.receivedByEvery.length}
+              {" "}· dependent {variant.observerDependent.length} · hidden {variant.unreceived.length}
+            </span>
+            <small>result {variant.signature}</small>
+            <small>
+              {variant.symmetryClass} · complement {variant.complementFaces.join(" · ") || "NONE"}
+            </small>
+          </button>
+        ))}
+      </div>
+      <div className="face-views">
+        {resolution.observers
+          .filter((observer) => selectedVariant.faces.includes(observer.id))
+          .map((observer) => {
+            const view = resolution.views.get(observer.id) ?? []
+            const shown = view.length > 450
+              ? view.filter((_, index) => index % Math.ceil(view.length / 450) === 0)
+              : view
+            return (
+              <figure className="face-view" key={observer.id}>
+                <figcaption>
+                  <strong>{observer.id}</strong>
+                  <span>{view.length} received</span>
+                </figcaption>
+                <svg
+                  key={`${frame.observer.act}:${observer.id}`}
+                  viewBox="0 0 100 100"
+                  role="img"
+                  aria-label={`${observer.id} observer received ${view.length} Differences`}
+                >
+                  <rect x="1" y="1" width="98" height="98" />
+                  <line x1="50" y1="4" x2="50" y2="96" />
+                  <line x1="4" y1="50" x2="96" y2="50" />
+                  {shown.map((sight) => {
+                    const [x, y] = faceProjection(observer.id, sight.address, extent)
+                    const visibility = resolution.visibility.get(sight.address) ?? 0
+                    return (
+                      <circle
+                        key={sight.address}
+                        cx={x}
+                        cy={y}
+                        r={view.length > 150 ? 1.1 : 1.8}
+                        className={`visibility-${visibility}`}
+                      />
+                    )
+                  })}
+                </svg>
+              </figure>
+            )
+          })}
+      </div>
+      <section className="merged-view-state" aria-labelledby="merged-view-title">
+        <div className="merged-view-heading">
+          <div>
+            <span className="eyebrow">Combined causal requirements</span>
+            <h3 id="merged-view-title">Merged view states</h3>
+          </div>
+          <strong>
+            {selectedVariant.faces.join(" · ")} · moment {frame.observer.act}
+          </strong>
+        </div>
+        <div className="merged-state-controls">
+          {(["COMPLETE", "ANY", "EVERY", "DEPENDENT", "UNRECEIVED"] as const).map((mode) => (
+            <button
+              type="button"
+              key={mode}
+              className={mergedMode === mode ? "selected" : ""}
+              aria-pressed={mergedMode === mode}
+              onClick={() => setMergedMode(mode)}
+            >
+              <span>{mode}</span>
+              <strong>
+                {{
+                  COMPLETE: field.size,
+                  ANY: selectedVariant.receivedByAny.length,
+                  EVERY: selectedVariant.receivedByEvery.length,
+                  DEPENDENT: selectedVariant.observerDependent.length,
+                  UNRECEIVED: selectedVariant.unreceived.length,
+                }[mode]}
+              </strong>
+            </button>
+          ))}
+        </div>
+        <svg
+          key={`${frame.observer.act}:${mergedMode}:${selectedVariant.faces.join(":")}`}
+          className="merged-state-canvas"
+          viewBox="0 0 320 224"
+          role="img"
+          aria-label={`${mergedMode} merged state contains ${mergedPoints.length} field addresses`}
+        >
+          <rect width="320" height="224" />
+          <line x1="160" y1="112" x2="260" y2="160" />
+          <line x1="160" y1="112" x2="60" y2="160" />
+          <line x1="160" y1="112" x2="160" y2="20" />
+          {mergedPoints.map((point) => (
+            <circle
+              key={point.address}
+              cx={point.x}
+              cy={point.y}
+              r={mergedPoints.length > 500 ? 1.5 : mergedPoints.length > 100 ? 2.1 : 3.2}
+              className={`visibility-${point.visibility}`}
+            />
+          ))}
+        </svg>
+        <p>
+          COMPLETE retains the generated field. The other states filter what
+          the selected MEs jointly receive without replacing the complete field.
+          Colour is the number of selected observers receiving each address.
+        </p>
+      </section>
+      <div className="combined-resolution" aria-live="polite">
+        <div><span>Whole field</span><strong>{frame.chronology.is.length}</strong></div>
+        <div><span>Received by any</span><strong>{selectedVariant.receivedByAny.length}</strong></div>
+        <div><span>Received by every</span><strong>{selectedVariant.receivedByEvery.length}</strong></div>
+        <div><span>Not received</span><strong>{selectedVariant.unreceived.length}</strong></div>
+      </div>
+      <p>
+        Every result remains separate. Matching counts do not make two
+        configurations identical: their Face addresses and complete visibility
+        histograms remain part of the result.
+      </p>
+    </section>
+  )
+}
+
+function RecursiveLineageResolution() {
+  const [depth, setDepth] = useState(2)
+  const level = useMemo(() => generateLineageLevel(depth), [depth])
+  return (
+    <section className="model-extension lineage-resolution" aria-labelledby="lineage-title">
+      <div className="extension-heading">
+        <div>
+          <span className="eyebrow">Causal identity before projection</span>
+          <h2 id="lineage-title">Infinite six-Face lineage</h2>
+        </div>
+        <strong>6^{depth} = {level.count}</strong>
+      </div>
+      <div className="lineage-levels" aria-label="Lineage depth">
+        {[0, 1, 2, 3, 4, 5].map((value) => (
+          <button
+            type="button"
+            key={value}
+            className={value === depth ? "selected" : ""}
+            aria-pressed={value === depth}
+            onClick={() => setDepth(value)}
+          >
+            <span>Level {value}</span>
+            <strong>{lineageCount(value)}</strong>
+          </button>
+        ))}
+        <div className="lineage-infinite">
+          <span>Next</span>
+          <strong>6^{depth + 1} = {lineageCount(depth + 1)}</strong>
+        </div>
+        <div className="lineage-infinite">
+          <span>No final level</span>
+          <strong>6ⁿ as n → ∞</strong>
+        </div>
+      </div>
+      <div className="allowance-copy">
+        <div>
+          <span className="eyebrow">What it is</span>
+          <p>
+            Every branch retains its ordered Face path. Binary-scaled levels
+            currently produce {level.count} distinct causal addresses and
+            {level.unique ? " no lineage identity is lost" : " an identity conflict"}.
+          </p>
+        </div>
+        <div>
+          <span className="eyebrow">What it allows</span>
+          <p>
+            A visible coordinate can be treated as a projection while the
+            complete path remains available. Presentation, overlap in a view,
+            and causal identity are therefore separate relations.
+          </p>
+        </div>
+      </div>
+      <ol className="lineage-sample">
+        {level.nodes.slice(0, 12).map((node) => (
+          <li key={node.path.join("/") || "origin"}>
+            <span>{node.path.join(" → ") || "NOTHING → ME"}</span>
+            <strong>{node.position}</strong>
+          </li>
+        ))}
+      </ol>
+      {level.nodes.length > 12 ? (
+        <p className="extension-note">
+          Showing 12 of {level.nodes.length} exact lineages. Every lineage was
+          included in the uniqueness calculation.
+        </p>
+      ) : null}
+    </section>
+  )
+}
+
+function ThoughtResolutionPanel() {
+  const [thoughtState, setThoughtState] = useState(emptyThoughtState)
+  const [thoughtInput, setThoughtInput] = useState("the cube")
+  const [lastResolution, setLastResolution] = useState<ThoughtResolution | null>(null)
+
+  const resolveInput = useCallback((content: string) => {
+    if (content.trim().length === 0) return
+    const resolution = resolveThought(thoughtState, content)
+    setLastResolution(resolution)
+    setThoughtState(resolution.is)
+  }, [thoughtState])
+
+  return (
+    <section className="model-extension thought-resolution" aria-labelledby="thought-title">
+      <div className="extension-heading">
+        <div>
+          <span className="eyebrow">ME resolves a represented Difference</span>
+          <h2 id="thought-title">Thought becomes an event</h2>
+        </div>
+        <strong>Moment {thoughtState.moment}</strong>
+      </div>
+      <div className="thought-controls">
+        <label>
+          <span>Something ME can think</span>
+          <input
+            value={thoughtInput}
+            onChange={(event) => setThoughtInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") resolveInput(thoughtInput)
+            }}
+          />
+        </label>
+        <button type="button" onClick={() => resolveInput(thoughtInput)}>
+          Resolve thought
+        </button>
+        <button
+          type="button"
+          disabled={lastResolution === null}
+          onClick={() => {
+            if (lastResolution) resolveInput(`thought(${lastResolution.content})`)
+          }}
+        >
+          Think about that thought
+        </button>
+      </div>
+      <div className="thought-transition">
+        <div>
+          <span className="eyebrow">WAS</span>
+          <strong>{lastResolution ? (lastResolution.wasPresent ? "PRESENT" : "NOT PRESENT") : "UNRESOLVED"}</strong>
+        </div>
+        <div className="thought-arrow">→</div>
+        <div>
+          <span className="eyebrow">IS</span>
+          <strong>{lastResolution ? "PRESENT" : "UNRESOLVED"}</strong>
+        </div>
+        <div>
+          <span className="eyebrow">Recursion</span>
+          <strong>{lastResolution?.recurrence ?? 0}</strong>
+        </div>
+      </div>
+      <div className="allowance-copy">
+        <div>
+          <span className="eyebrow">What it is</span>
+          <p>
+            A local observer state changes because a represented Difference is
+            absent or differently retained in WAS and present in IS.
+          </p>
+        </div>
+        <div>
+          <span className="eyebrow">What it allows</span>
+          <p>
+            The distinction can be maintained, resolved again, or become the
+            NOT ME of a further thought without claiming that it is the external
+            thing being represented.
+          </p>
+        </div>
+      </div>
+      <ol className="thought-memory" aria-label="Maintained thoughts">
+        {thoughtState.records.map((record) => (
+          <li key={record.content}>
+            <span>{record.content}</span>
+            <strong>{record.resolutions} resolution{record.resolutions === 1 ? "" : "s"}</strong>
+          </li>
+        ))}
+      </ol>
+    </section>
   )
 }
 
@@ -451,6 +1441,12 @@ export function App() {
             onSelect={selectRelation}
             isPlaying={isPlaying}
           />
+          <PotentialFlowResolution frame={frame} isPlaying={isPlaying} />
+          <FirstActParticleResolution isPlaying={isPlaying} />
+          <AtomInvariantSearch />
+          <ProgressiveObserverResolution frame={frame} isPlaying={isPlaying} />
+          <RecursiveLineageResolution />
+          <ThoughtResolutionPanel />
           <div className="field-status" aria-live="polite">
             <div>
               <span className="eyebrow">Observer</span>
