@@ -127,3 +127,23 @@ not replaced with a floating-point approximation. It belongs to the first
 cube-to-axis handoff and remains constant along the path, so it cancels from
 later second differences. The renderer exaggerates the separation only to
 make the otherwise infinitesimal distinction visible.
+
+## Spiral while spiralling
+
+The child grain is not resolved around a stationary parent address. Its local
+spiral is composed with the parent ME's still-changing carrier spiral:
+
+```text
+total(t,s) = parentSpiral(t) + (1/2) childSpiral(s,t) + epsilon U
+```
+
+The child path retains equal outward and return components. Their exact
+superposition is displayed as a standing spiral:
+
+```text
+out(s,t) + return(s,t) = 2 A(s) cos(2 pi s) cos(2 pi t)
+```
+
+The standing nodes remain fixed relative to the moving parent carrier while
+the amplitude changes through the Act. The renderer therefore shows a spiral
+resolving inside a spiral, rather than two unrelated rotations.
