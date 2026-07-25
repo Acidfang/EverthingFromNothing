@@ -65,10 +65,10 @@ export const PROVENANCE: readonly ProvenanceNode[] = Object.freeze([
   },
   {
     id: "physical-identity",
-    label: "PHYSICAL IDENTITY",
+    label: "EXTERNAL COMPARISON",
     status: "UNRESOLVED",
     parents: ["whole-web"],
-    reason: "No physical object identity has yet been derived.",
+    reason: "Generated results are model facts; relationships to currently named observations require an explicit mapping.",
   },
 ] satisfies readonly ProvenanceNode[])
 

@@ -20,6 +20,7 @@
     "preview": "vite preview",
     "demo": "node --experimental-strip-types src/cli.ts",
     "explore": "node --experimental-strip-types src/terminal.ts",
+    "search:atoms": "node --experimental-strip-types src/search-atoms.ts",
     "test:model": "node --experimental-strip-types --test tests/*.test.ts",
     "audit:release": "node --experimental-strip-types scripts/release-audit.ts"
   },
