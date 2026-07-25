@@ -4,6 +4,7 @@ import test from "node:test"
 import {
   PARTICLE_MOMENTS_PER_ACT,
   calculateParticleForceMoments,
+  calculateParticleTransformPath,
   deriveFirstActParticle,
   sampleParticleHelix,
 } from "../src/model/particle.ts"
@@ -69,5 +70,34 @@ test("all six Faces generate equal force magnitudes at every moment", () => {
   )
   for (const signature of signatures.slice(1)) {
     assert.deepEqual(signature, signatures[0])
+  }
+})
+
+test("the full transform path preserves every WAS to IS handoff", () => {
+  const path = calculateParticleTransformPath("1,0,0")
+  assert.equal(path.length, PARTICLE_MOMENTS_PER_ACT)
+  assert.equal(path[0].parentId, null)
+  assert.equal(path.at(-1)!.nextId, null)
+  assert.deepEqual(
+    path.map((step) => step.phase),
+    [
+      ...Array(12).fill("DIRECTION ALLOWED"),
+      ...Array(12).fill("FACE PRESENTED"),
+      ...Array(12).fill("ADDRESS RESOLVED"),
+    ],
+  )
+  for (let index = 1; index < path.length; index += 1) {
+    assert.equal(path[index].parentId, path[index - 1].id)
+    assert.equal(path[index - 1].nextId, path[index].id)
+    assert.deepEqual(path[index].was, path[index - 1].is)
+  }
+})
+
+test("the particle retains all 216 six-Face transforms", () => {
+  const particle = deriveFirstActParticle()
+  assert.equal(particle.transformPaths.size, 6)
+  assert.equal(particle.transformStepCount, 6 * PARTICLE_MOMENTS_PER_ACT)
+  for (const path of particle.transformPaths.values()) {
+    assert.equal(path.length, PARTICLE_MOMENTS_PER_ACT)
   }
 })
