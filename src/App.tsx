@@ -108,13 +108,17 @@ function OperatorResolutionStage({
   isPlaying,
   onMomentChange,
   onTogglePlay,
+  onPlayToPhase,
 }: Readonly<{
   moment: number
   isPlaying: boolean
   onMomentChange: (moment: number) => void
   onTogglePlay: () => void
+  onPlayToPhase: (phase: number) => void
 }>) {
   const [depth, setDepth] = useState(1)
+  const [phaseQuery, setPhaseQuery] = useState("")
+  const [showCompleteState, setShowCompleteState] = useState(false)
   const nestedMoment = moment === 0
     ? null
     : INITIAL_SPIRAL_DISCOVERY.moments[Math.min(moment, ATOM_FIELD_MOMENT) - 1]
@@ -145,6 +149,13 @@ function OperatorResolutionStage({
   ]
   const projectionAvailable = mechanismMoment.phase === FIRST_ACT_RESOLUTION.phases.length - 1
   const resolutionViews = ["FIRST_FRAME", "CLOUD_FRAME", "STRUCTURE_FRAME"] as const
+  const frameStarts = { FIRST_FRAME: 0, CLOUD_FRAME: 1, STRUCTURE_FRAME: 10 } as const
+  const normalizedQuery = phaseQuery.trim().toLowerCase()
+  const visiblePhases = FIRST_ACT_RESOLUTION.phases.filter((phase) =>
+    normalizedQuery.length === 0
+    || [phase.did, phase.evidence, ...phase.was, ...phase.is, ...phase.canBe]
+      .join(" ").toLowerCase().includes(normalizedQuery),
+  )
 
   return (
     <section className="operator-stage" aria-labelledby="operator-stage-title">
@@ -171,12 +182,14 @@ function OperatorResolutionStage({
           <p>{mechanismMoment.evidence}</p>
         </div>
         <div className="nested-resolution-view" data-view={mechanismMoment.frame}>
-          <nav aria-label="Nested resolution views">
+          <nav aria-label="Enter a contained frame">
             {resolutionViews.map((view, index) => (
-              <span
+              <button
+                type="button"
                 key={view}
                 className={view === mechanismMoment.frame ? "active" : resolutionViews.indexOf(mechanismMoment.frame) > index ? "passed" : ""}
-              >{index + 1} · {view.replace("_", " ")}</span>
+                onClick={() => onMomentChange(frameStarts[view])}
+              >{index + 1} · {view.replace("_", " ")}</button>
             ))}
           </nav>
           <div className="resolution-frame-visual">
@@ -202,18 +215,52 @@ function OperatorResolutionStage({
             <div><dt>DID</dt><dd>{mechanismMoment.did}</dd></div>
           </dl>
         </div>
+        <div className="exploration-controls">
+          <button type="button" onClick={() => onMomentChange(Math.max(0, mechanismMoment.phase - 1))} disabled={mechanismMoment.phase === 0}>← Previous phase</button>
+          <button type="button" className="play-mechanism" onClick={() => onPlayToPhase(FIRST_ACT_RESOLUTION.phases.length - 1)}>▶ Play First Act resolution</button>
+          <button type="button" onClick={() => onMomentChange(Math.min(FIRST_ACT_RESOLUTION.phases.length - 1, mechanismMoment.phase + 1))} disabled={projectionAvailable}>Next phase →</button>
+          <label>
+            <span>SEARCH THE WRITTEN MECHANISM</span>
+            <input value={phaseQuery} onChange={(event) => setPhaseQuery(event.target.value)} placeholder="wave, medium, orientation…" />
+          </label>
+          <label className="state-toggle">
+            <input type="checkbox" checked={showCompleteState} onChange={(event) => setShowCompleteState(event.target.checked)} />
+            <span>Show complete retained State</span>
+          </label>
+        </div>
+        <section className="phase-inspector" aria-live="polite">
+          <header>
+            <span>SELECTED PHASE {mechanismMoment.phase}</span>
+            <strong>{mechanismMoment.frame.replace("_", " ")} · GRAIN {mechanismMoment.temporalGrain}</strong>
+          </header>
+          <dl>
+            <div><dt>WAS</dt><dd>{mechanismMoment.was.length ? mechanismMoment.was.join(" · ") : "NO PRIOR REPRESENTED STATE INSIDE THIS MODEL"}</dd></div>
+            <div><dt>DID</dt><dd>{mechanismMoment.did}</dd></div>
+            <div><dt>IS</dt><dd>{(showCompleteState ? mechanismMoment.is : mechanismMoment.introduced).join(" · ")}</dd></div>
+            <div><dt>CAN BE</dt><dd>{mechanismMoment.canBe.join(" · ")}</dd></div>
+            <div><dt>WHY / EVIDENCE</dt><dd>{mechanismMoment.evidence}</dd></div>
+            <div><dt>PARENT</dt><dd>{mechanismMoment.parents.length ? `PHASE ${mechanismMoment.parents.join(" · ")}` : "SELECTED ROOT ACT"}</dd></div>
+          </dl>
+        </section>
+        <details className="assumption-gate">
+          <summary>Prior assumptions removed before this phase</summary>
+          <p>NO CLOCK · NO EXTERNAL CAMERA · NO PIXEL GRID · NO CUBE · NO CARTESIAN AXES · NO DISTANCE · NO VOLUME · NO TRANSLATION · NO PRE-EXISTING SPACE · NO PRE-EXISTING MEDIUM · NO PARTICLE · NO PHYSICAL LABEL</p>
+        </details>
         <ol>
-          {FIRST_ACT_RESOLUTION.phases.map((state) => (
+          {visiblePhases.map((state) => (
             <li
               key={state.phase}
               className={state.phase === mechanismMoment.phase ? "active" : state.phase < mechanismMoment.phase ? "passed" : ""}
             >
-              <span>PHASE {state.phase} · {state.frame.replace("_", " ")}</span>
-              <strong>{state.introduced.length === 0 ? "NO REPRESENTED DIFFERENCE" : state.introduced.join(" · ")}</strong>
-              <small>WAS → {state.did} → IS → {state.canBe.join(" / ")}</small>
+              <button type="button" onClick={() => onMomentChange(state.phase)}>
+                <span>PHASE {state.phase} · {state.frame.replace("_", " ")}</span>
+                <strong>{state.introduced.length === 0 ? "NO REPRESENTED DIFFERENCE" : state.introduced.join(" · ")}</strong>
+                <small>WAS → {state.did} → IS → {state.canBe.join(" / ")}</small>
+              </button>
             </li>
           ))}
         </ol>
+        {visiblePhases.length === 0 ? <p className="no-phase-results">No retained phase contains that Difference.</p> : null}
         <div className="projection-gate">
           <span>SELECTED ONLY AFTER ADMISSION</span>
           <strong>{FIRST_ACT_RESOLUTION.selectedProjections.join(" · ")}</strong>
@@ -2963,6 +3010,10 @@ export function App() {
   const explainClick = useCallback((event: ReactMouseEvent<HTMLElement>) => {
     const origin = event.target
     if (!(origin instanceof Element) || origin.closest(".page-info-bubble")) return
+    if (origin.closest(".generating-ledger button, .generating-ledger input, .generating-ledger label, .generating-ledger summary")) {
+      setPageExplanation(null)
+      return
+    }
     const target = origin.closest(INFO_TARGETS)
     if (!target) {
       setPageExplanation(null)
@@ -3101,6 +3152,12 @@ export function App() {
           setIsPlaying(false)
           setResolutionPhase(moment)
           setTargetMoment(moment)
+        }}
+        onPlayToPhase={(phase) => {
+          setIsPlaying(false)
+          setResolutionPhase(0)
+          setTargetMoment(phase)
+          window.setTimeout(() => setIsPlaying(true), 0)
         }}
         onTogglePlay={() => {
           if (isPlaying) {
