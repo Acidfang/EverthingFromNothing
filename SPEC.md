@@ -28,9 +28,9 @@ model, not a claim that either layer is established physics.
 The reconstructed source is
 `C:\Users\joera\OneDrive\Documents\Music\Digital Control Act\docs\DCA-WHITEPAPER.md`,
 SHA-256 `C70C2F0C9A93523D8D3D92814327250202F429D9463F65FEAF62C2E56B358D6E`.
-The governing passages are the admission order (lines 146–201), minimum
-two-presentation projection (1699–1713), orientation test (1735–1765), epsilon
-definition (1851–1855), and closure/ripple/spiral reconstruction (1815–1884).
+The governing passages are **Origin gate**, **Framerate: three pictures of the
+First Act becoming structure**, **One Act, one Moment, and an already populated
+universe**, and **The two-face demonstration: why medium and spiral emerge**.
 
 Every visible statement is classified as:
 
@@ -53,22 +53,49 @@ Difference between current and closable State, its forming Moment and boundary,
 its resolving evidence, and its effect. Pattern counts may rank references;
 they never create a condition or replace unresolved State with probability.
 
-## Generating ledger
+## One Moment, three contained frame views
 
 ```text
-M0  WAS [] -> NO ACT -> IS []
-M1  WAS [] -> DISTINGUISH -> IS [THIS, IS-NOT-THIS]
-M2  retain epsilon(G) > 0 -> ORIENTATION REMAINDER
-M3  resolve allowance -> FIRST WAVE / LOCAL MEDIUM
-M4  parent IS becomes child WAS -> RIPPLE / GRAIN AVAILABLE
-M5  repeat from retained orientation -> SPIRAL / RECURSIVE MEDIUM
+FRAME 1 / FIRST FRAME / temporal Grain 0
+  complete First Act
+  complete recursive ripple already causally contained
+
+FRAME 2 / CLOUD FRAME / temporal Grain -1
+  temporal zoom into Frame 1
+  two faces at one reference
+  unresolved external step rejected
+  look around retains location
+  epsilon(G) rotation exposes oriented Difference
+  connecting allowance closes as first wave / local medium
+  recursive waves form the ripple
+
+FRAME 3 / STRUCTURE FRAME / temporal Grain -2
+  finer temporal zoom into the same ripple
+  parent ripple remains retained
+  inherited orientation produces nested spiral
+  recurring paths form local closures
+  closures expose field, medium, path and container relations
 ```
 
-`THIS` and `IS-NOT-THIS` are relational presentations, not polygonal faces.
-Wave and medium are two presentations of the same closure. A child Grain first
-inherits the complete parent `IS`, then contributes its own local orientation
-Difference. The implementation retains every state as `WAS → DID → IS → CAN
-BE`; it never overwrites a parent to manufacture continuity.
+All three are views of outer Moment 1. Frames 2 and 3 are inside Frame 1; they
+are not later creation events. Zoom is a selected observer operation that
+reveals contained resolution. It is not the causal `DID`. The ledger separately
+records what the wave did at each exposed Grain.
+
+`FACE A` and `FACE B` are relational presentations, not polygonal faces. Wave
+and medium are two presentations of the same minimum closure. A child Grain
+first inherits the complete parent `IS`, then resolves its own presented
+Difference. Every phase retains `WAS → DID → IS → CAN BE`; no finer frame may
+rewrite how its parent formed.
+
+## Prior-assumption gate
+
+The generating model does not begin with a clock, sequence of empty snapshots,
+camera, pixel grid, cube, Cartesian axes, distance, volume, translation,
+pre-existing space, pre-existing medium, particle, physical label, or empirical
+identity. Nothing from the older six-face implementation is permitted to define
+the three First-Frame views. Those structures become optional projections only
+after the two-face mechanism has admitted the relations they require.
 
 ## Selected executable projection
 
