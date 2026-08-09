@@ -77,6 +77,7 @@ import {
   SIMULTANEOUS_RECURSIVE_VOLUME,
   recursiveGapAtGrain,
 } from "./model/volume-gap.ts"
+import { reconstructFirstAct } from "./model/first-act.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
 const PLAYBACK_SPEEDS = [
@@ -86,6 +87,7 @@ const PLAYBACK_SPEEDS = [
 ] as const
 const INITIAL_SPIRAL_DISCOVERY = deriveNestedGrain("1,0,0", 0)
 const ATOM_FIELD_MOMENT = INITIAL_SPIRAL_DISCOVERY.moments.length
+const FIRST_ACT_RESOLUTION = reconstructFirstAct()
 
 type ProjectedPoint = Readonly<{
   point: ScenePoint
@@ -138,15 +140,16 @@ function OperatorResolutionStage({
     }
   })
   const missingVariable = 0
+  const mechanismMoment = FIRST_ACT_RESOLUTION.moments[Math.min(moment, 5)]
 
   return (
     <section className="operator-stage" aria-labelledby="operator-stage-title">
       <header className="operator-stage-heading">
         <div>
-          <h2 id="operator-stage-title">One state · two grains · one observer</h2>
+          <h2 id="operator-stage-title">Everything begins with one Difference</h2>
           <p>
-            The local field resolves inside its ME while the original view
-            retains the whole and records every boundary remainder.
+            The generating ledger comes first. Geometry, binary and parity are
+            later projections and cannot create their own Root.
           </p>
         </div>
         <div className="operator-stage-readout" aria-live="polite">
@@ -156,6 +159,30 @@ function OperatorResolutionStage({
           <strong>0 → -{depth}</strong>
         </div>
       </header>
+
+      <section className="generating-ledger" aria-label="Carrier-independent First Act resolution">
+        <div className="generating-now">
+          <span>ROOT · {mechanismMoment.root}</span>
+          <strong>{mechanismMoment.did}</strong>
+          <p>{mechanismMoment.evidence}</p>
+        </div>
+        <ol>
+          {FIRST_ACT_RESOLUTION.moments.map((state) => (
+            <li
+              key={state.moment}
+              className={state.moment === mechanismMoment.moment ? "active" : state.moment < mechanismMoment.moment ? "passed" : ""}
+            >
+              <span>M{state.moment} · {state.status}</span>
+              <strong>{state.is.length === 0 ? "NO REPRESENTED DIFFERENCE" : state.is.join(" · ")}</strong>
+              <small>WAS → {state.did} → IS → {state.canBe.join(" / ")}</small>
+            </li>
+          ))}
+        </ol>
+        <div className="projection-gate">
+          <span>SELECTED ONLY AFTER ADMISSION</span>
+          <strong>{FIRST_ACT_RESOLUTION.selectedProjections.join(" · ")}</strong>
+        </div>
+      </section>
 
       <div className="operator-views">
         <section className="operator-view original-view" aria-label="Original view">

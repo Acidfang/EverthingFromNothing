@@ -55,5 +55,8 @@ test("terminal exposes ledger and complete JSON frame", () => {
   executeCommand(explorer, "tick")
   assert.match(executeCommand(explorer, "ledger").output, /arrivals/)
   const json = executeCommand(explorer, "frame").output
-  assert.equal(JSON.parse(json).kernelVersion, "first-act-gf2-v1")
+  assert.equal(
+    JSON.parse(json).kernelVersion,
+    "first-act-resolution-v2 / gf2-projection-v1",
+  )
 })

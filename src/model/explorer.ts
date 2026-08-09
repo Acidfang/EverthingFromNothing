@@ -40,7 +40,7 @@ export type CausalExplanation = Readonly<{
 }>
 
 export type ExplorerFrame = Readonly<{
-  kernelVersion: "first-act-gf2-v1"
+  kernelVersion: "first-act-resolution-v2 / gf2-projection-v1"
   observer: Readonly<{
     act: number
     relativeGrain: number
@@ -274,7 +274,7 @@ export class FirstActExplorer {
     }
 
     return Object.freeze({
-      kernelVersion: "first-act-gf2-v1",
+      kernelVersion: "first-act-resolution-v2 / gf2-projection-v1",
       observer: Object.freeze({
         act: state.act,
         relativeGrain: this.#relativeGrain,
