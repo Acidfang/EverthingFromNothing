@@ -14,7 +14,8 @@ test("the unresolved external comparison retains its complete parent path", () =
   const path = ancestry("physical-identity")
   assert.equal(path.at(-1)?.resolution.closure, "UNRESOLVED UNTIL NATIVE EVIDENCE CLOSES")
   assert.deepEqual(path.map((node) => node.id), [
-    "nothing", "first-difference", "recurrence-required", "six-face-grid",
+    "nothing", "first-difference", "two-presentations", "orientation-change",
+    "first-closure", "recurrence-required", "six-face-grid",
     "gf2", "reversible-update", "whole-web", "physical-identity",
   ])
 })

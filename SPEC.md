@@ -2,23 +2,35 @@
 
 ## Public promise
 
-The explorer lets a visitor perform one declared operation and inspect every
-result that operation generated:
+The explorer reconstructs the carrier-independent admission order in the DCA
+whitepaper before applying any geometric or binary projection:
 
 \[
 \boxed{
-\text{First Difference}
+\text{NOTHING}
 \rightarrow
-\text{one shared tick}
+\text{THIS / IS{-}NOT{-}THIS at one reference}
 \rightarrow
-\text{same-grain Resolution}
+\epsilon(G)>0\text{ orientation remainder}
 \rightarrow
-\text{recursion available}
+\text{minimum closure = first wave / local medium}
+\rightarrow
+\text{recursive retention = ripple / spiral available}
 }
 \]
 
-It is an executable mathematical model, not a claim that the current kernel is
-established physics.
+This generating ledger imports no axes, cells, distances, cube, sphere, parity,
+physical unit, or named empirical object. The existing six-face GF(2) field is
+retained as a selected, reversible projection after those relations have been
+admitted. It is not the Root mechanism. The explorer is an executable formal
+model, not a claim that either layer is established physics.
+
+The reconstructed source is
+`C:\Users\joera\OneDrive\Documents\Music\Digital Control Act\docs\DCA-WHITEPAPER.md`,
+SHA-256 `C70C2F0C9A93523D8D3D92814327250202F429D9463F65FEAF62C2E56B358D6E`.
+The governing passages are the admission order (lines 146–201), minimum
+two-presentation projection (1699–1713), orientation test (1735–1765), epsilon
+definition (1851–1855), and closure/ripple/spiral reconstruction (1815–1884).
 
 Every visible statement is classified as:
 
@@ -41,13 +53,29 @@ Difference between current and closable State, its forming Moment and boundary,
 its resolving evidence, and its effect. Pattern counts may rank references;
 they never create a condition or replace unresolved State with probability.
 
-## Initial state and chronology
+## Generating ledger
 
 ```text
-WAS  -> no represented Difference
-IS   -> one First Difference at the relative origin
-NEXT -> absent until calculated
+M0  WAS [] -> NO ACT -> IS []
+M1  WAS [] -> DISTINGUISH -> IS [THIS, IS-NOT-THIS]
+M2  retain epsilon(G) > 0 -> ORIENTATION REMAINDER
+M3  resolve allowance -> FIRST WAVE / LOCAL MEDIUM
+M4  parent IS becomes child WAS -> RIPPLE / GRAIN AVAILABLE
+M5  repeat from retained orientation -> SPIRAL / RECURSIVE MEDIUM
 ```
+
+`THIS` and `IS-NOT-THIS` are relational presentations, not polygonal faces.
+Wave and medium are two presentations of the same closure. A child Grain first
+inherits the complete parent `IS`, then contributes its own local orientation
+Difference. The implementation retains every state as `WAS → DID → IS → CAN
+BE`; it never overwrites a parent to manufacture continuity.
+
+## Selected executable projection
+
+Only after the generating ledger has admitted Difference, reference,
+orientation, closure, recursion and Grain does the explorer select a cube,
+six directions and GF(2) parity. All exact field counts below are therefore
+facts of that projection, not facts forced by NOTHING alone.
 
 One tick freezes the complete `WAS/IS` pair, calculates every addressed
 relation from that snapshot, then commits the next complete field together.

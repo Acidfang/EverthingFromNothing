@@ -114,7 +114,7 @@ test("recursive field queries preserve every prior finite prefix", () => {
 })
 
 test("provenance blocks unresolved physical identity claims", () => {
-  assert.equal(PROVENANCE.length, 8)
+  assert.equal(PROVENANCE.length, 11)
   assert.equal(mayClaimExternalIdentity("recurrence-required"), true)
   assert.equal(mayClaimExternalIdentity("whole-web"), false)
   assert.equal(mayClaimExternalIdentity("physical-identity"), false)
