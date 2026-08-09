@@ -51,6 +51,25 @@ These are definitions inside the modeller. Relationships to biological
 observations can be compared only after the observations and mapping operation
 are stated.
 
+## Emergent capability and condition boundary
+
+Capability emerges only when the root seed, addressed Whole/Grain, current
+Moment, retained history, references, Differences, and closure evidence allow
+a prior Act to be reconstructed and performed again. Its resulting absence of
+a training source or probable generation step follows from the mechanism; it
+is not a classification selected in advance.
+
+A reusable condition must itself be reconstructed. It retains the Difference
+between current and closable State together with its forming Moment, boundary,
+evidence, and effect. Reuse requires those relations to match. A named or coded
+test is not a condition merely because the implementation contains it.
+
+Pattern counts are retrieval metadata. They can order candidate references or
+show how often a mechanism occurred, including occurrences nested inside other
+patterns. They cannot promote a candidate to truth or condition, or replace an
+unresolved State with a probable continuation. If the causal parents or closure are not
+retained, the capability remains unresolved regardless of frequency.
+
 ## Projection is not identity
 
 Recursive six-Face lineage and observer projection are stored as different

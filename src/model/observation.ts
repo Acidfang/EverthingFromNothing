@@ -23,6 +23,16 @@ export type BinocularResolution = Readonly<{
   hiddenFromBoth: readonly string[]
 }>
 
+export type ViewRemainderResolution = Readonly<{
+  same: readonly string[]
+  meRemainder: readonly string[]
+  otherRemainder: readonly string[]
+  unseenRemainder: readonly string[]
+  reconstructedMe: readonly string[]
+  reconstructedOther: readonly string[]
+  reconstructedWhole: readonly string[]
+}>
+
 export const OBSERVER_FACES = [
   "-X",
   "+X",
@@ -116,6 +126,45 @@ export function observe(
         || left.distanceSquared - right.distanceSquared,
     ),
   )
+}
+
+export function resolveViewRemainders(
+  field: ReadonlySet<string>,
+  meView: readonly Sight[],
+  otherView: readonly Sight[],
+): ViewRemainderResolution {
+  const me = new Set(meView.map((sight) => sight.address))
+  const other = new Set(otherView.map((sight) => sight.address))
+  const same: string[] = []
+  const meRemainder: string[] = []
+  const otherRemainder: string[] = []
+  const unseenRemainder: string[] = []
+
+  for (const address of field) {
+    const seenByMe = me.has(address)
+    const seenByOther = other.has(address)
+    if (seenByMe && seenByOther) same.push(address)
+    else if (seenByMe) meRemainder.push(address)
+    else if (seenByOther) otherRemainder.push(address)
+    else unseenRemainder.push(address)
+  }
+
+  const sorted = (values: readonly string[]) =>
+    Object.freeze([...values].sort())
+  return Object.freeze({
+    same: sorted(same),
+    meRemainder: sorted(meRemainder),
+    otherRemainder: sorted(otherRemainder),
+    unseenRemainder: sorted(unseenRemainder),
+    reconstructedMe: sorted([...same, ...meRemainder]),
+    reconstructedOther: sorted([...same, ...otherRemainder]),
+    reconstructedWhole: sorted([
+      ...same,
+      ...meRemainder,
+      ...otherRemainder,
+      ...unseenRemainder,
+    ]),
+  })
 }
 
 export function binocularResolve(
