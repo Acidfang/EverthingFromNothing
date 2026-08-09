@@ -140,7 +140,11 @@ function OperatorResolutionStage({
     }
   })
   const missingVariable = 0
-  const mechanismMoment = FIRST_ACT_RESOLUTION.moments[Math.min(moment, 5)]
+  const mechanismMoment = FIRST_ACT_RESOLUTION.phases[
+    Math.min(moment, FIRST_ACT_RESOLUTION.phases.length - 1)
+  ]
+  const projectionAvailable = mechanismMoment.phase === FIRST_ACT_RESOLUTION.phases.length - 1
+  const resolutionViews = ["FIRST_FRAME", "CLOUD_FRAME", "STRUCTURE_FRAME"] as const
 
   return (
     <section className="operator-stage" aria-labelledby="operator-stage-title">
@@ -153,10 +157,10 @@ function OperatorResolutionStage({
           </p>
         </div>
         <div className="operator-stage-readout" aria-live="polite">
-          <span>MOMENT</span>
-          <strong>{moment} / {ATOM_FIELD_MOMENT}</strong>
-          <span>GRAIN</span>
-          <strong>0 → -{depth}</strong>
+          <span>OUTER MOMENT</span>
+          <strong>1 · UNCHANGED</strong>
+          <span>RESOLUTION PHASE</span>
+          <strong>{mechanismMoment.phase} / {FIRST_ACT_RESOLUTION.phases.length - 1}</strong>
         </div>
       </header>
 
@@ -166,14 +170,46 @@ function OperatorResolutionStage({
           <strong>{mechanismMoment.did}</strong>
           <p>{mechanismMoment.evidence}</p>
         </div>
+        <div className="nested-resolution-view" data-view={mechanismMoment.frame}>
+          <nav aria-label="Nested resolution views">
+            {resolutionViews.map((view, index) => (
+              <span
+                key={view}
+                className={view === mechanismMoment.frame ? "active" : resolutionViews.indexOf(mechanismMoment.frame) > index ? "passed" : ""}
+              >{index + 1} · {view.replace("_", " ")}</span>
+            ))}
+          </nav>
+          <div className="resolution-frame-visual">
+            <div className="outer-act-frame">
+              <span>FRAME 1 · COMPLETE FIRST ACT</span>
+              <div className="cloud-grain-frame">
+                <span>FRAME 2 · CONTAINED CLOUD</span>
+                <i className="wave-trace" />
+                <b className="wave-origin">FACE A</b>
+                <b className="wave-effect">FACE B</b>
+                <div className="structure-grain-frame">
+                  <span>FRAME 3 · CONTAINED STRUCTURE</span>
+                  <b>DID</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <dl>
+            <div><dt>ACT</dt><dd>UNCHANGED · ONE FRAME</dd></div>
+            <div><dt>VIEW</dt><dd>{mechanismMoment.frame.replace("_", " ")}</dd></div>
+            <div><dt>TEMPORAL GRAIN</dt><dd>{mechanismMoment.temporalGrain}</dd></div>
+            <div><dt>INTRODUCED</dt><dd>{mechanismMoment.introduced.join(" · ") || "NOTHING"}</dd></div>
+            <div><dt>DID</dt><dd>{mechanismMoment.did}</dd></div>
+          </dl>
+        </div>
         <ol>
-          {FIRST_ACT_RESOLUTION.moments.map((state) => (
+          {FIRST_ACT_RESOLUTION.phases.map((state) => (
             <li
-              key={state.moment}
-              className={state.moment === mechanismMoment.moment ? "active" : state.moment < mechanismMoment.moment ? "passed" : ""}
+              key={state.phase}
+              className={state.phase === mechanismMoment.phase ? "active" : state.phase < mechanismMoment.phase ? "passed" : ""}
             >
-              <span>M{state.moment} · {state.status}</span>
-              <strong>{state.is.length === 0 ? "NO REPRESENTED DIFFERENCE" : state.is.join(" · ")}</strong>
+              <span>PHASE {state.phase} · {state.frame.replace("_", " ")}</span>
+              <strong>{state.introduced.length === 0 ? "NO REPRESENTED DIFFERENCE" : state.introduced.join(" · ")}</strong>
               <small>WAS → {state.did} → IS → {state.canBe.join(" / ")}</small>
             </li>
           ))}
@@ -184,7 +220,7 @@ function OperatorResolutionStage({
         </div>
       </section>
 
-      <div className="operator-views">
+      <div className={`operator-views ${projectionAvailable ? "" : "projection-locked"}`}>
         <section className="operator-view original-view" aria-label="Original view">
           <div className="operator-view-title">
             <span>ORIGINAL VIEW</span>
@@ -270,10 +306,16 @@ function OperatorResolutionStage({
       <div className="operator-ledger">
         <div className="operator-timeline">
           {([
-            [0, "WAS"],
-            [1, "TRANSFER"],
-            [2, "TURNING"],
-            [36, "IS"],
+            [0, "FIRST FRAME"],
+            [1, "CLOUD ZOOM"],
+            [3, "LOOK AROUND"],
+            [4, "ε ROTATION"],
+            [7, "FIRST WAVE"],
+            [9, "RIPPLE"],
+            [10, "STRUCTURE ZOOM"],
+            [11, "SPIRAL"],
+            [12, "LOCAL CLOSURE"],
+            [13, "DID RETAINED"],
           ] as const).map(([value, label]) => (
             <button
               key={value}
