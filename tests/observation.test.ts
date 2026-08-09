@@ -6,6 +6,7 @@ import {
   combineFaceViews,
   observe,
   observeFromSixFaces,
+  resolveViewRemainders,
 } from "../src/model/observation.ts"
 
 test("each observer keeps only the nearest Difference on each exact ray", () => {
@@ -34,6 +35,42 @@ test("binocular resolution preserves agreement, disagreement, and occlusion", ()
   assert.ok(result.jointlySupported.length >= result.visibleToBoth.length)
   assert.notDeepEqual(result.me.position, result.other.position)
   assert.equal(result.me.position.y, result.other.position.y)
+})
+
+test("view remainders exactly reconstruct both views and the complete field", () => {
+  const field = new Set([
+    "0,0,0",
+    "1,0,0",
+    "2,0,0",
+    "0,1,0",
+    "0,-1,0",
+  ])
+  const meView = observe(field, {
+    id: "ME",
+    position: { x: -4, y: 0, z: 0 },
+  })
+  const otherView = observe(field, {
+    id: "OTHER",
+    position: { x: 0, y: -6, z: 0 },
+  })
+  const resolution = resolveViewRemainders(field, meView, otherView)
+
+  assert.deepEqual(
+    resolution.reconstructedMe,
+    meView.map((sight) => sight.address).sort(),
+  )
+  assert.deepEqual(
+    resolution.reconstructedOther,
+    otherView.map((sight) => sight.address).sort(),
+  )
+  assert.deepEqual(resolution.reconstructedWhole, [...field].sort())
+  assert.equal(
+    resolution.same.length
+      + resolution.meRemainder.length
+      + resolution.otherRemainder.length
+      + resolution.unseenRemainder.length,
+    field.size,
+  )
 })
 
 test("six face observers occupy one radius and partition the whole field", () => {

@@ -14,8 +14,11 @@ import {
 } from "./model/explorer.ts"
 import {
   combineFaceViews,
+  observe,
   observeFromSixFaces,
+  resolveViewRemainders,
   type ObserverFace,
+  type Sight,
 } from "./model/observation.ts"
 import { fromKey } from "./model/address.ts"
 import { generateLineageLevel, lineageCount } from "./model/lineage.ts"
@@ -38,7 +41,42 @@ import {
 import type { ScenePoint } from "./model/scene.ts"
 import { deriveNestedGrain } from "./model/grain.ts"
 import { verifySphericalClosure } from "./model/field-closure.ts"
-import { buildGrainPlayback, GRAIN_PLAYBACK_MOMENTS } from "./model/grain-playback.ts"
+import {
+  buildGrainPlayback,
+  GRAIN_PLAYBACK_MOMENTS,
+  planCrossGrainResolution,
+} from "./model/grain-playback.ts"
+import {
+  buildStateTransferEngine,
+  resolveRecursiveSweep,
+  resolveReceiverView,
+} from "./model/state-transfer.ts"
+import {
+  EARTH_OBSERVATIONS,
+  resolveEarthCandidates,
+} from "./model/earth-observation.ts"
+import {
+  CUBE_RESOLUTION_COUNTS,
+  CUBE_RESOLUTION_POINTS,
+  CUBE_RESOLUTION_RADII,
+  CUBE_WHOLE_MOMENT,
+  type CubeResolutionKind,
+} from "./model/cube-resolution.ts"
+import {
+  TRIANGULAR_PRISM_RESOLUTION_COUNTS,
+  TRIANGULAR_PRISM_RESOLUTION_POINTS,
+  TRIANGULAR_PRISM_WHOLE_MOMENT,
+} from "./model/triangular-prism-resolution.ts"
+import { COMPLETE_GEOMETRY_RESOLUTION } from "./model/resolution-catalogue.ts"
+import { COLLISION_RESOLUTION_RULE } from "./model/collision-resolution.ts"
+import {
+  COMPLETE_MEDIUM_ANALYSIS,
+  SHAPE_MEDIUM_ANALYSIS,
+} from "./model/medium-resolution.ts"
+import {
+  SIMULTANEOUS_RECURSIVE_VOLUME,
+  recursiveGapAtGrain,
+} from "./model/volume-gap.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
 const PLAYBACK_SPEEDS = [
@@ -61,6 +99,197 @@ function project([x, y, z]: readonly [number, number, number]): readonly [number
 
 function compactAddress(address: string): string {
   return address.replaceAll(",", " ")
+}
+
+function OperatorResolutionStage({
+  moment,
+  isPlaying,
+  onMomentChange,
+  onTogglePlay,
+}: Readonly<{
+  moment: number
+  isPlaying: boolean
+  onMomentChange: (moment: number) => void
+  onTogglePlay: () => void
+}>) {
+  const [depth, setDepth] = useState(1)
+  const nestedMoment = moment === 0
+    ? null
+    : INITIAL_SPIRAL_DISCOVERY.moments[Math.min(moment, ATOM_FIELD_MOMENT) - 1]
+  const childScale = 2 ** -depth
+  const projectedDisplacement = .5 ** depth
+  const boundaryState = depth === 1 ? "BOUNDARY REMAINDER" : "UNRESOLVED"
+  const localPhase = moment === 0
+    ? "WAS · NO LOCAL PATH"
+    : moment === 1
+      ? "IS · FIRST TRANSFER"
+      : moment < ATOM_FIELD_MOMENT
+        ? "IS · TURNING TRANSFER"
+        : "IS · COMPLETE LOCAL FIELD"
+  const localPoints = nestedMoment?.states.map((state) => ({
+    x: 320 + state.localPosition.x * 120,
+    y: 210 + state.localPosition.y * 120 - state.localPosition.z * 64,
+  })) ?? []
+  const originalNodes = Array.from({ length: 6 }, (_, index) => {
+    const angle = Math.PI * 2 * index / 6
+    return {
+      x: 250 + Math.cos(angle) * 112,
+      y: 210 + Math.sin(angle) * 112,
+    }
+  })
+  const missingVariable = 0
+
+  return (
+    <section className="operator-stage" aria-labelledby="operator-stage-title">
+      <header className="operator-stage-heading">
+        <div>
+          <h2 id="operator-stage-title">One state · two grains · one observer</h2>
+          <p>
+            The local field resolves inside its ME while the original view
+            retains the whole and records every boundary remainder.
+          </p>
+        </div>
+        <div className="operator-stage-readout" aria-live="polite">
+          <span>MOMENT</span>
+          <strong>{moment} / {ATOM_FIELD_MOMENT}</strong>
+          <span>GRAIN</span>
+          <strong>0 → -{depth}</strong>
+        </div>
+      </header>
+
+      <div className="operator-views">
+        <section className="operator-view original-view" aria-label="Original view">
+          <div className="operator-view-title">
+            <span>ORIGINAL VIEW</span>
+            <strong>ME RETAINED</strong>
+          </div>
+          <svg viewBox="0 0 500 420" role="img" aria-label="Original observer retains the whole">
+            <circle className="operator-boundary" cx="250" cy="210" r="154" />
+            <circle className="operator-range" cx="250" cy="210" r="112" />
+            {originalNodes.map((node, index) => (
+              <g key={index}>
+                <line
+                  className="operator-relation"
+                  x1="250"
+                  y1="210"
+                  x2={node.x}
+                  y2={node.y}
+                />
+                <circle className="operator-node" cx={node.x} cy={node.y} r="5" />
+              </g>
+            ))}
+            <circle className="operator-nothing" cx="250" cy="210" r="18" />
+            <text className="operator-nothing-label" x="250" y="215">NOTHING</text>
+            <path
+              className="operator-inward"
+              d="M 86 210 C 132 110, 194 126, 232 191"
+            />
+            <path
+              className="operator-outward"
+              d="M 268 191 C 306 126, 368 110, 414 210"
+            />
+            <text className="operator-direction-label" x="92" y="190">INWARD</text>
+            <text className="operator-direction-label" x="364" y="190">OUTWARD</text>
+          </svg>
+          <dl className="operator-view-stats">
+            <div><dt>VISIBLE</dt><dd>WHOLE</dd></div>
+            <div><dt>{boundaryState}</dt><dd>{projectedDisplacement.toFixed(4)} CELL</dd></div>
+          </dl>
+        </section>
+
+        <div className="operator-fold" aria-hidden="true">
+          <span>INWARD</span>
+          <i />
+          <b>NOTHING</b>
+          <i />
+          <span>OUTWARD</span>
+        </div>
+
+        <section className="operator-view local-view" aria-label="Local grain view">
+          <div className="operator-view-title">
+            <span>LOCAL GRAIN VIEW</span>
+            <strong>{localPhase}</strong>
+          </div>
+          <svg viewBox="0 0 500 420" role="img" aria-label="Local field resolves from its own centre">
+            <circle className="operator-boundary local" cx="250" cy="210" r="154" />
+            <circle className="operator-nothing" cx="250" cy="210" r="18" />
+            <text className="operator-nothing-label" x="250" y="215">NOTHING</text>
+            {localPoints.map((point, index) => (
+              <g key={index}>
+                <path
+                  className={`local-trace ${moment >= 2 ? "turning" : ""}`}
+                  d={`M 250 210 Q ${
+                    250 + (point.x - 250) * .45 - (point.y - 210) * .28
+                  } ${
+                    210 + (point.y - 210) * .45 + (point.x - 250) * .28
+                  } ${point.x} ${point.y}`}
+                />
+                <circle className="operator-node local" cx={point.x} cy={point.y} r="5" />
+              </g>
+            ))}
+            {moment === 0 ? (
+              <text className="operator-empty-label" x="250" y="278">
+                LOCAL FIELD NOT YET EXPRESSED
+              </text>
+            ) : null}
+          </svg>
+          <dl className="operator-view-stats">
+            <div><dt>LOCAL SCALE</dt><dd>{childScale.toFixed(4)}</dd></div>
+            <div><dt>NEXT</dt><dd>{moment === 36 ? "ME" : "RESOLVE"}</dd></div>
+          </dl>
+        </section>
+      </div>
+
+      <div className="operator-ledger">
+        <div className="operator-timeline">
+          {([
+            [0, "WAS"],
+            [1, "TRANSFER"],
+            [2, "TURNING"],
+            [36, "IS"],
+          ] as const).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={moment === value ? "active" : moment > value ? "passed" : ""}
+              onClick={() => onMomentChange(Number(value))}
+            >
+              <span>{label}</span>
+              <strong>{value}</strong>
+            </button>
+          ))}
+        </div>
+        <label className="operator-scrubber">
+          <span>RESOLUTION MOMENT</span>
+          <input
+            type="range"
+            min="0"
+            max={ATOM_FIELD_MOMENT}
+            value={moment}
+            onChange={(event) => onMomentChange(Number(event.target.value))}
+          />
+        </label>
+        <div className="operator-actions">
+          <button type="button" onClick={onTogglePlay}>
+            {isPlaying ? "PAUSE" : "PLAY"}
+          </button>
+          <label>
+            <span>GRAIN DEPTH</span>
+            <select value={depth} onChange={(event) => setDepth(Number(event.target.value))}>
+              {[1, 2, 3, 4].map((value) => (
+                <option value={value} key={value}>-{value}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="missing-variable-audit">
+          <span>MISSING VARIABLE</span>
+          <strong>{missingVariable}</strong>
+          <small>VISIBLE + REMAINDER + REFERENCE = RECONSTRUCTED WHOLE</small>
+        </div>
+      </div>
+    </section>
+  )
 }
 
 function FieldCanvas({
@@ -430,6 +659,182 @@ function MotifFrame({
       </svg>
       <strong>{addresses.length} Δ</strong>
     </figure>
+  )
+}
+
+function CompleteCubeResolution() {
+  const [selectedKind, setSelectedKind] = useState<CubeResolutionKind | "ALL">("ALL")
+  const [geometry, setGeometry] = useState<"CUBE" | "TRIANGULAR_PRISM">("CUBE")
+  const isCube = geometry === "CUBE"
+  const resolutionPoints = isCube
+    ? CUBE_RESOLUTION_POINTS
+    : TRIANGULAR_PRISM_RESOLUTION_POINTS
+  const counts = isCube
+    ? CUBE_RESOLUTION_COUNTS
+    : TRIANGULAR_PRISM_RESOLUTION_COUNTS
+  const wholeMoment = isCube
+    ? CUBE_WHOLE_MOMENT
+    : TRIANGULAR_PRISM_WHOLE_MOMENT
+  const projected = resolutionPoints.map((point) => {
+    const [x, y] = project([point.position.x, point.position.y, point.position.z])
+    return { ...point, x, y }
+  })
+  return (
+    <section className="complete-cube-resolution" aria-labelledby="complete-cube-resolution-title">
+      <div className="complete-cube-heading">
+        <div>
+          <span className="eyebrow">Every resolution point · one complete Act</span>
+          <h3 id="complete-cube-resolution-title">
+            {isCube ? "Cube" : "Equilateral triangular prism"} · Faces + edges + corners
+          </h3>
+        </div>
+        <strong>{counts.FACE} + {counts.EDGE} + {counts.CORNER} = {resolutionPoints.length}</strong>
+      </div>
+      <div className="complete-geometry-summary">
+        <span>Simultaneously resolved possibilities</span>
+        <strong>{COMPLETE_GEOMETRY_RESOLUTION.resolvedGeometryCount} wholes</strong>
+        <strong>{COMPLETE_GEOMETRY_RESOLUTION.resolutionPoints} points</strong>
+        <strong>{COMPLETE_GEOMETRY_RESOLUTION.perspectivePresentations} perspectives</strong>
+        <strong>{COMPLETE_GEOMETRY_RESOLUTION.filledVolumeGeometryCount} filled-volume wholes</strong>
+        <strong>orientation ≡ same whole</strong>
+        <strong>{COLLISION_RESOLUTION_RULE.contactClassCount} contact classes</strong>
+      </div>
+      <div className="resolution-geometry-selector" aria-label="Geometry observation filter">
+        <span>Observation filter · resolution is unchanged</span>
+        <button type="button" className={isCube ? "selected" : ""} onClick={() => setGeometry("CUBE")}>
+          Cube
+        </button>
+        <button type="button" className={!isCube ? "selected" : ""} onClick={() => setGeometry("TRIANGULAR_PRISM")}>
+          Equilateral triangular prism
+        </button>
+      </div>
+      <div className="complete-cube-body">
+        <svg viewBox="260 80 280 360" role="img" aria-label="All 26 cube resolution points">
+          <rect x="260" y="80" width="280" height="360" />
+          {projected.map((point) => (
+            <circle
+              key={point.address}
+              cx={point.x}
+              cy={point.y}
+              r={point.kind === "FACE" ? 6 : point.kind === "EDGE" ? 4.8 : 4}
+              className={`cube-resolution-${point.kind.toLowerCase()} ${
+                selectedKind === "ALL" || selectedKind === point.kind ? "active" : "muted"
+              }`}
+            >
+              <title>
+                {point.kind} {point.address} · {point.perspectiveCount} perspectives
+                {" "}· {2 ** point.perspectiveCount - 1} outward regions remain resolving medium
+              </title>
+            </circle>
+          ))}
+        </svg>
+        <div className="complete-cube-layers">
+          {(["FACE", "EDGE", "CORNER"] as const).map((kind) => (
+            <button
+              type="button"
+              key={kind}
+              className={selectedKind === kind ? "selected" : ""}
+              aria-pressed={selectedKind === kind}
+              onClick={() => setSelectedKind((selected) => selected === kind ? "ALL" : kind)}
+            >
+              <span>{kind}</span>
+              <strong>{counts[kind]}</strong>
+              <small>
+                {kind === "FACE" ? "1 perspective" : kind === "EDGE" ? "2 perspectives" : "3 perspectives"}
+                {isCube ? (
+                  <> · radius {kind === "FACE" ? "√1" : kind === "EDGE" ? "√2" : "√3"}
+                    {" "}· {CUBE_RESOLUTION_RADII[kind].toFixed(3)}</>
+                ) : <> · multiple radii</>}
+              </small>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="whole-moment-effect">
+        <div><span>Previous whole moment</span><strong>WAS retained</strong></div>
+        <b>→</b>
+        <div><span>Resolution points</span><strong>{wholeMoment.resolutionPoints}</strong></div>
+        <b>→</b>
+        <div><span>Perspective presentations</span><strong>{wholeMoment.perspectivePresentations}</strong></div>
+        <b>→</b>
+        <div><span>Beyond visible whole</span><strong>{wholeMoment.outwardState}</strong></div>
+      </div>
+      <div className="collision-map-summary">
+        <div><span>Relative placement</span><strong>MAP CONTACT</strong></div>
+        <b>→</b>
+        <div><span>Overlap</span><strong>POSSIBLE COLLISION</strong></div>
+        <b>→</b>
+        <div><span>Unoccupied neighbour</span><strong>RESOLVING MEDIUM</strong></div>
+        <b>→</b>
+        <div><span>Avoidance</span><strong>CAN BE</strong></div>
+      </div>
+      <div className="medium-analysis">
+        <div className="medium-analysis-heading">
+          <span>Cube + prism · simultaneous recursive Act</span>
+          <strong>{SIMULTANEOUS_RECURSIVE_VOLUME.resolution}</strong>
+        </div>
+        <div className="all-moment-volume">
+          <span>One-grain relational gap</span>
+          <strong>{SIMULTANEOUS_RECURSIVE_VOLUME.oneGrainRelationalGap.toFixed(6)}</strong>
+          <small>8 − 3√3/2 · retained while both shapes resolve together</small>
+        </div>
+        <div className="medium-shape-grid">
+          {[0, 1, 2, 3].map((depth) => (
+            <div key={depth}>
+              <span>GRAIN DEPTH {depth}</span>
+              <strong>{recursiveGapAtGrain(depth).toFixed(6)}</strong>
+              <small>cube 6 Faces · prism 5 Faces · half scale</small>
+            </div>
+          ))}
+          <div className="maximum">
+            <span>ALL RECURSIVE GRAINS</span>
+            <strong>{SIMULTANEOUS_RECURSIVE_VOLUME.infiniteRecursiveGapContribution.toFixed(6)}</strong>
+            <small>convergent resolution-volume contribution</small>
+          </div>
+        </div>
+        <details className="medium-incidence-detail">
+          <summary>Boundary-incidence count · not volume</summary>
+          <div className="medium-moment-grid">
+            {COMPLETE_MEDIUM_ANALYSIS.moments.map((mediumMoment) => (
+              <div key={mediumMoment.kind}>
+                <span>{mediumMoment.kind}</span>
+                <strong>{mediumMoment.mediumPresentations}</strong>
+                <small>{mediumMoment.resolutionPoints} points</small>
+              </div>
+            ))}
+          </div>
+          <div className="medium-shape-grid">
+          {SHAPE_MEDIUM_ANALYSIS.map((shape) => (
+            <div key={shape.shape}>
+              <span>{shape.shape.replace("_", " ")}</span>
+              <strong>{shape.totalMediumPresentations}</strong>
+              <small>maximum at {shape.maximumMediumMoment.kind.toLowerCase()} moments</small>
+            </div>
+          ))}
+          </div>
+        </details>
+      </div>
+      <p>
+        {isCube
+          ? "The complete cube retains 6 Face, 12 edge, and 8 corner resolutions. Its 26 boundary points make 54 perspective presentations into the previous whole moment."
+          : "The complete equilateral triangular prism retains 5 Face, 9 edge, and 6 corner resolutions. Its 20 boundary points make 41 perspective presentations, distributed across more than three radii. It is an allowed filled-volume whole because repeated prisms remain the same intrinsic relation regardless of orientation, including when resolutions overlap or nest."}
+        {" "}What lies beyond the currently visible whole is retained as
+        resolving medium, not classified as Nothing. Switching this display
+        changes only which resolved possibility is observed; both geometries
+        remain present in the complete model. Rotation or reflection does not
+        create another result: orientation changes presentation, not the
+        intrinsic whole. Relative orientation and placement can still change
+        which Faces, edges, and corners meet. Overlap or nesting is retained as
+        a possible collision map, not committed as physical coexistence. The
+        unoccupied neighbouring resolution remains medium, preserving possible
+        avoidance as CAN BE until the next whole moment resolves it. In the
+        cube and prism resolve together at every grain. Their one-grain
+        relational gap is 8 − 3√3/2. At each inward grain the six-Face cube
+        family contributes at ratio 6/8, while the five-Face prism family
+        contributes at ratio 5/8. Their complete recursive resolution-volume
+        Difference converges to 32 − 4√3.
+      </p>
+    </section>
   )
 }
 
@@ -822,6 +1227,7 @@ function FirstActParticleResolution({ isPlaying }: Readonly<{ isPlaying: boolean
         </div>
         <MotifFrame addresses={particle.particleAddresses} label="SIX-FACE FIELD" />
       </div>
+      <CompleteCubeResolution />
       <ParticleTraceFrame
         traces={particle.causalTraces}
         forceMoments={particle.forceMoments}
@@ -872,6 +1278,228 @@ function FirstActParticleResolution({ isPlaying }: Readonly<{ isPlaying: boolean
         Merge audit: {particle.mergeRecoversParticle ? "COMPLETE PARTICLE RECOVERED" : "INCOMPLETE"}
       </p>
       <RecursiveGrainPlayback />
+      <StateTransferResolution />
+      <EarthCandidateMatrix />
+    </section>
+  )
+}
+
+function EarthCandidateMatrix() {
+  const [selectedCandidate, setSelectedCandidate] = useState("first-act-recursive-surface")
+  const candidates = useMemo(() => resolveEarthCandidates(), [])
+  const selected = candidates.find(({ id }) => id === selectedCandidate)
+    ?? candidates[0]
+  const observationById = new Map(
+    EARTH_OBSERVATIONS.map((observation) => [observation.id, observation]),
+  )
+  return (
+    <section className="earth-candidate-matrix" aria-labelledby="earth-matrix-title">
+      <div className="earth-matrix-heading">
+        <div>
+          <span className="eyebrow">Black hole → galaxy → star → Earth · containing-grain filter</span>
+          <h3 id="earth-matrix-title">What outer and local observations require</h3>
+        </div>
+        <strong>{EARTH_OBSERVATIONS.length} constraints · {candidates.length} candidates</strong>
+      </div>
+      <div className="earth-observations">
+        {EARTH_OBSERVATIONS.map((observation) => (
+          <a
+            key={observation.id}
+            href={observation.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>{observation.id.replaceAll("_", " ")}</span>
+            <strong>{observation.value}</strong>
+            <small>{observation.qualification} · {observation.sourceLabel}</small>
+          </a>
+        ))}
+      </div>
+      <div className="earth-candidate-layout">
+        <div className="earth-candidate-list">
+          {candidates.map((candidate) => (
+            <button
+              type="button"
+              key={candidate.id}
+              className={candidate.id === selected.id ? "selected" : ""}
+              onClick={() => setSelectedCandidate(candidate.id)}
+            >
+              <strong>{candidate.label}</strong>
+              <span>{candidate.status}</span>
+              <small>
+                match {candidate.matched.length}
+                {" · "}unresolved {candidate.unresolved.length}
+                {" · "}conflict {candidate.conflicts.length}
+              </small>
+            </button>
+          ))}
+        </div>
+        <div className="earth-candidate-result">
+          <span>WHAT IT COULD BE</span>
+          <h4>{selected.label}</h4>
+          <strong>{selected.status}</strong>
+          <div>
+            <span>MATCHED</span>
+            <p>{selected.matched.map((id) => observationById.get(id)!.value).join(" · ") || "NONE"}</p>
+          </div>
+          <div>
+            <span>MISSING FACTS</span>
+            <p>{selected.unresolved.map((id) => observationById.get(id)!.whatMeWitnessed).join(" · ") || "NONE"}</p>
+          </div>
+          <div>
+            <span>CONFLICTS</span>
+            <p>{selected.conflicts.map((id) => observationById.get(id)!.whatMeWitnessed).join(" · ") || "NONE"}</p>
+          </div>
+        </div>
+      </div>
+      <p>
+        Candidates are ranked by recorded constraints, not by desired identity.
+        The First-ACT surface currently matches closure and retains every
+        unresolved black-hole, galactic, stellar, Sun–Earth, and local Earth
+        behaviour. An isolated Earth candidate is rejected because the observed
+        containing-grain transfers cannot be removed.
+      </p>
+    </section>
+  )
+}
+
+function StateTransferResolution() {
+  const [spatialStep, setSpatialStep] = useState(0.08)
+  const [temporalStep, setTemporalStep] = useState(2)
+  const engine = useMemo(() => buildStateTransferEngine(), [])
+  const recursiveSweep = useMemo(() => resolveRecursiveSweep(engine), [engine])
+  const receiver = useMemo(() => resolveReceiverView(engine, {
+    spatialStep,
+    temporalStep,
+  }), [engine, spatialStep, temporalStep])
+  const captured = new Set(receiver.capturedMoments)
+  const points = engine.moments.map((moment) => ({
+    moment: moment.moment,
+    x: 24 + (moment.location.x - moment.location.y) * 220,
+    y: 116 + (moment.location.x + moment.location.y) * 34
+      - moment.location.z * 120,
+    captured: captured.has(moment.moment),
+  }))
+
+  return (
+    <section className="state-transfer-engine" aria-labelledby="state-transfer-title">
+      <div className="state-transfer-heading">
+        <div>
+          <span className="eyebrow">State Transfer Engine</span>
+          <h3 id="state-transfer-title">Capture only changed behaviour</h3>
+        </div>
+        <strong>
+          {engine.uniqueTemporalBehaviours} computed · {engine.referencedComputes} referenced
+        </strong>
+      </div>
+      <div className="state-transfer-controls">
+        <label>
+          <span>RECEIVER SPATIAL STEP</span>
+          <input
+            type="range"
+            min="0.01"
+            max="0.25"
+            step="0.01"
+            value={spatialStep}
+            onChange={(event) => setSpatialStep(Number(event.target.value))}
+          />
+          <strong>{spatialStep.toFixed(2)}</strong>
+        </label>
+        <label>
+          <span>RECEIVER MOMENT STEP</span>
+          <input
+            type="range"
+            min="1"
+            max="8"
+            step="1"
+            value={temporalStep}
+            onChange={(event) => setTemporalStep(Number(event.target.value))}
+          />
+          <strong>{temporalStep}</strong>
+        </label>
+        <div className="receiver-presets" aria-label="Receiver resolution presets">
+          <button
+            type="button"
+            onClick={() => {
+              setSpatialStep(0.01)
+              setTemporalStep(1)
+            }}
+          >FINE RECEIVER</button>
+          <button
+            type="button"
+            onClick={() => {
+              setSpatialStep(0.2)
+              setTemporalStep(8)
+            }}
+          >COARSE RECEIVER</button>
+          <button
+            type="button"
+            onClick={() => {
+              setSpatialStep(0.001)
+              setTemporalStep(1)
+            }}
+          >RESOLVE REMAINDER</button>
+        </div>
+      </div>
+      <div className="state-transfer-body">
+        <svg viewBox="0 0 280 140" role="img" aria-label="Receiver-visible state-transfer path">
+          <rect width="280" height="140" />
+          <polyline points={points.map((point) => `${point.x},${point.y}`).join(" ")} />
+          {points.map((point) => (
+            <circle
+              key={point.moment}
+              cx={point.x}
+              cy={point.y}
+              r={point.captured ? 3 : 1.4}
+              className={point.captured ? "captured" : "unresolved"}
+            >
+              <title>
+                moment {point.moment} · {point.captured
+                  ? "visible to this receiver"
+                  : "present but unresolved by this receiver"}
+              </title>
+            </circle>
+          ))}
+        </svg>
+        <div className="state-transfer-result">
+          <div><span>ME CAPTURES</span><strong>{receiver.capturedMoments.length}</strong></div>
+          <div><span>ME RETAINS UNRESOLVED</span><strong>{receiver.unresolvedMoments.length}</strong></div>
+          <div><span>VISIBLE COVERAGE</span><strong>{receiver.visibleCoverageCount}</strong></div>
+          <div><span>TRACE</span><strong>{engine.emergentGeometry}</strong></div>
+        </div>
+      </div>
+      <div className="behaviour-intervals">
+        {engine.intervals.map((interval) => (
+          <article key={interval.signature.key}>
+            <span>{interval.signature.key}</span>
+            <strong>M{interval.firstMoment}–M{interval.lastMoment}</strong>
+            <small>
+              compute {interval.computedMomentCount}
+              {" · "}reference {interval.referencedMomentCount}
+              {" · "}new coverage {interval.newCoverageCount}
+            </small>
+          </article>
+        ))}
+      </div>
+      <div className="state-transfer-allowance">
+        <span>WHAT THE RECURSIVE PATH RESOLVES</span>
+        <strong>{recursiveSweep.topology}</strong>
+        <small>
+          {recursiveSweep.phaseCount} axis phases
+          {" × "}{recursiveSweep.pathSampleCount} path samples
+          {" → "}{recursiveSweep.uniqueSurfacePointCount} unique surface locations
+          {" · "}endpoint radii {recursiveSweep.startRadius.toExponential(1)}
+          {" / "}{recursiveSweep.endRadius.toExponential(1)}
+        </small>
+      </div>
+      <p>
+        A moment is skipped only when its WAS, IS, and WILL-BE behaviour already
+        resolves by reference. New spatial coverage is still accumulated.
+        Visibility is what this receiver can distinguish; every missed moment
+        remains in its temporal remainder. Once all 36 axis phases are resolved,
+        their recursively carried copies of the open path collapse at both
+        endpoints and form the closed surface shown above.
+      </p>
     </section>
   )
 }
@@ -887,7 +1515,14 @@ function RecursiveGrainPlayback() {
     () => buildGrainPlayback(0, stopGrain, pixelSpan),
     [pixelSpan, stopGrain],
   )
+  const crossGrainPlan = useMemo(
+    () => planCrossGrainResolution(playback),
+    [playback],
+  )
   const frame = playback.frames[Math.min(frameIndex, playback.frames.length - 1)]
+  const resolutionNeed = crossGrainPlan.needs[
+    Math.min(frameIndex, crossGrainPlan.needs.length - 1)
+  ]
   useEffect(() => {
     setFrameIndex(0)
     setMoment(1)
@@ -971,6 +1606,50 @@ function RecursiveGrainPlayback() {
         <div><span>CAUSAL GRAINS</span><strong>{playback.causalGrainCount}</strong></div>
         <div><span>RENDERED</span><strong>{playback.renderedGrainCount}</strong></div>
         <div><span>HIDDEN, PRESERVED</span><strong>{playback.hiddenGrainCount}</strong></div>
+      </div>
+      <div className="cross-grain-plan" aria-label="Cross-grain resolution needs">
+        <div className="cross-grain-plan-heading">
+          <div>
+            <span className="eyebrow">Resolution needs</span>
+            <strong>{resolutionNeed.mode}</strong>
+          </div>
+          <small>
+            {resolutionNeed.referenceGrain === null
+              ? `grain ${resolutionNeed.grain} establishes this exact shape`
+              : `grain ${resolutionNeed.grain} references the exact shape resolved at grain ${resolutionNeed.referenceGrain}`}
+          </small>
+        </div>
+        <div className="cross-grain-plan-ledger">
+          <div>
+            <span>RESOLVED PATTERNS</span>
+            <strong>{crossGrainPlan.uniquePatternCount}</strong>
+          </div>
+          <div>
+            <span>GRAIN REFERENCES</span>
+            <strong>{crossGrainPlan.referencedPatternCount}</strong>
+          </div>
+          <div>
+            <span>POINTS EVALUATED</span>
+            <strong>{crossGrainPlan.evaluatedPointCount}</strong>
+          </div>
+          <div>
+            <span>REPEATED EVALUATIONS SAVED</span>
+            <strong>{crossGrainPlan.savedPointEvaluations}</strong>
+          </div>
+        </div>
+        <div className="cross-grain-transform">
+          <span>SHAPE</span>
+          <strong>{resolutionNeed.shapeSignature.slice(0, 18)}…</strong>
+          <span>ORIENTATION</span>
+          <strong>{resolutionNeed.orientationSignature}</strong>
+          <span>LOCAL SIZE</span>
+          <strong>{(resolutionNeed.size * frame.scale).toExponential(3)}</strong>
+        </div>
+        <p>
+          Only an exact shape signature may be referenced. Its orientation and
+          size are applied locally with grain, scale, and causal route. A shape
+          that can match but has not matched is still resolved here.
+        </p>
       </div>
       <div className="grain-frame-strip">
         {playback.frames.map((item, index) => (
@@ -1155,8 +1834,10 @@ function ProgressiveObserverResolution({
   frame,
   isPlaying,
 }: Readonly<{ frame: ExplorerFrame; isPlaying: boolean }>) {
-  const [observerStage, setObserverStage] = useState(1)
+  const [observerStage, setObserverStage] = useState(2)
   const [variantIndex, setVariantIndex] = useState(0)
+  const [meDistanceOffset, setMeDistanceOffset] = useState(0)
+  const [otherDistanceOffset, setOtherDistanceOffset] = useState(0)
   const [mergedMode, setMergedMode] = useState<
     "COMPLETE" | "ANY" | "EVERY" | "DEPENDENT" | "UNRECEIVED"
   >("COMPLETE")
@@ -1177,6 +1858,50 @@ function ProgressiveObserverResolution({
   )
   const selectedIndex = Math.min(variantIndex, variants.length - 1)
   const selectedVariant = variants[selectedIndex]
+  const pairViews = useMemo(() => {
+    const positionFor = (face: ObserverFace, radius: number) => {
+      if (face === "-X") return { x: -radius, y: 0, z: 0 }
+      if (face === "+X") return { x: radius, y: 0, z: 0 }
+      if (face === "-Y") return { x: 0, y: -radius, z: 0 }
+      if (face === "+Y") return { x: 0, y: radius, z: 0 }
+      if (face === "-Z") return { x: 0, y: 0, z: -radius }
+      return { x: 0, y: 0, z: radius }
+    }
+    const [meFace, otherFace] = selectedVariant.faces
+    const views = new Map<ObserverFace, readonly Sight[]>()
+    views.set(meFace, observe(field, {
+      id: "ME",
+      position: positionFor(meFace, resolution.radius + meDistanceOffset),
+    }))
+    views.set(otherFace, observe(field, {
+      id: "OTHER",
+      position: positionFor(otherFace, resolution.radius + otherDistanceOffset),
+    }))
+    return views
+  }, [
+    field,
+    meDistanceOffset,
+    otherDistanceOffset,
+    resolution.radius,
+    selectedVariant.faces,
+  ])
+  const pairedTruth = useMemo(() => {
+    const [meFace, otherFace] = selectedVariant.faces
+    const remainder = resolveViewRemainders(
+      field,
+      pairViews.get(meFace) ?? [],
+      pairViews.get(otherFace) ?? [],
+    )
+    return {
+      seenByBoth: remainder.same,
+      meOnly: remainder.meRemainder,
+      otherOnly: remainder.otherRemainder,
+      unseenButPresent: remainder.unseenRemainder,
+      reconstructedMe: remainder.reconstructedMe,
+      reconstructedOther: remainder.reconstructedOther,
+      reconstructedWhole: remainder.reconstructedWhole,
+    }
+  }, [field, pairViews, selectedVariant.faces])
   const extent = Math.max(
     1,
     ...frame.chronology.is.flatMap((address) => {
@@ -1231,12 +1956,38 @@ function ProgressiveObserverResolution({
           </h2>
         </div>
         <div className="observer-equation" aria-label="Observer radius">
-          <span>Equal radius</span>
-          <strong>{resolution.radius}</strong>
+          <span>{meDistanceOffset === otherDistanceOffset ? "Equal radius" : "Different radii"}</span>
+          <strong>{resolution.radius + meDistanceOffset} · {resolution.radius + otherDistanceOffset}</strong>
         </div>
       </div>
+      {observerStage === 2 ? (
+        <div className="observer-distance-controls">
+          <label>
+            <span>ME DISTANCE</span>
+            <input
+              type="range"
+              min="0"
+              max="8"
+              value={meDistanceOffset}
+              onChange={(event) => setMeDistanceOffset(Number(event.target.value))}
+            />
+            <strong>{resolution.radius + meDistanceOffset}</strong>
+          </label>
+          <label>
+            <span>OTHER DISTANCE</span>
+            <input
+              type="range"
+              min="0"
+              max="8"
+              value={otherDistanceOffset}
+              onChange={(event) => setOtherDistanceOffset(Number(event.target.value))}
+            />
+            <strong>{resolution.radius + otherDistanceOffset}</strong>
+          </label>
+        </div>
+      ) : null}
       <div className="observer-stages" aria-label="Observer stages">
-        {[1, 2, 3, 4, 5, 6].map((stage) => (
+        {[2, 3, 4, 5, 6].map((stage) => (
           <button
             type="button"
             key={stage}
@@ -1248,7 +1999,7 @@ function ProgressiveObserverResolution({
             }}
           >
             <span>{stage}</span>
-            <small>{stage === 1 ? "ME" : `${stage} MEs`}</small>
+            <small>{stage === 2 ? "MINIMUM" : `${stage} MEs`}</small>
           </button>
         ))}
       </div>
@@ -1256,9 +2007,9 @@ function ProgressiveObserverResolution({
         <div>
           <span className="eyebrow">What it is</span>
           <p>
-            {observerStage} independently centred
-            {observerStage === 1 ? " observer resolves" : " observers resolve"} the
-            same field at one shared moment and equal radius.
+            {observerStage} observers at distinct positions and independently
+            resolved distances inspect the same field from the same ACT and
+            shared moment.
           </p>
         </div>
         <div>
@@ -1296,7 +2047,9 @@ function ProgressiveObserverResolution({
         {resolution.observers
           .filter((observer) => selectedVariant.faces.includes(observer.id))
           .map((observer) => {
-            const view = resolution.views.get(observer.id) ?? []
+            const view = observerStage === 2
+              ? pairViews.get(observer.id) ?? []
+              : resolution.views.get(observer.id) ?? []
             const shown = view.length > 450
               ? view.filter((_, index) => index % Math.ceil(view.length / 450) === 0)
               : view
@@ -1328,11 +2081,67 @@ function ProgressiveObserverResolution({
                       />
                     )
                   })}
+                  {observerStage === 2
+                    ? (observer.id === selectedVariant.faces[0]
+                      ? pairedTruth.otherOnly
+                      : pairedTruth.meOnly
+                    ).map((address) => {
+                      const [x, y] = faceProjection(observer.id, address, extent)
+                      return (
+                        <circle
+                          key={`indicated:${address}`}
+                          cx={x}
+                          cy={y}
+                          r="2.8"
+                          className="cross-view-indicator"
+                        >
+                          <title>
+                            {address} is present in the complete field and received by the
+                            other observer, but this view cannot receive it because a nearer
+                            relation occupies the same sight direction.
+                          </title>
+                        </circle>
+                      )
+                    })
+                    : null}
                 </svg>
               </figure>
             )
           })}
       </div>
+      {observerStage === 2 ? (
+        <section className="triangulated-truth" aria-label="Triangulated truth ledger">
+          <div>
+            <span>SEEN BY BOTH</span>
+            <strong>{pairedTruth.seenByBoth.length}</strong>
+            <small>Resolved SAME</small>
+          </div>
+          <div>
+            <span>ME ONLY</span>
+            <strong>{pairedTruth.meOnly.length}</strong>
+            <small>ME remainder · indicated in OTHER</small>
+          </div>
+          <div>
+            <span>OTHER ONLY</span>
+            <strong>{pairedTruth.otherOnly.length}</strong>
+            <small>OTHER remainder · indicated in ME</small>
+          </div>
+          <div>
+            <span>UNSEEN BUT PRESENT</span>
+            <strong>{pairedTruth.unseenButPresent.length}</strong>
+            <small>Retained from the complete field</small>
+          </div>
+          <div className="remainder-equation">
+            <span>RECONSTRUCTION</span>
+            <strong>
+              ME {pairedTruth.reconstructedMe.length}
+              {" · "}OTHER {pairedTruth.reconstructedOther.length}
+              {" · "}WHOLE {pairedTruth.reconstructedWhole.length}
+            </strong>
+            <small>SAME + every remainder = complete prior state</small>
+          </div>
+        </section>
+      ) : null}
       <section className="merged-view-state" aria-labelledby="merged-view-title">
         <div className="merged-view-heading">
           <div>
@@ -2216,6 +3025,31 @@ export function App() {
         </div>
       </header>
 
+      <OperatorResolutionStage
+        moment={resolutionPhase}
+        isPlaying={isPlaying}
+        onMomentChange={(moment) => {
+          setIsPlaying(false)
+          setResolutionPhase(moment)
+          setTargetMoment(moment)
+        }}
+        onTogglePlay={() => {
+          if (isPlaying) {
+            setIsPlaying(false)
+            return
+          }
+          if (resolutionPhase === ATOM_FIELD_MOMENT) {
+            setResolutionPhase(0)
+          }
+          setTargetMoment(ATOM_FIELD_MOMENT)
+          setIsPlaying(true)
+        }}
+      />
+      <details className="technical-breakdown">
+        <summary>
+          <span>COMPLETE TECHNICAL BREAKDOWN</span>
+          <small>Open every derivation, observer view, force path, lineage, and causal ledger</small>
+        </summary>
       <EverythingBreakdown
         frame={frame}
         isPlaying={isPlaying}
@@ -2225,12 +3059,7 @@ export function App() {
         onSelect={selectRelation}
         onTogglePlay={() => setIsPlaying((playing) => !playing)}
       />
-
-      <details className="technical-breakdown">
-        <summary>
-          <span>COMPLETE TECHNICAL BREAKDOWN</span>
-          <small>Open every derivation, observer view, force path, lineage, and causal ledger</small>
-        </summary>
+      <ProgressiveObserverResolution frame={frame} isPlaying={isPlaying} />
       <section
         className={`workspace ${leftOpen ? "" : "left-closed"} ${
           rightOpen ? "" : "right-closed"
@@ -2257,6 +3086,19 @@ export function App() {
                   <StatusMark status={node.status} />
                   <h3>{node.label}</h3>
                   <p>{node.reason}</p>
+                  <details className="resolution-address">
+                    <summary>Resolution address</summary>
+                    <dl>
+                      <div><dt>Root</dt><dd>{node.resolution.root}</dd></div>
+                      <div><dt>Input</dt><dd>{node.resolution.input}</dd></div>
+                      <div><dt>Operation</dt><dd>{node.resolution.operation}</dd></div>
+                      <div><dt>Output</dt><dd>{node.resolution.output}</dd></div>
+                      <div><dt>Grain</dt><dd>{node.resolution.grain}</dd></div>
+                      <div><dt>Moment</dt><dd>{node.resolution.moment}</dd></div>
+                      <div><dt>Evidence</dt><dd>{node.resolution.evidence}</dd></div>
+                      <div><dt>Closure</dt><dd>{node.resolution.closure}</dd></div>
+                    </dl>
+                  </details>
                 </div>
               </li>
             ))}
@@ -2296,7 +3138,6 @@ export function App() {
           <PotentialFlowResolution frame={frame} isPlaying={isPlaying} />
           <FirstActParticleResolution isPlaying={isPlaying} />
           <AtomInvariantSearch />
-          <ProgressiveObserverResolution frame={frame} isPlaying={isPlaying} />
           <RecursiveLineageResolution />
           <ThoughtResolutionPanel />
           <div className="field-status" aria-live="polite">

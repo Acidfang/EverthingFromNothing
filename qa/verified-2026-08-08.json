@@ -1,0 +1,52 @@
+{
+  "verifiedAt": "2026-08-08",
+  "target": "http://127.0.0.1:4174/EverthingFromNothing/",
+  "buildSource": "dist/",
+  "scope": "local rendered worktree only",
+  "desktop": {
+    "requestedViewport": { "width": 1440, "height": 1000 },
+    "observedViewport": { "width": 1440, "height": 1000 },
+    "title": "First Act Explorer",
+    "mainPresent": true,
+    "horizontalOverflow": false,
+    "consoleErrorsOrWarnings": 0,
+    "pointerInteraction": {
+      "control": "TRANSFER 1",
+      "beforeMoment": 36,
+      "afterMoment": 1,
+      "result": "PASS"
+    },
+    "screenshot": "emitted in the 2026-08-08 in-app Browser QA session; not stored in the repository"
+  },
+  "narrow": {
+    "requestedViewport": { "width": 390, "height": 844 },
+    "observedContentViewport": { "width": 375, "height": 844 },
+    "title": "First Act Explorer",
+    "mainPresent": true,
+    "horizontalOverflow": false,
+    "visiblePrimaryControls": [
+      "Pause formation",
+      "One resolution Space",
+      "Reset"
+    ],
+    "topbarWidth": 375,
+    "stageWidth": 375,
+    "consoleErrorsOrWarnings": 0,
+    "screenshot": "emitted in the 2026-08-08 in-app Browser QA session; not stored in the repository"
+  },
+  "keyboard": {
+    "result": "BLOCKED",
+    "attempts": [
+      "Playwright locator press",
+      "browser coordinate keypress",
+      "visible-DOM keypress"
+    ],
+    "observedDifference": "No injected key changed focus or model state.",
+    "classification": "Browser-input evidence blocker; neither an application pass nor an application failure."
+  },
+  "boundaries": {
+    "publicDeploymentVerified": false,
+    "githubWorkflowVerifiedForWorktree": false,
+    "physicalOrEmpiricalClaimsVerified": false
+  }
+}
