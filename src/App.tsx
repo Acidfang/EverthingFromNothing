@@ -77,7 +77,12 @@ import {
   SIMULTANEOUS_RECURSIVE_VOLUME,
   recursiveGapAtGrain,
 } from "./model/volume-gap.ts"
-import { reconstructFirstAct } from "./model/first-act.ts"
+import {
+  reconstructFirstAct,
+  relationChildren,
+  type FirstActRelation,
+  type RelationLayer,
+} from "./model/first-act.ts"
 
 const STATUS_ORDER = ["GIVEN", "DERIVED", "SELECTED", "GENERATED", "UNRESOLVED"] as const
 const PLAYBACK_SPEEDS = [
@@ -88,6 +93,15 @@ const PLAYBACK_SPEEDS = [
 const INITIAL_SPIRAL_DISCOVERY = deriveNestedGrain("1,0,0", 0)
 const ATOM_FIELD_MOMENT = INITIAL_SPIRAL_DISCOVERY.moments.length
 const FIRST_ACT_RESOLUTION = reconstructFirstAct()
+
+const LAYER_LABELS: Readonly<Record<RelationLayer, string>> = {
+  ROOT: "ROOT",
+  PRE_TEMPORAL: "PRE-TEMPORAL ENTAILMENT",
+  TEMPORAL: "AFTER MOMENT ORDER",
+  EXPLANATORY_PROJECTION: "EXPLANATORY PROJECTION",
+  OPTIONAL_PROJECTION: "OPTIONAL PROJECTION",
+  LATER_LABEL: "LATER LABEL / MAPPING",
+}
 
 type ProjectedPoint = Readonly<{
   point: ScenePoint
@@ -103,6 +117,137 @@ function compactAddress(address: string): string {
   return address.replaceAll(",", " ")
 }
 
+function WhitepaperMechanismExplorer() {
+  const [selectedId, setSelectedId] = useState("root-thought")
+  const [query, setQuery] = useState("")
+  const [showProjections, setShowProjections] = useState(false)
+  const [grainDepth, setGrainDepth] = useState(0)
+  const selected = FIRST_ACT_RESOLUTION.relations.find(({ id }) => id === selectedId)
+    ?? FIRST_ACT_RESOLUTION.relations[0]
+  const byId = useMemo(
+    () => new Map(FIRST_ACT_RESOLUTION.relations.map((item) => [item.id, item])),
+    [],
+  )
+  const normalizedQuery = query.trim().toLowerCase()
+  const displayed = FIRST_ACT_RESOLUTION.relations.filter((item) => {
+    const isProjection = item.layer === "EXPLANATORY_PROJECTION" || item.layer === "OPTIONAL_PROJECTION" || item.layer === "LATER_LABEL"
+    if (!showProjections && isProjection) return false
+    return normalizedQuery.length === 0 || [item.label, item.statement, item.why, item.how, item.source]
+      .join(" ").toLowerCase().includes(normalizedQuery)
+  })
+  const parents = selected.parents.flatMap((id) => {
+    const parent = byId.get(id)
+    return parent ? [parent] : []
+  })
+  const children = relationChildren(selected.id)
+
+  const ancestry: FirstActRelation[] = []
+  const visit = (item: FirstActRelation): void => {
+    for (const parentId of item.parents) {
+      const parent = byId.get(parentId)
+      if (parent) visit(parent)
+    }
+    if (!ancestry.some(({ id }) => id === item.id)) ancestry.push(item)
+  }
+  visit(selected)
+
+  return (
+    <section className="whitepaper-explorer" aria-labelledby="whitepaper-explorer-title">
+      <header>
+        <div>
+          <span className="eyebrow">WHITEPAPER RELATION EXPLORER</span>
+          <h2 id="whitepaper-explorer-title">One Act · entailment before sequence</h2>
+          <p>The double arrow is logical containment inside one Act. Temporal sequence is unavailable until Moment order emerges.</p>
+        </div>
+        <dl>
+          <div><dt>Source</dt><dd>{FIRST_ACT_RESOLUTION.sourceHash.slice(0, 12)}…</dd></div>
+          <div><dt>Selected Grain</dt><dd>G{grainDepth}</dd></div>
+          <div><dt>Foundational closure</dt><dd>SPACE</dd></div>
+        </dl>
+      </header>
+
+      <section className="root-ledger" aria-label="Joe's selected First Act ledger">
+        <strong>JOE'S SELECTED THOUGHT ACT</strong>
+        <dl>
+          <div><dt>WAS</dt><dd>{FIRST_ACT_RESOLUTION.ledger.was}</dd></div>
+          <div><dt>DID</dt><dd>{FIRST_ACT_RESOLUTION.ledger.did}</dd></div>
+          <div><dt>IS</dt><dd>{FIRST_ACT_RESOLUTION.ledger.is}</dd></div>
+          <div><dt>CAN BE</dt><dd>{FIRST_ACT_RESOLUTION.ledger.canBe}</dd></div>
+        </dl>
+      </section>
+
+      <div className="whitepaper-tools">
+        <label>
+          <span>SEARCH EXACT RELATIONS</span>
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Space, boundary, Moment, Grain…" />
+        </label>
+        <label className="projection-switch">
+          <input type="checkbox" checked={showProjections} onChange={(event) => setShowProjections(event.target.checked)} />
+          <span>Show explanations, optional projections and later labels</span>
+        </label>
+        <div className="grain-controls">
+          <span>RECURSIVE GRAIN</span>
+          <button type="button" onClick={() => setGrainDepth((value) => value + 1)}>Outward</button>
+          <button type="button" onClick={() => setGrainDepth(0)}>Root</button>
+          <button type="button" onClick={() => setGrainDepth((value) => value - 1)}>Inward</button>
+        </div>
+      </div>
+
+      <div className="relation-boundary">
+        <span>NO CLOCK · NO SEQUENCE · ONE ACT</span>
+        <i />
+        <strong>MOMENT ORDER BECOMES EXPRESSIBLE HERE</strong>
+        <i />
+        <span>ORDERED RESOLUTION AVAILABLE</span>
+      </div>
+
+      <div className="relation-workspace">
+        <nav className="relation-map" aria-label="First Act relation map">
+          {displayed.map((item) => (
+            <button
+              type="button"
+              key={item.id}
+              className={`${item.layer.toLowerCase()} ${item.id === selected.id ? "active" : ""}`}
+              onClick={() => setSelectedId(item.id)}
+            >
+              <span>{LAYER_LABELS[item.layer]} · {item.status}</span>
+              <strong>{item.label}</strong>
+              <small>{item.id === "ordered-time" ? "=> TEMPORAL BOUNDARY ->" : item.layer === "TEMPORAL" ? "->" : item.layer === "PRE_TEMPORAL" ? "=>" : "REFERENCE"}</small>
+            </button>
+          ))}
+          {displayed.length === 0 ? <p>No retained relation matches that search.</p> : null}
+        </nav>
+
+        <article className="relation-inspector" aria-live="polite">
+          <header>
+            <div><span>{LAYER_LABELS[selected.layer]}</span><h3>{selected.label}</h3></div>
+            <b className={selected.status.toLowerCase()}>{selected.status}</b>
+          </header>
+          <p className="relation-statement">{selected.statement}</p>
+          <dl>
+            <div><dt>WHY</dt><dd>{selected.why}</dd></div>
+            <div><dt>HOW</dt><dd>{selected.how}</dd></div>
+            <div><dt>SOURCE ADDRESS</dt><dd>{selected.source}</dd></div>
+            <div><dt>GRAIN VIEW</dt><dd>Same invariant mechanism · selected occurrence G{grainDepth}</dd></div>
+          </dl>
+          <section className="relation-links">
+            <div><span>REQUIRED PARENTS</span>{parents.length ? parents.map((item) => <button type="button" key={item.id} onClick={() => setSelectedId(item.id)}>{item.label}</button>) : <em>Selected Root</em>}</div>
+            <div><span>WHAT THIS ALLOWS</span>{children.length ? children.map((item) => <button type="button" key={item.id} onClick={() => { setShowProjections(true); setSelectedId(item.id) }}>{item.label}</button>) : <em>No derived child retained</em>}</div>
+          </section>
+          <ol className="ancestry-path">
+            {ancestry.map((item, index) => <li key={item.id}><span>{index === 0 ? "ROOT" : item.layer === "TEMPORAL" ? "->" : "=>"}</span><button type="button" onClick={() => setSelectedId(item.id)}>{item.label}</button></li>)}
+          </ol>
+        </article>
+      </div>
+
+      <footer>
+        <span>MECHANISM stops at recursively retained medium: SPACE.</span>
+        <span>The next retained frame supplies TIME. Everything physical is after that fact.</span>
+      </footer>
+    </section>
+  )
+}
+
 function OperatorResolutionStage({
   moment,
   isPlaying,
@@ -116,6 +261,8 @@ function OperatorResolutionStage({
   onTogglePlay: () => void
   onPlayToPhase: (phase: number) => void
 }>) {
+  return null
+  /* Contradicted staged implementation retained only in git history.
   const [depth, setDepth] = useState(1)
   const [phaseQuery, setPhaseQuery] = useState("")
   const [showCompleteState, setShowCompleteState] = useState(false)
@@ -406,6 +553,8 @@ function OperatorResolutionStage({
       </div>
     </section>
   )
+}
+  */
 }
 
 function FieldCanvas({
@@ -3010,7 +3159,7 @@ export function App() {
   const explainClick = useCallback((event: ReactMouseEvent<HTMLElement>) => {
     const origin = event.target
     if (!(origin instanceof Element) || origin.closest(".page-info-bubble")) return
-    if (origin.closest(".generating-ledger button, .generating-ledger input, .generating-ledger label, .generating-ledger summary")) {
+    if (origin.closest(".generating-ledger button, .generating-ledger input, .generating-ledger label, .generating-ledger summary, .whitepaper-explorer button, .whitepaper-explorer input, .whitepaper-explorer label")) {
       setPageExplanation(null)
       return
     }
@@ -3061,7 +3210,7 @@ export function App() {
           <span className="binary-mark" aria-hidden="true">01</span>
           <div>
             <h1>FIRST ACT</h1>
-            <p>Difference / Resolution explorer</p>
+            <p>Whitepaper relation explorer</p>
           </div>
         </div>
         <div className="chronology" aria-label="Shared chronology">
@@ -3145,32 +3294,7 @@ export function App() {
         </div>
       </header>
 
-      <OperatorResolutionStage
-        moment={resolutionPhase}
-        isPlaying={isPlaying}
-        onMomentChange={(moment) => {
-          setIsPlaying(false)
-          setResolutionPhase(moment)
-          setTargetMoment(moment)
-        }}
-        onPlayToPhase={(phase) => {
-          setIsPlaying(false)
-          setResolutionPhase(0)
-          setTargetMoment(phase)
-          window.setTimeout(() => setIsPlaying(true), 0)
-        }}
-        onTogglePlay={() => {
-          if (isPlaying) {
-            setIsPlaying(false)
-            return
-          }
-          if (resolutionPhase === ATOM_FIELD_MOMENT) {
-            setResolutionPhase(0)
-          }
-          setTargetMoment(ATOM_FIELD_MOMENT)
-          setIsPlaying(true)
-        }}
-      />
+      <WhitepaperMechanismExplorer />
       <details className="technical-breakdown">
         <summary>
           <span>COMPLETE TECHNICAL BREAKDOWN</span>

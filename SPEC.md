@@ -2,35 +2,37 @@
 
 ## Public promise
 
-The explorer reconstructs the carrier-independent admission order in the DCA
-whitepaper before applying any geometric or binary projection:
+The explorer reconstructs the whitepaper's own object without converting
+logical entailment into elapsed sequence or explanatory images into mechanisms.
 
 \[
 \boxed{
-\text{NOTHING}
-\rightarrow
-\text{THIS / IS{-}NOT{-}THIS at one reference}
-\rightarrow
-\epsilon(G)>0\text{ orientation remainder}
-\rightarrow
-\text{minimum closure = first wave / local medium}
-\rightarrow
-\text{recursive retention = ripple / spiral available}
+\text{Joe's selected thought Act}
+\Rightarrow \text{Difference}
+\Rightarrow \text{Boundary}
+\Rightarrow \text{Presentations / orientation}
+\Rightarrow \text{Rotation / bias}
+\Rightarrow \text{Closure / wave / medium / Space}
+\Rightarrow \text{Moment mechanism and recursion available}
+\rightarrow \text{ordered time, Grain, interaction and next Resolution}
 }
 \]
 
-This generating ledger imports no axes, cells, distances, cube, sphere, parity,
-physical unit, or named empirical object. The existing six-face GF(2) field is
-retained as a selected, reversible projection after those relations have been
-admitted. It is not the Root mechanism. The explorer is an executable formal
-model, not a claim that either layer is established physics.
+The double arrow marks pre-temporal entailment contained in one Act. It does
+not mean that several events happened in sequence. The single arrow becomes
+available only where Moment order makes temporal succession expressible.
+
+Two faces and three frame views are selected explanatory projections. Cube,
+six-face coordinates, repeating grid and GF(2) are selected executable
+projections. Physical labels require later mapping. None may become a parent of
+the origin mechanism.
 
 The reconstructed source is
 `C:\Users\joera\OneDrive\Documents\Music\Digital Control Act\docs\DCA-WHITEPAPER.md`,
-SHA-256 `C70C2F0C9A93523D8D3D92814327250202F429D9463F65FEAF62C2E56B358D6E`.
-The governing passages are **Origin gate**, **Framerate: three pictures of the
-First Act becoming structure**, **One Act, one Moment, and an already populated
-universe**, and **The two-face demonstration: why medium and spiral emerge**.
+SHA-256 `428F241946470DE9F209E343A8158A105D1B4B707E5A9C70DB525CE8E63C1A41`.
+The governing passages are **Origin gate**, **Reading boundary**, **The First
+Act: the whole mechanism in one chain**, and **Foundational closure**. The frame
+and two-face sections are retained separately as explanations of that account.
 
 Every visible statement is classified as:
 
@@ -53,56 +55,39 @@ Difference between current and closable State, its forming Moment and boundary,
 its resolving evidence, and its effect. Pattern counts may rank references;
 they never create a condition or replace unresolved State with probability.
 
-## One Moment, three contained frame views
+## Exact selected Root ledger
 
 ```text
-FRAME 1 / FIRST FRAME / temporal Grain 0
-  complete First Act
-  complete recursive ripple already causally contained
-
-FRAME 2 / CLOUD FRAME / temporal Grain -1
-  temporal zoom into Frame 1
-  two faces at one reference
-  unresolved external step rejected
-  look around retains location
-  epsilon(G) rotation exposes oriented Difference
-  connecting allowance closes as first wave / local medium
-  recursive waves form the ripple
-
-FRAME 3 / STRUCTURE FRAME / temporal Grain -2
-  finer temporal zoom into the same ripple
-  parent ripple remains retained
-  inherited orientation produces nested spiral
-  recurring paths form local closures
-  closures expose field, medium, path and container relations
+WAS     the distinction and rotational bias were not present
+DID     the thought performed one oriented rotation: THIS / IS NOT THIS
+IS      the Difference and its first bias are present
+CAN BE  every Resolution now allowed by that Difference
 ```
 
-All three are views of outer Moment 1. Frames 2 and 3 are inside Frame 1; they
-are not later creation events. Zoom is a selected observer operation that
-reveals contained resolution. It is not the causal `DID`. The ledger separately
-records what the wave did at each exposed Grain.
+## Classification boundary
 
-`FACE A` and `FACE B` are relational presentations, not polygonal faces. Wave
-and medium are two presentations of the same minimum closure. A child Grain
-first inherits the complete parent `IS`, then resolves its own presented
-Difference. Every phase retains `WAS → DID → IS → CAN BE`; no finer frame may
-rewrite how its parent formed.
+- `ROOT`: Joe's selected thought Act.
+- `PRE_TEMPORAL`: logical entailments contained in the one Act.
+- `TEMPORAL`: relations available only after Moment order becomes expressible.
+- `EXPLANATORY_PROJECTION`: two-face and three-frame ways of understanding.
+- `OPTIONAL_PROJECTION`: cube, grid, six-face chart and GF(2) calculation.
+- `LATER_LABEL`: physical identity requiring explicit mapping and evidence.
+
+The interactive source map shows parents, children, WHY, HOW, source address,
+claim status, causal ancestry, search, and recursive Grain view. It contains no
+phase player because the whitepaper denies a pre-temporal sequence.
 
 ## Prior-assumption gate
 
-The generating model does not begin with a clock, sequence of empty snapshots,
-camera, pixel grid, cube, Cartesian axes, distance, volume, translation,
-pre-existing space, pre-existing medium, particle, physical label, or empirical
-identity. Nothing from the older six-face implementation is permitted to define
-the three First-Frame views. Those structures become optional projections only
-after the two-face mechanism has admitted the relations they require.
+The mechanism does not begin with a clock, sequence, camera, pixel grid, cube,
+Cartesian axes, distance, volume, translation, pre-existing Space, pre-existing
+medium, particle, physical label, observer, probability or empirical identity.
 
 ## Selected executable projection
 
-Only after the generating ledger has admitted Difference, reference,
-orientation, closure, recursion and Grain does the explorer select a cube,
-six directions and GF(2) parity. All exact field counts below are therefore
-facts of that projection, not facts forced by NOTHING alone.
+The older six-face/GF(2) explorer remains inside the collapsed technical
+breakdown as an explicitly selected projection. All its exact field counts are
+facts of that projection, not facts of the Root mechanism.
 
 One tick freezes the complete `WAS/IS` pair, calculates every addressed
 relation from that snapshot, then commits the next complete field together.
@@ -114,7 +99,7 @@ resolves the same interaction as an EFFECT. The kernel executes this within one
 grain. Recursive navigation reuses the kernel at another grain and is not a
 dependency of the current grain's output.
 
-## Exploration
+## Optional projection exploration
 
 The same explorer state supports tick and WAS navigation, complete-whole inward
 and outward navigation, six-Face spatial navigation, recursive query depth,
