@@ -1,54 +1,53 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { reconstructChildGrain, reconstructFirstAct } from "../src/model/first-act.ts"
+import { reconstructFirstAct, relationChildren } from "../src/model/first-act.ts"
 
-test("all resolution phases remain inside one outer First-Act Moment", () => {
-  const act = reconstructFirstAct()
-  assert.equal(act.outerMoment, 1)
-  assert.deepEqual([...new Set(act.phases.map(({ outerMoment }) => outerMoment))], [1])
-  assert.deepEqual([...new Set(act.phases.map(({ frame }) => frame))], [
-    "FIRST_FRAME", "CLOUD_FRAME", "STRUCTURE_FRAME",
-  ])
+test("Joe's selected thought Act is the sole model Root", () => {
+  const model = reconstructFirstAct()
+  const roots = model.relations.filter(({ parents }) => parents.length === 0)
+  assert.deepEqual(roots.map(({ id, status }) => [id, status]), [["root-thought", "SELECTED"]])
 })
 
-test("the minimum projection is two relational faces at one reference", () => {
-  const act = reconstructFirstAct()
-  assert.deepEqual(act.presentations.map(({ id }) => id), ["FACE_A", "FACE_B"])
-  assert.equal(new Set(act.presentations.map(({ reference }) => reference)).size, 1)
+test("the exact First Act ledger retains WAS DID IS CAN BE", () => {
+  const { ledger } = reconstructFirstAct()
+  assert.match(ledger.was, /not present/)
+  assert.match(ledger.did, /one oriented rotation/)
+  assert.match(ledger.is, /Difference and its first bias/)
+  assert.match(ledger.canBe, /Every Resolution/)
 })
 
-test("zoom exposes contained resolution without becoming the causal DID", () => {
-  const act = reconstructFirstAct()
-  const cloud = act.phases.find(({ did }) => did.startsWith("ZOOM TEMPORAL"))!
-  assert.equal(cloud.outerMoment, 1)
-  assert.equal(cloud.frame, "CLOUD_FRAME")
-  assert.ok(cloud.evidence.includes("no geometry"))
+test("pre-temporal entailment does not execute recursion or ordered time", () => {
+  const model = reconstructFirstAct()
+  const recursion = model.relations.find(({ id }) => id === "recursion-available")!
+  const time = model.relations.find(({ id }) => id === model.temporalBoundaryId)!
+  assert.equal(recursion.layer, "PRE_TEMPORAL")
+  assert.match(recursion.statement, /available/)
+  assert.match(recursion.how, /do not claim repeated temporal execution/)
+  assert.equal(time.layer, "TEMPORAL")
 })
 
-test("the wave forms the medium before recursive ripple and structure", () => {
-  const act = reconstructFirstAct()
-  const closure = act.phases.find(({ introduced }) => introduced.includes("FIRST_WAVE"))!
-  const ripple = act.phases.find(({ introduced }) => introduced.includes("RIPPLE"))!
-  const structure = act.phases.find(({ frame }) => frame === "STRUCTURE_FRAME")!
-  assert.deepEqual(closure.introduced, ["FIRST_WAVE", "LOCAL_MEDIUM"])
-  assert.ok(closure.phase < ripple.phase)
-  assert.ok(ripple.phase < structure.phase)
+test("foundational physical closure ends at recursively retained medium SPACE", () => {
+  const model = reconstructFirstAct()
+  const space = model.relations.find(({ id }) => id === model.foundationalClosureId)!
+  assert.equal(space.label, "RECURSIVELY RETAINED MEDIUM · SPACE")
+  assert.deepEqual(space.parents, ["medium"])
+  assert.deepEqual(relationChildren("closure").map(({ id }) => id), ["wave"])
 })
 
-test("geometry and parity remain optional projections after the mechanism", () => {
-  const act = reconstructFirstAct()
-  const generated = act.phases.flatMap(({ is }) => is)
-  assert.equal(generated.includes("CUBE"), false)
-  assert.equal(generated.includes("GF(2)_PARITY"), false)
-  assert.deepEqual(act.selectedProjections, ["CUBE", "REPEATING_GRID", "GF(2)_PARITY"])
+test("frames and two faces are explanatory projections, not mechanism events", () => {
+  const model = reconstructFirstAct()
+  for (const id of ["two-face-demo", "frame-views"]) {
+    assert.equal(model.relations.find((item) => item.id === id)?.layer, "EXPLANATORY_PROJECTION")
+  }
 })
 
-test("a child Grain inherits the complete parent IS before local Difference", () => {
-  const parent = reconstructFirstAct().phases.at(-1)!
-  const child = reconstructChildGrain(parent, "G-1")
-  assert.deepEqual(child.was, parent.is)
-  assert.deepEqual(child.is.slice(0, parent.is.length), parent.is)
-  assert.equal(child.is.at(-1), "LOCAL_ORIENTATION@G-1")
-  assert.equal(child.outerMoment, parent.outerMoment)
+test("cube algebra is optional and physical identity remains unresolved", () => {
+  const model = reconstructFirstAct()
+  const cube = model.relations.find(({ id }) => id === "cube")!
+  const labels = model.relations.find(({ id }) => id === "physical-labels")!
+  assert.equal(cube.layer, "OPTIONAL_PROJECTION")
+  assert.equal(cube.status, "SELECTED")
+  assert.equal(labels.layer, "LATER_LABEL")
+  assert.equal(labels.status, "UNRESOLVED")
 })
