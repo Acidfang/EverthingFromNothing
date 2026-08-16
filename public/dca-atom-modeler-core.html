@@ -286,9 +286,13 @@ root.setAttribute('data-atom-bound','true');
 root.setAttribute('data-bound-occurrence-count',String(count));
 root.setAttribute('data-local-view-boundary','one-selected-grain');
 root.setAttribute('data-surrounding-whole','same-mechanism-operating-in-all-available-relations');
+root.setAttribute('data-act-isolated','false');
+root.setAttribute('data-movement-cause','current-difference-resolving-against-surrounding-state');
+root.setAttribute('data-direction-cause','remaining-available-continuation-after-surrounding-constraints');
+root.setAttribute('data-spiral-cause','direction-continuously-changed-by-surrounding-relations');
 root.setAttribute('data-count-cause','entry-speed-resolved-against-surrounding-whole-before-closure');
 root.setAttribute('data-speed-to-count-mapping','unresolved-numerically');
-coreOutcome.textContent='BOUND: '+count+' SELF occurrences retained | local closure resolves entry speed against the same model operating all around it; numerical mapping remains unresolved';
+coreOutcome.textContent='BOUND: '+count+' SELF occurrences retained | never isolated: surrounding State determines movement, direction, spiral and closure; numerical mapping remains unresolved';
 };
 function placeAnimationControl(){if(orbit.parentElement?.classList.contains('animation-stage'))return;const stage=document.createElement('div');stage.className='animation-stage';stage.style.position='relative';svg.parentNode.insertBefore(stage,svg);stage.append(orbit,svg);Object.assign(orbit.style,{position:'absolute',zIndex:'2',top:'12px',right:'12px',minWidth:'190px',padding:'10px 14px'});orbit.classList.add('btn-primary');orbit.addEventListener('click',syncAnimationControl)}
 function syncAnimationControl(){orbit.setAttribute('aria-pressed',String(orbiting));orbit.textContent=orbiting?'Pause spiral animation':'Start spiral animation'}
