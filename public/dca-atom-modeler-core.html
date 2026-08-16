@@ -303,7 +303,7 @@ root.setAttribute('data-diffusion-relation','at-the-nothing-boundary-the-prior-f
 root.setAttribute('data-spiral-cause','repeated-cross-grain-through-resolution-and-relational-deflection-while-continuation-remains-available');
 root.setAttribute('data-count-cause','entry-speed-resolved-against-surrounding-whole-before-closure');
 root.setAttribute('data-speed-to-count-mapping','unresolved-numerically');
-coreOutcome.textContent='PARTICLE → THE PARTICLE IN ITSELF AS THE SPIRAL → PARTICLES | BOUND '+count;
+coreOutcome.textContent='COLLISION [PARENT GRAIN] → PARTICLE → ITSELF AS SPIRAL [CHILD GRAIN] → NOTHING → DIFFUSION → PARTICLES → REPEAT | BOUND '+count;
 };
 function placeAnimationControl(){if(orbit.parentElement?.classList.contains('animation-stage'))return;const stage=document.createElement('div');stage.className='animation-stage';stage.style.position='relative';svg.parentNode.insertBefore(stage,svg);stage.append(orbit,svg);Object.assign(orbit.style,{position:'absolute',zIndex:'2',top:'12px',right:'12px',minWidth:'190px',padding:'10px 14px'});orbit.classList.add('btn-primary');orbit.addEventListener('click',syncAnimationControl)}
 function syncAnimationControl(){orbit.setAttribute('aria-pressed',String(orbiting));orbit.textContent=orbiting?'Pause spiral animation':'Start spiral animation'}
