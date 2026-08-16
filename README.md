@@ -6,6 +6,15 @@ Public repository:
 Public web modeller:
 [acidfang.github.io/EverthingFromNothing](https://acidfang.github.io/EverthingFromNothing/)
 
+DCA occurrence and atom modeler (work in progress):
+[acidfang.github.io/EverthingFromNothing/dca-atom-modeler.html](https://acidfang.github.io/EverthingFromNothing/dca-atom-modeler.html)
+
+The WIP model currently demonstrates sequential occurrence emergence,
+fixed-Whole resolution, DCA contradiction-brain and atom boundaries, spiral
+animation, the shrinking-core boundary, measured Hydrogen reference controls,
+and mouse-controlled observation. Unclosed physical mappings remain visible as
+work rather than being presented as completed results.
+
 Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may
 use, study, modify, and redistribute the software for noncommercial purposes.
 Commercial or profit-making use requires separate permission from Acidfang;
