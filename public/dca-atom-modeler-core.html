@@ -278,6 +278,16 @@ flow.appendChild(el('text',{x:cx,y:cy+inner*drawScale*1.62,'text-anchor':'middle
 orbitGroup.insertBefore(flow,orbitGroup.firstChild);
 root.setAttribute('data-reformation-count',String(count));
 };
+const renderBindingClosure=render;
+render=function(now=performance.now()){
+renderBindingClosure(now);
+if(modelMode.value!=='atom'||!orbiting||count<2)return;
+root.setAttribute('data-atom-bound','true');
+root.setAttribute('data-bound-occurrence-count',String(count));
+root.setAttribute('data-count-cause','entry-speed-before-closure');
+root.setAttribute('data-speed-to-count-mapping','unresolved-numerically');
+coreOutcome.textContent='BOUND: '+count+' SELF occurrences retained | count follows entry speed before closure; numerical mapping remains unresolved';
+};
 function placeAnimationControl(){if(orbit.parentElement?.classList.contains('animation-stage'))return;const stage=document.createElement('div');stage.className='animation-stage';stage.style.position='relative';svg.parentNode.insertBefore(stage,svg);stage.append(orbit,svg);Object.assign(orbit.style,{position:'absolute',zIndex:'2',top:'12px',right:'12px',minWidth:'190px',padding:'10px 14px'});orbit.classList.add('btn-primary');orbit.addEventListener('click',syncAnimationControl)}
 function syncAnimationControl(){orbit.setAttribute('aria-pressed',String(orbiting));orbit.textContent=orbiting?'Pause spiral animation':'Start spiral animation'}
 function resetModel(){
