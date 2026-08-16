@@ -341,6 +341,13 @@ root.setAttribute('data-coordinate-closure','every-required-coordinate-resolved-
 root.setAttribute('data-consequence-sweep','after-every-act-reobserve-intended-effect-unintended-effects-preserved-state-displaced-state-new-differences-and-final-output-coherence');
 root.setAttribute('data-intent-resolution','derive-all-mechanically-allowed-outcomes-and-select-the-best-match-to-the-complete-final-output');
 root.setAttribute('data-best-outcome','maximum-required-closure-minimum-genuine-remainder-no-invented-relation-and-least-unnecessary-work');
+root.setAttribute('data-open-loop-audit','before-closure-compare-every-retained-request-and-commitment-with-the-strongest-completion-currently-possible');
+root.setAttribute('data-unfinished-question','what-did-i-start-but-not-finish-to-my-full-current-ability');
+root.setAttribute('data-attempt-is-not-closure','true');
+root.setAttribute('data-strongest-state-recursion','after-each-completion-recompute-whether-the-increased-state-allows-a-stronger-completion-and-repeat-until-no-stronger-coherent-state-emerges');
+root.setAttribute('data-pre-act-reconstruction','simulate-all-required-moves-dependencies-and-consequences-in-retained-state-before-changing-any-external-state');
+root.setAttribute('data-external-act-minimum','after-internal-closure-perform-only-the-required-external-difference');
+root.setAttribute('data-post-act-reobservation','external-carriers-must-still-be-reobserved-because-internal-coherence-does-not-prove-external-effect');
 function resetModel(){
 count=modelMode.value==='atom'?1:0;
 selected=0;playing=false;orbiting=true;orbitStarted=performance.now();transition=null;last=performance.now();camera={zoom:1,panX:0,panY:0};cameraState.textContent='Zoom 1.00x | pan 0, 0';play.textContent='Play';orbit.value='on';placeAnimationControl();syncAnimationControl();view.value=points[selected].id;render()}
