@@ -10,10 +10,11 @@ DCA occurrence and atom modeler (work in progress):
 [acidfang.github.io/EverthingFromNothing/dca-atom-modeler.html](https://acidfang.github.io/EverthingFromNothing/dca-atom-modeler.html)
 
 The WIP model currently demonstrates sequential occurrence emergence,
-fixed-Whole resolution, DCA contradiction-brain and atom boundaries, spiral
-animation, the shrinking-core boundary, measured Hydrogen reference controls,
-and mouse-controlled observation. Unclosed physical mappings remain visible as
-work rather than being presented as completed results.
+fixed-Whole resolution, DCA contradiction-brain and atom boundaries, the full
+118-element atomic address table, retained-spiral animation, a selectable
+toroidal-spiral WIP resolution increase, the shrinking-core boundary, measured
+Hydrogen reference controls, and mouse-controlled observation. Unclosed physical
+mappings remain visible as work rather than being presented as completed results.
 
 Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may
 use, study, modify, and redistribute the software for noncommercial purposes.
