@@ -284,15 +284,21 @@ renderBindingClosure(now);
 if(modelMode.value!=='atom'||!orbiting||count<2)return;
 root.setAttribute('data-atom-bound','true');
 root.setAttribute('data-bound-occurrence-count',String(count));
+root.setAttribute('data-recursive-was','PARTICLE');
+root.setAttribute('data-recursive-did','BECAME-THE-PARTICLE-IN-ITSELF-AS-THE-SPIRAL');
+root.setAttribute('data-recursive-is','PARTICLES');
+root.setAttribute('data-recursion','repeat-at-every-next-grain-with-no-final-grain');
 root.setAttribute('data-local-view-boundary','one-selected-grain');
 root.setAttribute('data-surrounding-whole','same-mechanism-operating-in-all-available-relations');
 root.setAttribute('data-act-isolated','false');
 root.setAttribute('data-movement-cause','current-difference-resolving-against-surrounding-state');
-root.setAttribute('data-direction-cause','continue-through-resolvable-boundary-otherwise-deflect-by-contact-or-constraint');
-root.setAttribute('data-spiral-cause','repeated-through-resolution-and-relational-deflection-while-continuation-remains-available');
+root.setAttribute('data-direction-cause','blocked-particle-becomes-itself-as-spiral-and-continues-at-the-spiral-grain');
+root.setAttribute('data-grain-transition','the-obstructing-thing-at-the-prior-grain-is-not-that-thing-at-the-spiral-grain');
+root.setAttribute('data-diffusion-relation','prior-form-lost-at-one-grain-state-continues-through-another');
+root.setAttribute('data-spiral-cause','repeated-cross-grain-through-resolution-and-relational-deflection-while-continuation-remains-available');
 root.setAttribute('data-count-cause','entry-speed-resolved-against-surrounding-whole-before-closure');
 root.setAttribute('data-speed-to-count-mapping','unresolved-numerically');
-coreOutcome.textContent='BOUND: '+count+' SELF occurrences retained | never isolated: surrounding State determines movement, direction, spiral and closure; numerical mapping remains unresolved';
+coreOutcome.textContent='PARTICLE → THE PARTICLE IN ITSELF AS THE SPIRAL → PARTICLES | BOUND '+count;
 };
 function placeAnimationControl(){if(orbit.parentElement?.classList.contains('animation-stage'))return;const stage=document.createElement('div');stage.className='animation-stage';stage.style.position='relative';svg.parentNode.insertBefore(stage,svg);stage.append(orbit,svg);Object.assign(orbit.style,{position:'absolute',zIndex:'2',top:'12px',right:'12px',minWidth:'190px',padding:'10px 14px'});orbit.classList.add('btn-primary');orbit.addEventListener('click',syncAnimationControl)}
 function syncAnimationControl(){orbit.setAttribute('aria-pressed',String(orbiting));orbit.textContent=orbiting?'Pause spiral animation':'Start spiral animation'}
