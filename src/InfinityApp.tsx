@@ -4,7 +4,8 @@ import "./infinity.css"
 
 type Channel = "NONE" | "FILTER" | "ISOLATE" | "RECONSTRUCT"
 type FieldAddress = { root:string; grain:number; act:number; x:number; y:number; z:number; depth:number; channel:Channel; subject?:string }
-type FieldNode = { id:string; x:number; y:number; z:number; generation:number; address:string }\ntype FieldEdge = { from:string; to:string; relation:string }
+type FieldNode = { id:string; x:number; y:number; z:number; generation:number; address:string }
+type FieldEdge = { from:string; to:string; relation:string }
 type Whole = { root:string; zero:FieldAddress; nodes:FieldNode[]; channel:Channel; scope:string; enactment:string; provenance:string[] }
 
 const ROOT="FAMILY/NOTODUS/ZERO"
