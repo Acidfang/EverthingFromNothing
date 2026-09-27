@@ -4,52 +4,60 @@ import "./infinity.css"
 
 type Channel = "NONE" | "FILTER" | "ISOLATE" | "RECONSTRUCT"
 type FieldAddress = { root:string; grain:number; act:number; x:number; y:number; z:number; depth:number; channel:Channel; subject?:string }
-type FieldNode = { id:string; x:number; y:number; z:number; generation:number; address:string }
-type FieldEdge = { from:string; to:string; relation:string }
-type Whole = { root:string; zero:FieldAddress; nodes:FieldNode[]; channel:Channel; scope:string; enactment:string; provenance:string[] }
+type Receipt = { at:string; from:string; to:string; action:string }
 
 const ROOT="FAMILY/NOTODUS/ZERO"
-const DEFAULT_ADDRESS:FieldAddress={root:ROOT,grain:0,act:0,x:0,y:0,z:0,depth:2,channel:"NONE"}
-function readAddress():FieldAddress{const source=new URLSearchParams(location.search).get("field")||new URLSearchParams(location.hash.replace(/^#/,"")).get("field");if(!source)return DEFAULT_ADDRESS;try{return{...DEFAULT_ADDRESS,...JSON.parse(decodeURIComponent(source))}}catch{return DEFAULT_ADDRESS}}
-function writeAddress(address:FieldAddress){history.replaceState(null,"",`${location.pathname}#field=${encodeURIComponent(JSON.stringify(address))}`)}
-function nodeAddress(g:number,x:number,y:number,z:number){return `${ROOT}/FIELD/${g}/X${x}/Y${y}/Z${z}`}
-function parseEventAddress(raw:string,generation:number):FieldNode|null{const m=raw.match(/(?:^|[/:])(-?\d+),(-?\d+),(-?\d+)(?:$|[/:])/);if(!m)return null;const[,xs,ys,zs]=m;const x=Number(xs),y=Number(ys),z=Number(zs);return{id:raw,x,y,z,generation,address:raw}}
-function fractureNodes(events:readonly string[],centre:string):FieldNode[]{const nodes:FieldNode[]=[];for(const event of events){const n=parseEventAddress(event,event===centre?0:1);if(n)nodes.push(n)}return nodes.length?nodes:[{id:centre,x:0,y:0,z:0,generation:0,address:centre}]}
-function project(n:FieldNode,w:number,h:number,scale:number){const px=w/2+(n.x-n.z*.55)*scale;const py=h/2+(n.y*.82+n.z*.45)*scale;return{x:px,y:py}}
-function download(name:string,type:string,data:string){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),0)}
+const DEFAULT_ADDRESS:FieldAddress={root:ROOT,grain:0,act:0,x:0,y:0,z:0,depth:2,channel:"NONE",subject:"USER"}
+const encode=(a:FieldAddress)=>`${a.root}/G${a.grain}/A${a.act}/X${a.x}/Y${a.y}/Z${a.z}/D${a.depth}/${a.channel}/${a.subject||"USER"}`
+function readAddress():FieldAddress{const source=new URLSearchParams(location.hash.replace(/^#/,"")).get("field");if(!source)return DEFAULT_ADDRESS;try{return{...DEFAULT_ADDRESS,...JSON.parse(decodeURIComponent(source))}}catch{return DEFAULT_ADDRESS}}
+function writeAddress(a:FieldAddress){history.replaceState(null,"",`${location.pathname}#field=${encodeURIComponent(JSON.stringify(a))}`)}
 
 export function InfinityApp(){
  const explorer=useMemo(()=>new FirstActExplorer(),[])
- const[address,setAddress]=useState<FieldAddress>(()=>readAddress())
- const[frame,setFrame]=useState(()=>explorer.frame())
- const[message,setMessage]=useState("Whole addressed")
- const[spoken,setSpoken]=useState("")
+ const [address,setAddress]=useState<FieldAddress>(()=>readAddress())
+ const [frame,setFrame]=useState(()=>explorer.frame())
+ const [receipt,setReceipt]=useState<Receipt|null>(null)
  const canvas=useRef<HTMLCanvasElement>(null)
  const fracture=frame.recursiveQuery.query
- const nodes=useMemo(()=>fractureNodes(fracture.events,fracture.centre),[fracture])
- const edges=useMemo<FieldEdge[]>(()=>fracture.edges.map((edge:any)=>({from:String(edge.from??edge.source??edge.a??""),to:String(edge.to??edge.target??edge.b??""),relation:String(edge.relation??edge.type??"FRACTURE")})).filter(edge=>edge.from&&edge.to),[fracture])
- const whole=useMemo<Whole>(()=>({root:ROOT,zero:address,nodes,channel:address.channel,scope:"Complete addressable field: node, relation, lineage, provenance and presentation remain inside the carried Whole.",enactment:address.channel==="NONE"?"DO NOTHING -> MOVE ON":"Carry Whole -> address Difference -> "+address.channel+" -> return resolved Whole",provenance:["DEFAULT/WHOLE/PIXEL_ARRAY_MAP",address.root,nodeAddress(address.grain,address.x,address.y,address.z)]}),[address,nodes])
- const syncExplorer=(next:FieldAddress)=>{
+ const events=useMemo(()=>fracture.events.map((raw,index)=>({raw,index})),[fracture.events])
+
+ const sync=(next:FieldAddress)=>{
    while(explorer.frame().observer.relativeGrain>next.grain) explorer.enterWhole(0)
    while(explorer.frame().observer.relativeGrain<next.grain) explorer.returnOutward()
    let [cx,cy,cz]=explorer.frame().observer.spatialAddress.split(",").map(Number)
-   while(cx<next.x){explorer.moveSpatially(0);cx++}
-   while(cx>next.x){explorer.moveSpatially(1);cx--}
-   while(cy<next.y){explorer.moveSpatially(2);cy++}
-   while(cy>next.y){explorer.moveSpatially(3);cy--}
-   while(cz<next.z){explorer.moveSpatially(4);cz++}
-   while(cz>next.z){explorer.moveSpatially(5);cz--}
+   while(cx<next.x){explorer.moveSpatially(0);cx++} while(cx>next.x){explorer.moveSpatially(1);cx--}
+   while(cy<next.y){explorer.moveSpatially(2);cy++} while(cy>next.y){explorer.moveSpatially(3);cy--}
+   while(cz<next.z){explorer.moveSpatially(4);cz++} while(cz>next.z){explorer.moveSpatially(5);cz--}
    explorer.setQueryDepth(Math.max(0,Math.min(4,next.depth)))
    return explorer.frame()
  }
- const apply=(next:FieldAddress)=>{const nextFrame=syncExplorer(next);setAddress(next);writeAddress(next);setFrame(nextFrame);setMessage(`${next.channel}: Whole at ${next.x},${next.y},${next.z}`)}
- useEffect(()=>{setFrame(syncExplorer(address))},[])
- useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return;const resize=()=>{const r=c.getBoundingClientRect();c.width=Math.max(1,Math.floor(r.width*devicePixelRatio));c.height=Math.max(1,Math.floor(r.height*devicePixelRatio));ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);const w=r.width,h=r.height;ctx.clearRect(0,0,w,h);ctx.fillStyle="#050708";ctx.fillRect(0,0,w,h);const extent=Math.max(1,...nodes.flatMap(n=>[Math.abs(n.x),Math.abs(n.y),Math.abs(n.z)]));const scale=Math.max(18,Math.min(w,h)/(extent*4+4));const p=new Map(nodes.map(n=>[n.id,project(n,w,h,scale)]));ctx.strokeStyle="rgba(229,173,86,.18)";ctx.lineWidth=1;for(const edge of edges){const a=p.get(edge.from),b=p.get(edge.to);if(!a||!b)continue;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}for(const n of nodes){const q=p.get(n.id)!;const active=n.x===address.x&&n.y===address.y&&n.z===address.z;ctx.beginPath();ctx.arc(q.x,q.y,active?5:2.2,0,Math.PI*2);ctx.fillStyle=active?"#eeeade":"#e5ad56";ctx.fill()}const z=p.get(fracture.centre);if(z){ctx.strokeStyle="#69d5ce";ctx.beginPath();ctx.arc(z.x,z.y,10,0,Math.PI*2);ctx.stroke()}};resize();addEventListener("resize",resize);return()=>removeEventListener("resize",resize)},[nodes,edges,address,fracture])
- useEffect(()=>{const handler=(e:MessageEvent)=>{if(e.data?.type==="INFINITY_FIELD_ADDRESS")apply({...address,...e.data.address})};addEventListener("message",handler);const bc="BroadcastChannel"in window?new BroadcastChannel("infinity-field"):null;bc?.addEventListener("message",handler);return()=>{removeEventListener("message",handler);bc?.close()}},[address])
- const requestMedia=async(kind:"microphone"|"camera")=>{try{const stream=await navigator.mediaDevices.getUserMedia({audio:kind==="microphone",video:kind==="camera"});stream.getTracks().forEach(t=>t.stop());setMessage(`${kind} available at this field address`)}catch{setMessage(`${kind} unavailable or permission not granted`)}}
- const requestUsb=async()=>{try{const usb=(navigator as Navigator&{usb?:{requestDevice(options:{filters:unknown[]}):Promise<unknown>}}).usb;if(!usb)throw new Error();await usb.requestDevice({filters:[]});setMessage("USB addressed") }catch{setMessage("USB unavailable or permission not granted")}}
- const speak=()=>{if(!("speechSynthesis"in window)){setMessage("Speech output unavailable");return}const text=spoken||`Infinity field ${address.x} ${address.y} ${address.z}`;speechSynthesis.speak(new SpeechSynthesisUtterance(text));setMessage("Speech output enacted")}
- const spawn=()=>{const child=open(location.href,"infinity-field-map","popup,width=1100,height=800");if(child){setMessage("Field surface spawned");setTimeout(()=>child.postMessage({type:"INFINITY_FIELD_ADDRESS",address},location.origin),300)}else setMessage("Spawn blocked; webpage remains the field surface")}
- const exportWhole=()=>download("infinity-whole.json","application/json",JSON.stringify({whole,frame},null,2))
- return <main className="infinity-map"><header className="infinity-hud"><strong>INFINITY · WHOLE/PIXEL_ARRAY_MAP</strong><span>{message}</span><button onClick={()=>document.documentElement.requestFullscreen?.()}>Fullscreen</button></header><section className="infinity-field" aria-label="Addressable Infinity field map"><canvas ref={canvas} className="infinity-canvas"/><div className="infinity-centre"><div className="infinity-zero">0</div><div className="infinity-address">{nodeAddress(address.grain,address.x,address.y,address.z)}</div><div className="infinity-stats">{nodes.length} fracture states · {edges.length} fracture relations · {frame.recursiveQuery.frontierCount} frontier · Whole carried</div></div><div className="infinity-channels">{(["FILTER","ISOLATE","RECONSTRUCT","NONE"] as Channel[]).map(channel=><button key={channel} data-active={address.channel===channel} onClick={()=>apply({...address,channel})}>{channel==="NONE"?"DO NOTHING / MOVE ON":channel}</button>)}</div></section><aside className="infinity-controls"><label>Field depth <input type="range" min="1" max="4" value={Math.min(4,address.depth)} onChange={e=>apply({...address,depth:Number(e.target.value)})}/></label><button onClick={()=>apply({...address,x:address.x+1})}>+X</button><button onClick={()=>apply({...address,x:address.x-1})}>−X</button><button onClick={()=>apply({...address,y:address.y+1})}>+Y</button><button onClick={()=>apply({...address,y:address.y-1})}>−Y</button><button onClick={()=>apply({...address,z:address.z+1})}>+Z</button><button onClick={()=>apply({...address,z:address.z-1})}>−Z</button><button onClick={()=>requestMedia("microphone")}>Microphone</button><button onClick={()=>requestMedia("camera")}>Camera</button><button onClick={requestUsb}>USB</button><input aria-label="Speech text" value={spoken} onChange={e=>setSpoken(e.target.value)} placeholder="Addressed speech"/><button onClick={speak}>Speak</button><button onClick={spawn}>Spawn field surface</button><button onClick={exportWhole}>Save Whole</button><button onClick={()=>navigator.clipboard?.writeText(location.href)}>Copy field address</button></aside></main>
+ const apply=(next:FieldAddress,action:string)=>{const from=encode(address);const nextFrame=sync(next);setAddress(next);setFrame(nextFrame);writeAddress(next);setReceipt({at:new Date().toISOString(),from,to:encode(next),action})}
+ useEffect(()=>{setFrame(sync(address));writeAddress(address)},[])
+
+ useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return;const draw=()=>{const r=c.getBoundingClientRect();c.width=Math.max(1,Math.floor(r.width*devicePixelRatio));c.height=Math.max(1,Math.floor(r.height*devicePixelRatio));ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height);const cx=r.width/2,cy=r.height/2;ctx.strokeStyle="rgba(105,213,206,.28)";ctx.beginPath();ctx.arc(cx,cy,Math.min(r.width,r.height)*.22,0,Math.PI*2);ctx.stroke();events.forEach((event,i)=>{const a=(i/Math.max(1,events.length))*Math.PI*2;const radius=36+(i%7)*13;const x=cx+Math.cos(a)*radius,y=cy+Math.sin(a)*radius;ctx.beginPath();ctx.arc(x,y,i===0?6:2.4,0,Math.PI*2);ctx.fillStyle=i===0?"#eeeade":"#e5ad56";ctx.fill()});ctx.fillStyle="#69d5ce";ctx.font="12px monospace";ctx.textAlign="center";ctx.fillText("USER ZERO",cx,cy-14);ctx.fillText(`${address.x},${address.y},${address.z}`,cx,cy+18)};draw();addEventListener("resize",draw);return()=>removeEventListener("resize",draw)},[events,address])
+
+ const move=(axis:"x"|"y"|"z",delta:number)=>apply({...address,[axis]:address[axis]+delta},`${delta>0?"+":"-"}${axis.toUpperCase()}`)
+ const tick=()=>{const f=explorer.resolveOneTick();const next={...address,act:f.observer.act};const from=encode(address);setAddress(next);setFrame(f);writeAddress(next);setReceipt({at:new Date().toISOString(),from,to:encode(next),action:"FRACTURE / RESOLVE ONE TICK"})}
+ const reset=()=>{location.hash="";location.reload()}
+
+ return <main className="infinity-map">
+  <header className="infinity-hud"><strong>INFINITY · USER ADDRESSED FRACTURE</strong><span>{receipt?`RETURN ✓ ${receipt.action}`:"READY · USER → ZERO → FRACTURE → RETURN"}</span></header>
+  <section className="infinity-field" aria-label="User addressed fracture field">
+   <canvas ref={canvas} className="infinity-canvas"/>
+   <div className="infinity-centre"><div className="infinity-zero">0</div><div className="infinity-address">{encode(address)}</div><div className="infinity-stats">{frame.recursiveQuery.eventCount} fracture states · {frame.recursiveQuery.relationCount} relations · {frame.recursiveQuery.frontierCount} frontier</div></div>
+  </section>
+  <aside className="infinity-controls">
+   <label>User / subject <input value={address.subject||""} onChange={e=>apply({...address,subject:e.target.value},"ADDRESS USER")}/></label>
+   <label>Fracture depth <input type="range" min="0" max="4" value={address.depth} onChange={e=>apply({...address,depth:Number(e.target.value)},"SET FRACTURE DEPTH")}/></label>
+   <button onClick={()=>move("x",1)}>+X</button><button onClick={()=>move("x",-1)}>−X</button>
+   <button onClick={()=>move("y",1)}>+Y</button><button onClick={()=>move("y",-1)}>−Y</button>
+   <button onClick={()=>move("z",1)}>+Z</button><button onClick={()=>move("z",-1)}>−Z</button>
+   <button onClick={tick}>Fracture / resolve tick</button>
+   <button onClick={()=>apply({...address,channel:address.channel==="NONE"?"FILTER":"NONE"},"TOGGLE FILTER")}>Filter: {address.channel}</button>
+   <button onClick={()=>navigator.clipboard?.writeText(location.href)}>Copy addressed return</button>
+   <button onClick={reset}>Return to root ZERO</button>
+   <div className="infinity-address"><b>CURRENT USER ADDRESS</b><br/>{encode(address)}</div>
+   {receipt&&<div className="infinity-address"><b>LAST RETURN RECEIPT</b><br/>{receipt.action}<br/>FROM {receipt.from}<br/>TO {receipt.to}<br/>{receipt.at}</div>}
+  </aside>
+ </main>
 }
