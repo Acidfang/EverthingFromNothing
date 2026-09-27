@@ -1,4 +1,5 @@
 name: Model invariants
+run-name: "Model invariants · ${{ github.sha }}"
 
 on:
   push:
