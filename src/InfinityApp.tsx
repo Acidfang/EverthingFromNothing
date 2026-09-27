@@ -50,9 +50,9 @@ export function InfinityApp(){
        const nx=(e.x-minX)/spanX-.5,ny=(e.y-minY)/spanY-.5,nz=(e.z-minZ)/spanZ-.5,ng=(e.grain-minG)/spanG-.5,na=(e.act-minA)/spanA-.5
        return {x:r.width/2+nx*(r.width-pad*2)+nz*18+ng*10,y:r.height/2+ny*(r.height-pad*2)-nz*18-na*10}
      }
-     const byKey=new Map(events.map(e=>[e.key,e]))
-     ctx.lineWidth=1
-     for(const edge of q.edges){const s=byKey.get(edge.source),t=byKey.get(edge.target);if(!s||!t)continue;const a=point(s),b=point(t);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=edge.relation==="SPATIAL_FACE"?"rgba(229,173,86,.32)":edge.relation==="INWARD"||edge.relation==="OUTWARD"?"rgba(105,213,206,.28)":"rgba(238,234,222,.16)";ctx.stroke()}
+     // Relations/adjacency belong to field state. Projection renders addressed grains only.
+     // Never infer or draw an edge from adjacency, proximity, grain, face, WAS/IS/NEXT,
+     // inward/outward, or any other retained relation.
      for(const e of events){const p=point(e);const centre=e.key===q.centre;ctx.fillStyle=centre?"#eeeade":"#e5ad56";ctx.fillRect(Math.round(p.x),Math.round(p.y),centre?2:1,centre?2:1)}
    }
    draw();addEventListener("resize",draw);return()=>removeEventListener("resize",draw)
