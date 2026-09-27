@@ -1,4 +1,5 @@
 name: Deploy web modeller
+run-name: "Deploy web modeller · ${{ github.sha }}"
 
 on:
   push:
@@ -29,6 +30,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test:model
       - run: pnpm run build
+      - run: pnpm run audit:release
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
