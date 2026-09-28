@@ -32,7 +32,7 @@ export function parseArguments(arguments_: readonly string[]): CliOptions {
       inward.push(face)
     } else if (argument === "--depth") {
       queryDepth = integer(arguments_[++index], "--depth")
-      if (queryDepth < 0 || queryDepth > 4) throw new Error("--depth must be between 0 and 4")
+      if (queryDepth < 0) throw new Error("--depth must be zero or greater")
     } else if (argument === "--select-projection") {
       selectProjection = arguments_[++index] ?? null
       if (!selectProjection) throw new Error("--select-projection requires x,y,z")

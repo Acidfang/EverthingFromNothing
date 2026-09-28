@@ -218,8 +218,8 @@ export class FirstActExplorer {
   }
 
   setQueryDepth(depth: number): ExplorerFrame {
-    if (!Number.isSafeInteger(depth) || depth < 0 || depth > 4) {
-      throw new Error("Interactive query depth must be an integer from 0 through 4")
+    if (!Number.isSafeInteger(depth) || depth < 0) {
+      throw new Error("Interactive query depth must be a non-negative integer")
     }
     this.#queryDepth = depth
     return this.frame()

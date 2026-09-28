@@ -1,7 +1,7 @@
 import { useEffect,useRef,useState } from "react"
 import { advanceLedgerContinuum,createLedgerContinuum } from "./model/kernel"
 import { fromKey } from "./model/address"
-import { BINARY_MODEL,resolveResponse } from "./model/binaryRelationships"
+import { BINARY_MODEL,EVERYTHING_METHOD,FULL_SELF_RESOLUTION,WHOLE_INVARIANT,resolveResponse } from "./model/binaryRelationships"
 import "./infinity.css"
 
 type PixelReference=Readonly<{x:number;y:number;addresses:readonly string[]}>
@@ -18,7 +18,7 @@ const putPhysicalPixel=(ctx:CanvasRenderingContext2D,x:number,y:number,dpr:numbe
 export function InfinityApp(){
  const canvas=useRef<HTMLCanvasElement>(null),continuum=useRef(createLedgerContinuum()),raf=useRef(0),last=useRef(0),projected=useRef<readonly PixelReference[]>([]),avatarPhase=useRef(0)
  const pointers=useRef(new Map<number,{x:number;y:number}>()),lastPointer=useRef<{x:number;y:number}|null>(null)
- const channels=["HUMAN","EI_AGENT","TEXT","VOICE","IMAGE_VISION","FILE_DOCUMENT","CODE_EXECUTION","WEB_EXTERNAL","DEVICE_SENSOR","UI_CONTROL","MEMORY_HISTORY","LEDGER_RECEIPT"] as const
+ const channels=EVERYTHING_METHOD.domains
  const [sourceChannel,setSourceChannel]=useState<(typeof channels)[number]>("HUMAN"),[destinationChannel,setDestinationChannel]=useState<(typeof channels)[number]>("EI_AGENT")
  const mediaStream=useRef<MediaStream|null>(null),preview=useRef<HTMLVideoElement>(null),speechRecognition=useRef<any>(null)
  const [live,setLive]=useState(false),[muted,setMuted]=useState(false),[held,setHeld]=useState(false),[captions,setCaptions]=useState(true),[interruptible,setInterruptible]=useState(true),[camera,setCamera]=useState(false),[screen,setScreen]=useState(false),[listening,setListening]=useState(false),[heard,setHeard]=useState(""),[mediaError,setMediaError]=useState(""),[transcript,setTranscript]=useState<string[]>([]),[controlReceipts,setControlReceipts]=useState<readonly Readonly<{address:ControlAddress;value:string}>[]>([])
@@ -34,7 +34,7 @@ export function InfinityApp(){
  const [guidance,setGuidance]=useState("SOURCE"),[reply,setReply]=useState(""),[nextReply,setNextReply]=useState<string|null>(null),[sourceAddress,setSourceAddress]=useState("HUMAN/0"),[sourceMoment,setSourceMoment]=useState(0),[intentCenter,setIntentCenter]=useState("0,0,0"),[menu,setMenu]=useState<{x:number;y:number;address:string}|null>(null),[zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
-   if(now-last.current>=1000){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
+   if(now-last.current>=1000&&WHOLE_INVARIANT.recursive&&FULL_SELF_RESOLUTION.selfSimilar){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
    const addresses=[...continuum.current.state.is],coords=addresses.map(fromKey),extent=Math.max(1,...coords.flatMap(p=>[Math.abs(p.x),Math.abs(p.y),Math.abs(p.z)])),scale=Math.max(1,Math.min(r.width,r.height)*.46/extent*zoom)
    const pixels=mergeByPixel(addresses,address=>{const p=fromKey(address),cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;return{x:r.width/2+x*scale,y:r.height/2-y*scale}})
    projected.current=pixels

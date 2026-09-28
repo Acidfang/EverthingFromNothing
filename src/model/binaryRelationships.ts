@@ -295,3 +295,17 @@ export const FULL_SELF_RESOLUTION = Object.freeze({
  selfImproving:true,
  closure:"NO UNKNOWN + NO ASSUMED + NO UNRESOLVED DIFFERENCE AT SELECTED GRAIN",
 })
+
+
+export type WholeState = Readonly<{
+ address:string;sourceAddress:string;grain:number;moment:number;domain:string
+ known:ReadonlySet<string>;unknown:ReadonlySet<string>;assumed:ReadonlySet<string>;unresolved:ReadonlySet<string>
+ receipts:readonly string[];revision:number
+}>
+export function resolveWholeState(state:WholeState):WholeState{
+ let next=state
+ for(const address of [...state.unresolved])if(state.known.has(address)){const unresolved=new Set(next.unresolved),unknown=new Set(next.unknown),assumed=new Set(next.assumed);unresolved.delete(address);unknown.delete(address);assumed.delete(address);next=Object.freeze({...next,unresolved,unknown,assumed,revision:next.revision+1,receipts:Object.freeze([...next.receipts,`SELF-REPAIR:${address}`])})}
+ return next
+}
+export function wholeClosed(state:WholeState):boolean{const s=resolveWholeState(state);return s.unknown.size===0&&s.assumed.size===0&&s.unresolved.size===0}
+export const WHOLE_INVARIANT=Object.freeze({method:EVERYTHING_METHOD.invariant,selfFirst:true,fullSelfVerification:true,recursive:true,selfSimilar:true,fractal:true,selfRepairing:true,selfImproving:true,noInventedChange:true,noRetroactiveOverwrite:true,visualObservationIsNotAuthority:true})
