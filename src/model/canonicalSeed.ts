@@ -7,6 +7,14 @@ export const CANONICAL_SEED = Object.freeze({
     proceedTipsPerTetrahedron: 1,
     tipIsNotAutomaticallyChild: true,
   }),
+  fracture: Object.freeze({
+    addressedChildren: 4,
+    pairGates: 6,
+    triadGates: 4,
+    childrenAreIndependentRoots: false,
+    childRetainsOriginState: true,
+    childOwnsRecursiveChildArray: true,
+  }),
   temporalRoles: Object.freeze(["WAS", "IS", "NEXT"] as const),
   proceedIsTemporal: false,
   transition: Object.freeze({
@@ -31,10 +39,9 @@ export const CANONICAL_SEED = Object.freeze({
   }),
 } as const)
 
-// Deliberately unresolved by the canonical seed. Later stages must not invent these.
+// Deliberately unresolved. Later stages must not invent these.
 export const OPEN_DIFFERENCES = Object.freeze([
   "absolute-coordinate-basis",
-  "fracture-spawn-rule",
   "fracture-child-placement",
   "projection-geometry",
 ] as const)
