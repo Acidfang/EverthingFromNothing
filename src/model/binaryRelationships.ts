@@ -47,6 +47,12 @@ export const BINARY_MODEL = Object.freeze({
   merge:(a:Pick<BinaryObservation,"address"|"location">,b:Pick<BinaryObservation,"address"|"location">)=>a.address===b.address||a.location===b.location,
   mayInflictKnownHarm:(harmKnown:boolean,willing:boolean,self:boolean)=>!harmKnown||willing||self,
   mayCorrect:(sourceAlreadyContains:boolean)=>!sourceAlreadyContains,
+  // Address/time boundary: later receipts cannot retroactively alter an earlier
+  // source relation. They may resolve it only by returning to that exact address.
+  laterChangesEarlier:(laterMoment:number,earlierMoment:number)=>laterMoment<=earlierMoment,
+  resolvesAt:(differenceAddress:string,receiptAddress:string)=>differenceAddress===receiptAddress,
+  laterReceiptRelevantToEarlier:(differenceAddress:string,receiptAddress:string,receiptMoment:number,differenceMoment:number)=>
+   receiptMoment<=differenceMoment&&differenceAddress===receiptAddress,
   continue:(difference:boolean)=>difference,
   stop:(difference:boolean)=>!difference,
  }),
