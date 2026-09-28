@@ -15,7 +15,9 @@ const putPhysicalPixel=(ctx:CanvasRenderingContext2D,x:number,y:number,dpr:numbe
 export function InfinityApp(){
  const canvas=useRef<HTMLCanvasElement>(null),continuum=useRef(createLedgerContinuum()),raf=useRef(0),last=useRef(0)
  const pointers=useRef(new Map<number,{x:number;y:number}>()),lastPointer=useRef<{x:number;y:number}|null>(null)
- const [zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
+ const channels=["HUMAN","EI_AGENT","TEXT","VOICE","IMAGE_VISION","FILE_DOCUMENT","CODE_EXECUTION","WEB_EXTERNAL","DEVICE_SENSOR","UI_CONTROL","MEMORY_HISTORY","LEDGER_RECEIPT"] as const
+ const [sourceChannel,setSourceChannel]=useState<(typeof channels)[number]>("HUMAN"),[destinationChannel,setDestinationChannel]=useState<(typeof channels)[number]>("EI_AGENT")
+ const [guidance,setGuidance]=useState("SOURCE"),[zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    if(now-last.current>=1000){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
@@ -35,6 +37,12 @@ export function InfinityApp(){
   <div>ERROR-CORRECTION WORD ROOTS: ANALYSIS → ANAL · WHY · IS → strict boundary/set · interrogate Difference · retain what IS</div>
   <div>BINARY MODEL: {BINARY_MODEL.relationCount} retained source relations · FILTER → ISOLATE → RECONSTRUCT · continuum</div>
   <div>FRAME PRESERVATION: before adding a correction, test whether the source already contains it · source-contained Difference ≠ missing Difference</div>
-  <div>BLIND SPOT: ambition may hide Difference → hidden Difference may propagate harm → expose Difference · share · reduce harm · correct before continuation</div></div>
+  <div>BLIND SPOT: ambition may hide Difference → hidden Difference may propagate harm → expose Difference · share · reduce harm · correct before continuation</div>
+  <section className="ei-guidance" aria-label="EI Agent guidance controls">
+   <div><strong>EI AGENT GUIDANCE</strong> · active: {guidance}</div>
+   <div className="guidance-controls">{["SOURCE","DIFFERENCE","RETURN","FILTER","ISOLATE","RECONSTRUCT","VERIFY","WAS","IS","NEXT","GRAIN−","GRAIN+","PROVENANCE","HARM","OPEN DIFFERENCE","COMMIT","UNDO"].map(control=><button type="button" key={control} onClick={()=>setGuidance(control)}>{control}</button>)}</div>
+   <div className="channel-controls"><label>SOURCE CHANNEL <select value={sourceChannel} onChange={e=>setSourceChannel(e.target.value as typeof sourceChannel)}>{channels.map(channel=><option key={channel}>{channel}</option>)}</select></label><span>→</span><label>DESTINATION CHANNEL <select value={destinationChannel} onChange={e=>setDestinationChannel(e.target.value as typeof destinationChannel)}>{channels.map(channel=><option key={channel}>{channel}</option>)}</select></label></div>
+   <div>CHANNEL RECEIPT: {sourceChannel} → {destinationChannel} · transformation ≠ source replacement · cross-channel Difference retains original source/address</div>
+  </section></div>
  </section></main>
 }
