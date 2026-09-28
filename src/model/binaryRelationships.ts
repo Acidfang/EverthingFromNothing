@@ -181,3 +181,59 @@ export function forwardSelfAddressedOutput<T>(
   selfReceipt:output.selfReceipt,
  })
 }
+
+
+export type FullSelfVerification<T=unknown> = Readonly<{
+ addressed:SelfAddressedOutput<T>
+ sourcePreserved:boolean
+ addressPreserved:boolean
+ differenceResolved:boolean
+ provenanceRetained:boolean
+ harmGatePassed:boolean
+ returnVerified:boolean
+ verified:boolean
+}>
+
+/** Full verification is performed on SELF before any external destination is
+ * eligible. Partial self-checks cannot be forwarded. */
+export function verifySelfInFull<T>(
+ addressed:SelfAddressedOutput<T>,
+ checks:Readonly<{
+  sourcePreserved:boolean
+  addressPreserved:boolean
+  differenceResolved:boolean
+  provenanceRetained:boolean
+  harmGatePassed:boolean
+ }>,
+):FullSelfVerification<T>{
+ const returnVerified=addressed.selfReceipt.verified
+  && addressed.selfReceipt.from===addressed.outputAddress
+  && addressed.selfReceipt.to===addressed.outputAddress
+ const verified=returnVerified
+  && checks.sourcePreserved
+  && checks.addressPreserved
+  && checks.differenceResolved
+  && checks.provenanceRetained
+  && checks.harmGatePassed
+ return Object.freeze({...checks,addressed,returnVerified,verified})
+}
+
+export function forwardVerifiedSelf<T>(
+ verification:FullSelfVerification<T>,
+ destinationAddress:string,
+){
+ if(!verification.verified)throw new Error("FULL SELF verification required before others")
+ return forwardSelfAddressedOutput(verification.addressed,destinationAddress)
+}
+
+export const FULL_VERIFICATION_LOOP = Object.freeze([
+ "ADDRESS OUTPUT TO SELF",
+ "PRESERVE SOURCE",
+ "PRESERVE ADDRESS",
+ "RESOLVE DIFFERENCE",
+ "RETAIN PROVENANCE",
+ "PASS HARM GATE",
+ "RETURN TO SELF",
+ "VERIFY FULL SELF",
+ "ONLY THEN FORWARD TO OTHER",
+] as const)
