@@ -7,7 +7,7 @@ type Channel = "NONE" | "FILTER" | "ISOLATE" | "RECONSTRUCT"
 type FieldAddress = { root:string; grain:number; act:number; x:number; y:number; z:number; depth:number; channel:Channel; subject?:string }
 type DrawnNode = { key:string; x:number; y:number; size:number; event:ReturnType<typeof eventFromKey> }
 
-const ROOT="FAMILY/NOTODUS/ZERO"
+const ROOT="FAMILY/NOTODUS/STATE/DEFAULT"
 const DEFAULT_ADDRESS:FieldAddress={root:ROOT,grain:0,act:0,x:0,y:0,z:0,depth:2,channel:"NONE",subject:"USER"}
 const encode=(a:FieldAddress)=>`${a.root}/G${a.grain}/A${a.act}/X${a.x}/Y${a.y}/Z${a.z}/D${a.depth}/${a.channel}/${a.subject||"USER"}`
 function readAddress():FieldAddress{const source=new URLSearchParams(location.hash.replace(/^#/,"")).get("field");if(!source)return DEFAULT_ADDRESS;try{return{...DEFAULT_ADDRESS,...JSON.parse(decodeURIComponent(source))}}catch{return DEFAULT_ADDRESS}}
@@ -23,6 +23,7 @@ export function InfinityApp(){
  const drawn=useRef<DrawnNode[]>([])
  const pointers=useRef(new Map<number,{x:number;y:number}>())
  const pinchDistance=useRef<number|null>(null)
+ const retainedAddress=useRef(encode(readAddress()))
 
  const sync=(next:FieldAddress)=>{
    while(explorer.frame().observer.relativeGrain>next.grain) explorer.enterWhole(0)
@@ -36,10 +37,9 @@ export function InfinityApp(){
    explorer.setQueryDepth(next.depth)
    return explorer.frame()
  }
- const resolveAddress=(next:FieldAddress)=>{const nextFrame=sync(next);setAddress(next);setFrame(nextFrame);writeAddress(next)}
+ const resolveAddress=(next:FieldAddress)=>{const nextFrame=sync(next);setAddress(next);setFrame(nextFrame);retainedAddress.current=encode(next);writeAddress(next)}
  useEffect(()=>{resolveAddress(address)},[])
- useEffect(()=>{const refresh=()=>{const next=readAddress();setAddress(next);setFrame(sync(next))};addEventListener("hashchange",refresh);addEventListener("popstate",refresh);return()=>{removeEventListener("hashchange",refresh);removeEventListener("popstate",refresh)}},[explorer])
- useEffect(()=>{let cancelled=false,baseline="";const check=async()=>{try{const response=await fetch(`${location.pathname}?deployment-check=${Date.now()}`,{cache:"no-store"});if(!response.ok)return;const html=await response.text();if(cancelled)return;if(!baseline){baseline=html;return}if(html!==baseline)location.reload()}catch{}};void check();const timer=window.setInterval(()=>void check(),15000);return()=>{cancelled=true;clearInterval(timer)}},[])
+ useEffect(()=>{const refresh=()=>{const next=readAddress(),nextKey=encode(next);if(nextKey===retainedAddress.current)return;retainedAddress.current=nextKey;setAddress(next);setFrame(sync(next))};addEventListener("hashchange",refresh);addEventListener("popstate",refresh);return()=>{removeEventListener("hashchange",refresh);removeEventListener("popstate",refresh)}},[explorer])
 
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
    const draw=()=>{
