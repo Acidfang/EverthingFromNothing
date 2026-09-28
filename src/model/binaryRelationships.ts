@@ -103,3 +103,41 @@ export function resolveResponse(input:ResponseAddress):ResponseResolution{
  if(!harmAllowed)return Object.freeze({action:"OPEN_DIFFERENCE",address:input.sourceAddress,difference:true,reply:"Known harm is not committed onto an unaware or unwilling other. Difference remains open."})
  return Object.freeze({action:"COMMIT",address:input.sourceAddress,difference:false,reply:input.suppliedIntent? `Source retained. Intent: ${input.suppliedIntent}` : "Source retained at its address; no unresolved Difference detected."})
 }
+
+
+/** One mechanism for every domain: preserve source/address, detect Difference,
+ * resolve at that address, receipt the act, return through the same continuum.
+ * Domain labels never grant a different causal method. */
+export type UniversalAddressed<T=unknown> = Readonly<{
+ address:string
+ sourceAddress:string
+ domain:string
+ grain:number
+ moment:number
+ value:T
+}>
+
+export type UniversalReceipt<T=unknown> = Readonly<{
+ was:UniversalAddressed<T>
+ difference:boolean
+ operation:"RETURN"|"FILTER"|"ISOLATE"|"RECONSTRUCT"|"VERIFY"|"COMMIT"
+ is:UniversalAddressed<T>
+ returnAddress:string
+}>
+
+export function resolveEverything<T>(
+ current:UniversalAddressed<T>,
+ source:UniversalAddressed<T>,
+ same:(left:T,right:T)=>boolean=Object.is,
+):UniversalReceipt<T>{
+ const wrongAddress=current.sourceAddress!==source.address
+ if(wrongAddress)return Object.freeze({was:current,difference:true,operation:"RETURN" as const,is:Object.freeze({...current,address:source.address,sourceAddress:source.address}),returnAddress:source.address})
+ const difference=!same(current.value,source.value)
+ if(difference)return Object.freeze({was:current,difference:true,operation:"RECONSTRUCT" as const,is:Object.freeze({...source}),returnAddress:source.address})
+ return Object.freeze({was:current,difference:false,operation:"COMMIT" as const,is:Object.freeze({...current}),returnAddress:source.address})
+}
+
+export const EVERYTHING_METHOD = Object.freeze({
+ invariant:"ADDRESS → SOURCE → DIFFERENCE → RESOLVE → RECEIPT → RETURN",
+ domains:Object.freeze(["FRACTURE","PIXEL","GRAIN","ORIENTATION","VOICE","TEXT","VISION","FILE","CODE","WEB","DEVICE","UI","MEMORY","GUIDANCE","RESPONSE","HARM","PROVENANCE"] as const),
+})
