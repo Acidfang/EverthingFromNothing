@@ -20,12 +20,28 @@ const FRACTURE_RATIO=.5
 const addressedTip=(centre:V3,branch:number,radius:number):V3=>add(centre,mul(BASIS[branch],radius))
 const nextCentre=(centre:V3,branch:number,radius:number):V3=>addressedTip(centre,branch,radius)
 
-function buildView(depthLimit:number):DrawNode[]{let ledger=createRootLedger();const nodes:DrawNode[]=[{address:ROOT_ADDRESS,p:{x:0,y:0,z:0},depth:0}];const walk=(address:Address,centre:V3,depth:number,radius:number)=>{if(depth>=depthLimit)return;ledger=fractureAt(ledger,address);for(let branch=0;branch<CANONICAL_SEED.fracture.addressedChildren;branch++){const child=childAddress(address,branch),childCentre=nextCentre(centre,branch,radius);nodes.push({address:child,p:childCentre,depth:depth+1});walk(child,childCentre,depth+1,radius*FRACTURE_RATIO)}};walk(ROOT_ADDRESS,{x:0,y:0,z:0},0,1);return nodes}
+// The fracture/address field is not depth-limited.  Materialise only addresses
+// required by the finite observation window; the window never becomes a model limit.
+function buildView(observationBudget:number):DrawNode[]{
+ let ledger=createRootLedger(),frontier:[Address,V3,number,number][]=[[ROOT_ADDRESS,{x:0,y:0,z:0},0,1]]
+ const nodes:DrawNode[]=[{address:ROOT_ADDRESS,p:{x:0,y:0,z:0},depth:0}]
+ while(frontier.length&&nodes.length<observationBudget){
+  const [address,centre,depth,radius]=frontier.shift()!
+  ledger=fractureAt(ledger,address)
+  for(let branch=0;branch<CANONICAL_SEED.fracture.addressedChildren&&nodes.length<observationBudget;branch++){
+   const child=childAddress(address,branch),childCentre=nextCentre(centre,branch,radius)
+   nodes.push({address:child,p:childCentre,depth:depth+1})
+   // Scale is a projection concern only; it does not constrain address continuation.
+   frontier.push([child,childCentre,depth+1,radius/(depth+2)])
+  }
+ }
+ return nodes
+}
 
 export function InfinityApp(){
  const canvas=useRef<HTMLCanvasElement>(null),pointers=useRef(new Map<number,{x:number;y:number}>()),pinch=useRef<number|null>(null),gesture=useRef<{x:number;y:number;moved:boolean}|null>(null)
  const [zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("ZERO")
- const nodes=useMemo(()=>buildView(4),[])
+ const nodes=useMemo(()=>buildView(4096),[])
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return;const draw=()=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height);const projected=nodes.map(n=>({...n,q:rotate(n.p,yaw,pitch)})),extent=Math.max(1,...projected.flatMap(n=>[Math.abs(n.q.x),Math.abs(n.q.y)])),scale=Math.min(r.width,r.height)*.42/extent*zoom;for(const n of projected.sort((a,b)=>a.q.z-b.q.z)){const x=Math.round(r.width/2+n.q.x*scale),y=Math.round(r.height/2-n.q.y*scale);ctx.fillStyle=addressKey(n.address)===selected?"#eeeade":"#e5ad56";ctx.fillRect(x,y,1,1)}};draw();addEventListener("resize",draw);return()=>removeEventListener("resize",draw)},[nodes,zoom,yaw,pitch,selected])
  const pick=(x:number,y:number)=>{const c=canvas.current;if(!c)return;const r=c.getBoundingClientRect(),projected=nodes.map(n=>({...n,q:rotate(n.p,yaw,pitch)})),extent=Math.max(1,...projected.flatMap(n=>[Math.abs(n.q.x),Math.abs(n.q.y)])),scale=Math.min(r.width,r.height)*.42/extent*zoom;let best:{key:string;d:number}|null=null;for(const n of projected){const sx=r.width/2+n.q.x*scale,sy=r.height/2-n.q.y*scale,d=Math.hypot(x-r.left-sx,y-r.top-sy);if(!best||d<best.d)best={key:addressKey(n.address),d}}if(best&&best.d<=8)setSelected(best.key)}
  const move=(id:number,x:number,y:number)=>{const previous=pointers.current.get(id);pointers.current.set(id,{x,y});if(pointers.current.size===2){gesture.current=null;const [a,b]=[...pointers.current.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch.current&&pinch.current>0)setZoom(z=>Math.max(.125,Math.min(64,z*d/pinch.current!)));pinch.current=d;return}if(previous&&gesture.current){const dx=x-previous.x,dy=y-previous.y;if(Math.hypot(x-gesture.current.x,y-gesture.current.y)>3)gesture.current.moved=true;setYaw(v=>v+dx*.008);setPitch(v=>Math.max(-Math.PI/2,Math.min(Math.PI/2,v+dy*.008)))}}
@@ -35,6 +51,6 @@ export function InfinityApp(){
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===1)gesture.current={x:e.clientX,y:e.clientY,moved:false}}}
   onPointerMove={e=>{if(pointers.current.has(e.pointerId))move(e.pointerId,e.clientX,e.clientY)}} onPointerUp={e=>release(e.pointerId,e.clientX,e.clientY)} onPointerCancel={e=>release(e.pointerId,e.clientX,e.clientY)}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} addressed nodes · recursive depth 4</div><div>NODE = CENTRE = PIXEL = ADDRESS · centre → tip → next centre · fracture-map spacing</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>view basis only · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · centre → tip → next centre · fracture-map spacing</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
  </section></main>
 }
