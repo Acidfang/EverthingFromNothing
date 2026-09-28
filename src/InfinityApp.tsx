@@ -16,7 +16,6 @@ const rotate=(p:V3,yaw:number,pitch:number):V3=>{const cy=Math.cos(yaw),sy=Math.
 // parent centre -> addressed tetrahedral tip -> child centre pixel.
 // A child is therefore drawn where that fracture address actually lands; there is
 // no independent screen-spacing rule between pixels.
-const FRACTURE_RATIO=.5
 const addressedTip=(centre:V3,branch:number,radius:number):V3=>add(centre,mul(BASIS[branch],radius))
 const nextCentre=(centre:V3,branch:number,radius:number):V3=>addressedTip(centre,branch,radius)
 
