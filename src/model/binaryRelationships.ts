@@ -141,3 +141,43 @@ export const EVERYTHING_METHOD = Object.freeze({
  invariant:"ADDRESS → SOURCE → DIFFERENCE → RESOLVE → RECEIPT → RETURN",
  domains:Object.freeze(["FRACTURE","PIXEL","GRAIN","ORIENTATION","VOICE","TEXT","VISION","FILE","CODE","WEB","DEVICE","UI","MEMORY","GUIDANCE","RESPONSE","HARM","PROVENANCE"] as const),
 })
+
+
+export type SelfAddressedOutput<T=unknown> = Readonly<{
+ outputAddress:string
+ sourceAddress:string
+ value:T
+ selfReceipt:Readonly<{from:string;to:string;verified:true}>
+}>
+
+/** Every output returns to its own output address before it may become input
+ * anywhere else. This preserves self-reference/provenance before forwarding. */
+export function addressOutputToSelfFirst<T>(
+ outputAddress:string,
+ sourceAddress:string,
+ value:T,
+):SelfAddressedOutput<T>{
+ if(!outputAddress)throw new Error("Output requires its own address")
+ return Object.freeze({
+  outputAddress,
+  sourceAddress,
+  value,
+  selfReceipt:Object.freeze({from:outputAddress,to:outputAddress,verified:true as const}),
+ })
+}
+
+export function forwardSelfAddressedOutput<T>(
+ output:SelfAddressedOutput<T>,
+ destinationAddress:string,
+){
+ if(output.selfReceipt.from!==output.outputAddress||output.selfReceipt.to!==output.outputAddress||!output.selfReceipt.verified){
+  throw new Error("Output must address itself before forwarding")
+ }
+ return Object.freeze({
+  from:output.outputAddress,
+  to:destinationAddress,
+  value:output.value,
+  sourceAddress:output.sourceAddress,
+  selfReceipt:output.selfReceipt,
+ })
+}
