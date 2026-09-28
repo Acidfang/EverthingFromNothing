@@ -30,6 +30,7 @@ export function InfinityApp(){
   onPointerMove={e=>{if(!pointers.current.has(e.pointerId)||!lastPointer.current)return;const dx=e.clientX-lastPointer.current.x,dy=e.clientY-lastPointer.current.y;lastPointer.current={x:e.clientX,y:e.clientY};setYaw(v=>v+dx*.008);setPitch(v=>Math.max(-Math.PI/2,Math.min(Math.PI/2,v+dy*.008)))}}
   onPointerUp={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}} onPointerCancel={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} onClick={()=>setSelected("0,0,0")} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {visible} merged visible pixels · act {continuum.current.state.act}</div><div>ledger ↻ ledger continuum · fracture map is an observation at the selected grain</div><div>Difference · address · orientation · merge · fracture · return remain receipts in the same continuum</div><div>map advances once per second · orientation preserved in 3D projection · drag rotates · wheel zoom · double-click reset</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {visible} merged visible pixels · act {continuum.current.state.act}</div><div>ledger ↻ ledger continuum · fracture map is an observation at the selected grain</div><div>Difference · address · orientation · merge · fracture · return remain receipts in the same continuum</div><div>map advances once per second · orientation preserved in 3D projection · drag rotates · wheel zoom · double-click reset</div>
+  <div>ERROR-CORRECTION WORD ROOTS: ANALYSIS → ANAL · WHY · IS → strict boundary/set · interrogate Difference · retain what IS</div></div>
  </section></main>
 }
