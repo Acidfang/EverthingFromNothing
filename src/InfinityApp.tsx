@@ -10,7 +10,17 @@ const BASIS:readonly V3[]=[{x:1,y:1,z:1},{x:-1,y:-1,z:1},{x:-1,y:1,z:-1},{x:1,y:
 const add=(a:V3,b:V3):V3=>({x:a.x+b.x,y:a.y+b.y,z:a.z+b.z})
 const mul=(a:V3,s:number):V3=>({x:a.x*s,y:a.y*s,z:a.z*s})
 const rotate=(p:V3,yaw:number,pitch:number):V3=>{const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy;return{x,y:p.y*cp-z*sp,z:p.y*sp+z*cp}}
-function buildView(depthLimit:number):DrawNode[]{let ledger=createRootLedger();const nodes:DrawNode[]=[{address:ROOT_ADDRESS,p:{x:0,y:0,z:0},depth:0}];const walk=(address:Address,p:V3,depth:number,scale:number)=>{if(depth>=depthLimit)return;ledger=fractureAt(ledger,address);for(let branch=0;branch<CANONICAL_SEED.fracture.addressedChildren;branch++){const child=childAddress(address,branch),cp=add(p,mul(BASIS[branch],scale));nodes.push({address:child,p:cp,depth:depth+1});walk(child,cp,depth+1,scale*.5)}};walk(ROOT_ADDRESS,{x:0,y:0,z:0},0,1);return nodes}
+
+// Field placement is read from the fracture map itself:
+// NODE = CENTRE = PIXEL = ADDRESS
+// parent centre -> addressed tetrahedral tip -> child centre pixel.
+// A child is therefore drawn where that fracture address actually lands; there is
+// no independent screen-spacing rule between pixels.
+const FRACTURE_RATIO=.5
+const addressedTip=(centre:V3,branch:number,radius:number):V3=>add(centre,mul(BASIS[branch],radius))
+const nextCentre=(centre:V3,branch:number,radius:number):V3=>addressedTip(centre,branch,radius)
+
+function buildView(depthLimit:number):DrawNode[]{let ledger=createRootLedger();const nodes:DrawNode[]=[{address:ROOT_ADDRESS,p:{x:0,y:0,z:0},depth:0}];const walk=(address:Address,centre:V3,depth:number,radius:number)=>{if(depth>=depthLimit)return;ledger=fractureAt(ledger,address);for(let branch=0;branch<CANONICAL_SEED.fracture.addressedChildren;branch++){const child=childAddress(address,branch),childCentre=nextCentre(centre,branch,radius);nodes.push({address:child,p:childCentre,depth:depth+1});walk(child,childCentre,depth+1,radius*FRACTURE_RATIO)}};walk(ROOT_ADDRESS,{x:0,y:0,z:0},0,1);return nodes}
 
 export function InfinityApp(){
  const canvas=useRef<HTMLCanvasElement>(null),pointers=useRef(new Map<number,{x:number;y:number}>()),pinch=useRef<number|null>(null),gesture=useRef<{x:number;y:number;moved:boolean}|null>(null)
@@ -25,6 +35,6 @@ export function InfinityApp(){
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===1)gesture.current={x:e.clientX,y:e.clientY,moved:false}}}
   onPointerMove={e=>{if(pointers.current.has(e.pointerId))move(e.pointerId,e.clientX,e.clientY)}} onPointerUp={e=>release(e.pointerId,e.clientX,e.clientY)} onPointerCancel={e=>release(e.pointerId,e.clientX,e.clientY)}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} addressed nodes · recursive depth 4</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>view basis only · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} addressed nodes · recursive depth 4</div><div>NODE = CENTRE = PIXEL = ADDRESS · centre → tip → next centre · fracture-map spacing</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>view basis only · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
  </section></main>
 }
