@@ -28,6 +28,23 @@ export type TickLedger = Readonly<{
   entries: readonly LedgerEntry[]
 }>
 
+export type LedgerContinuum = Readonly<{
+  state: ResolverState
+  receipts: readonly TickLedger[]
+}>
+
+export function createLedgerContinuum(): LedgerContinuum {
+  return Object.freeze({ state: firstDifference(), receipts: Object.freeze([]) })
+}
+
+export function advanceLedgerContinuum(continuum: LedgerContinuum): LedgerContinuum {
+  const resolved = resolveTick(continuum.state)
+  return Object.freeze({
+    state: resolved.state,
+    receipts: Object.freeze([...continuum.receipts, resolved.ledger]),
+  })
+}
+
 export function firstDifference(): ResolverState {
   return Object.freeze({
     act: 0,
