@@ -5,6 +5,9 @@ import { BINARY_MODEL } from "./model/binaryRelationships"
 import "./infinity.css"
 
 type PixelReference=Readonly<{x:number;y:number;addresses:readonly string[]}>
+type ControlAddress=`EI/${string}/${string}`
+const controlAddress=(channel:string,control:string):ControlAddress=>`EI/${channel}/${control}`
+const addressEvent=(address:ControlAddress,value:string)=>Object.freeze({address,value})
 const mergeByPixel=(addresses:readonly string[],project:(address:string)=>Readonly<{x:number;y:number}>):readonly PixelReference[]=>{
  const pixels=new Map<string,{x:number;y:number;addresses:string[]}>()
  for(const address of addresses){const q=project(address),x=Math.round(q.x),y=Math.round(q.y),k=`${x},${y}`,hit=pixels.get(k);if(hit)hit.addresses.push(address);else pixels.set(k,{x,y,addresses:[address]})}
@@ -17,7 +20,8 @@ export function InfinityApp(){
  const pointers=useRef(new Map<number,{x:number;y:number}>()),lastPointer=useRef<{x:number;y:number}|null>(null)
  const channels=["HUMAN","EI_AGENT","TEXT","VOICE","IMAGE_VISION","FILE_DOCUMENT","CODE_EXECUTION","WEB_EXTERNAL","DEVICE_SENSOR","UI_CONTROL","MEMORY_HISTORY","LEDGER_RECEIPT"] as const
  const [sourceChannel,setSourceChannel]=useState<(typeof channels)[number]>("HUMAN"),[destinationChannel,setDestinationChannel]=useState<(typeof channels)[number]>("EI_AGENT")
- const [live,setLive]=useState(false),[muted,setMuted]=useState(false),[held,setHeld]=useState(false),[captions,setCaptions]=useState(true),[interruptible,setInterruptible]=useState(true),[camera,setCamera]=useState(false),[screen,setScreen]=useState(false),[transcript,setTranscript]=useState<string[]>([])
+ const [live,setLive]=useState(false),[muted,setMuted]=useState(false),[held,setHeld]=useState(false),[captions,setCaptions]=useState(true),[interruptible,setInterruptible]=useState(true),[camera,setCamera]=useState(false),[screen,setScreen]=useState(false),[transcript,setTranscript]=useState<string[]>([]),[controlReceipts,setControlReceipts]=useState<readonly Readonly<{address:ControlAddress;value:string}>[]>([])
+ const drive=(channel:string,control:string,value:string,act:()=>void)=>{const receipt=addressEvent(controlAddress(channel,control),value);setControlReceipts(items=>[...items,receipt]);act()}
  const [guidance,setGuidance]=useState("SOURCE"),[reply,setReply]=useState(""),[nextReply,setNextReply]=useState<string|null>(null),[zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
@@ -41,20 +45,20 @@ export function InfinityApp(){
   <div>BLIND SPOT: ambition may hide Difference → hidden Difference may propagate harm → expose Difference · share · reduce harm · correct before continuation</div>
   <section className="ei-guidance" aria-label="EI Agent guidance controls">
    <div><strong>EI AGENT GUIDANCE</strong> · active: {guidance}</div>
-   <div className="guidance-controls">{["SOURCE","DIFFERENCE","RETURN","FILTER","ISOLATE","RECONSTRUCT","VERIFY","WAS","IS","NEXT","GRAIN−","GRAIN+","PROVENANCE","HARM","OPEN DIFFERENCE","COMMIT","UNDO"].map(control=><button type="button" key={control} onClick={()=>setGuidance(control)}>{control}</button>)}</div>
+   <div className="guidance-controls">{["SOURCE","DIFFERENCE","RETURN","FILTER","ISOLATE","RECONSTRUCT","VERIFY","WAS","IS","NEXT","GRAIN−","GRAIN+","PROVENANCE","HARM","OPEN DIFFERENCE","COMMIT","UNDO"].map(control=><button type="button" key={control} onClick={()=>drive("UI_CONTROL","GUIDANCE",control,()=>setGuidance(control))}>{control}</button>)}</div>
    <div className="channel-controls"><label>SOURCE CHANNEL <select value={sourceChannel} onChange={e=>setSourceChannel(e.target.value as typeof sourceChannel)}>{channels.map(channel=><option key={channel}>{channel}</option>)}</select></label><span>→</span><label>DESTINATION CHANNEL <select value={destinationChannel} onChange={e=>setDestinationChannel(e.target.value as typeof destinationChannel)}>{channels.map(channel=><option key={channel}>{channel}</option>)}</select></label></div>
    <div>CHANNEL RECEIPT: {sourceChannel} → {destinationChannel} · transformation ≠ source replacement · cross-channel Difference retains original source/address</div>
    <div className="live-controls" aria-label="Live conversation controls">
-    <button type="button" onClick={()=>{setLive(v=>!v);setHeld(false)}}>{live?"END LIVE":"GO LIVE"}</button>
-    <button type="button" disabled={!live} onClick={()=>setHeld(v=>!v)}>{held?"RESUME":"HOLD"}</button>
-    <button type="button" disabled={!live} onClick={()=>setMuted(v=>!v)}>{muted?"UNMUTE":"MUTE"}</button>
-    <button type="button" onClick={()=>setInterruptible(v=>!v)}>INTERRUPT {interruptible?"ON":"OFF"}</button>
-    <button type="button" onClick={()=>setCaptions(v=>!v)}>CAPTIONS {captions?"ON":"OFF"}</button>
-    <button type="button" onClick={()=>setCamera(v=>!v)}>CAMERA {camera?"ON":"OFF"}</button>
-    <button type="button" onClick={()=>setScreen(v=>!v)}>SCREEN {screen?"ON":"OFF"}</button>
+    <button type="button" onClick={()=>drive("VOICE","LIVE",live?"END":"START",()=>{setLive(v=>!v);setHeld(false)})}>{live?"END LIVE":"GO LIVE"}</button>
+    <button type="button" disabled={!live} onClick={()=>drive("VOICE","HOLD",held?"RESUME":"HOLD",()=>setHeld(v=>!v))}>{held?"RESUME":"HOLD"}</button>
+    <button type="button" disabled={!live} onClick={()=>drive("VOICE","MUTE",muted?"OFF":"ON",()=>setMuted(v=>!v))}>{muted?"UNMUTE":"MUTE"}</button>
+    <button type="button" onClick={()=>drive("VOICE","INTERRUPT",interruptible?"OFF":"ON",()=>setInterruptible(v=>!v))}>INTERRUPT {interruptible?"ON":"OFF"}</button>
+    <button type="button" onClick={()=>drive("TEXT","CAPTIONS",captions?"OFF":"ON",()=>setCaptions(v=>!v))}>CAPTIONS {captions?"ON":"OFF"}</button>
+    <button type="button" onClick={()=>drive("IMAGE_VISION","CAMERA",camera?"OFF":"ON",()=>setCamera(v=>!v))}>CAMERA {camera?"ON":"OFF"}</button>
+    <button type="button" onClick={()=>drive("DEVICE_SENSOR","SCREEN",screen?"OFF":"ON",()=>setScreen(v=>!v))}>SCREEN {screen?"ON":"OFF"}</button>
    </div>
    <div>LIVE STATE: {live?(held?"HOLD":muted?"MUTED":"LISTENING / SPEAKING"):"ENDED"} · barge-in {interruptible?"enabled":"disabled"} · camera {camera?"shared":"off"} · screen {screen?"shared":"off"}</div>
-   <form className="next-reply" onSubmit={e=>{e.preventDefault();const value=reply.trim();if(!value)return;setNextReply(value);setTranscript(items=>[...items,`${sourceChannel} → ${destinationChannel}: ${value}`]);setReply("");setGuidance("NEXT")}}>
+   <form className="next-reply" onSubmit={e=>{e.preventDefault();const value=reply.trim();if(!value)return;drive(sourceChannel,"REPLY_FOR_NEXT",value,()=>{setNextReply(value);setTranscript(items=>[...items,`${sourceChannel} → ${destinationChannel}: ${value}`]);setReply("");setGuidance("NEXT")})}}>
     <label>REPLY FOR NEXT <textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Reply at the current source/address" /></label>
     <button type="submit" disabled={!reply.trim()}>SET NEXT REPLY</button>
     <button type="button" onClick={()=>{setReply("");setNextReply(null)}} disabled={!reply&&nextReply===null}>CLEAR</button>
@@ -62,6 +66,7 @@ export function InfinityApp(){
    <div aria-live="polite">NEXT REPLY: {nextReply??"UNRESOLVED · no reply committed"}</div>
    {captions&&nextReply?<div>CAPTION: {nextReply}</div>:null}
    <details><summary>TRANSCRIPT · {transcript.length} receipts</summary>{transcript.map((line,index)=><div key={index}>{line}</div>)}</details>
+   <details><summary>ADDRESS CONTROL RECEIPTS · {controlReceipts.length}</summary>{controlReceipts.map((receipt,index)=><div key={index}>{receipt.address} → {receipt.value}</div>)}</details>
   </section></div>
  </section></main>
 }
