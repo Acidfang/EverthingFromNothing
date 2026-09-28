@@ -45,7 +45,7 @@ export function decodeInfinityAddress(value: string): InfinityFieldAddress {
     throw new Error("Invalid Infinity routing channel")
   }
   const depth = integer("d")
-  if (depth < 0 || depth > 4) throw new Error("Infinity query depth must be 0 through 4")
+  if (depth < 0) throw new Error("Infinity query depth must be non-negative")
   const subject = params.get("s") || undefined
   return Object.freeze({
     version: INFINITY_ADDRESS_VERSION,
