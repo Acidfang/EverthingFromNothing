@@ -54,17 +54,24 @@ export function InfinityApp(){
      const cwx=centre.x*centreUnit,cwy=centre.y*centreUnit,cwz=centre.z*centreUnit
      const iso=(wx:number,wy:number,wz:number)=>({x:(wx-cwx)+(wz-cwz)*.5,y:(wy-cwy)-(wz-cwz)*.5})
      const projected=world.map(e=>({...e,...iso(e.wx,e.wy,e.wz)}))
-     const extent=Math.max(1,...projected.flatMap(p=>[Math.abs(p.x)+p.unit,Math.abs(p.y)+p.unit]))
+     const extent=Math.max(1,...projected.flatMap(p=>[Math.abs(p.x),Math.abs(p.y)]))
      const base=Math.max(1,Math.min(r.width,r.height)*.44/extent)
      const scale=base*zoom
      const nodes:DrawnNode[]=[]
-     for(const e of projected){const p={x:r.width/2+e.x*scale,y:r.height/2+e.y*scale};const size=Math.max(1,e.unit*scale);const isCentre=e.key===q.centre;ctx.fillStyle=isCentre?"#eeeade":"#e5ad56";ctx.fillRect(Math.round(p.x-size/2),Math.round(p.y-size/2),Math.max(1,Math.round(size)),Math.max(1,Math.round(size)));nodes.push({key:e.key,x:p.x,y:p.y,size,event:e})}
+     for(const e of projected){
+       const p={x:r.width/2+e.x*scale,y:r.height/2+e.y*scale}
+       const size=1
+       const isCentre=e.key===q.centre
+       ctx.fillStyle=isCentre?"#eeeade":"#e5ad56"
+       ctx.fillRect(Math.round(p.x),Math.round(p.y),1,1)
+       nodes.push({key:e.key,x:p.x,y:p.y,size,event:e})
+     }
      drawn.current=nodes
    }
    draw();addEventListener("resize",draw);return()=>removeEventListener("resize",draw)
  },[frame,zoom])
 
- const selectAt=(clientX:number,clientY:number)=>{const c=canvas.current;if(!c)return;const r=c.getBoundingClientRect(),x=clientX-r.left,y=clientY-r.top;let best:DrawnNode|null=null,bestDistance=Infinity;for(const node of drawn.current){const d=Math.hypot(x-node.x,y-node.y);const hit=Math.max(6,node.size*.7);if(d<=hit&&d<bestDistance){best=node;bestDistance=d}}if(!best)return;const e=best.event;const next={...address,grain:e.grain,act:e.act,x:e.x,y:e.y,z:e.z};setFocus(encode(next));resolveAddress(next)}
+ const selectAt=(clientX:number,clientY:number)=>{const c=canvas.current;if(!c)return;const r=c.getBoundingClientRect(),x=clientX-r.left,y=clientY-r.top;let best:DrawnNode|null=null,bestDistance=Infinity;for(const node of drawn.current){const d=Math.hypot(x-node.x,y-node.y);const hit=6;if(d<=hit&&d<bestDistance){best=node;bestDistance=d}}if(!best)return;const e=best.event;const next={...address,grain:e.grain,act:e.act,x:e.x,y:e.y,z:e.z};setFocus(encode(next));resolveAddress(next)}
  const updatePointer=(id:number,x:number,y:number)=>{pointers.current.set(id,{x,y});if(pointers.current.size===2){const [a,b]=[...pointers.current.values()];const distance=Math.hypot(a.x-b.x,a.y-b.y);if(pinchDistance.current!==null&&pinchDistance.current>0)setZoom(z=>Math.max(.125,Math.min(64,z*distance/pinchDistance.current!)));pinchDistance.current=distance}}
  const releasePointer=(id:number)=>{pointers.current.delete(id);if(pointers.current.size<2)pinchDistance.current=null}
 
