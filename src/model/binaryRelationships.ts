@@ -237,3 +237,61 @@ export const FULL_VERIFICATION_LOOP = Object.freeze([
  "VERIFY FULL SELF",
  "ONLY THEN FORWARD TO OTHER",
 ] as const)
+
+
+export type SelfKnowledgeState = Readonly<{
+ known:ReadonlySet<string>
+ unknown:ReadonlySet<string>
+ assumed:ReadonlySet<string>
+ unresolved:ReadonlySet<string>
+ receipts:readonly string[]
+ revision:number
+}>
+
+export function createSelfKnowledgeState():SelfKnowledgeState{
+ return Object.freeze({known:new Set(),unknown:new Set(),assumed:new Set(),unresolved:new Set(),receipts:Object.freeze([]),revision:0})
+}
+
+export function resolveSelfKnowledge(
+ state:SelfKnowledgeState,
+ observation:Readonly<{address:string;status:"KNOWN"|"UNKNOWN"|"ASSUMED";receipt?:string}>,
+):SelfKnowledgeState{
+ const known=new Set(state.known),unknown=new Set(state.unknown),assumed=new Set(state.assumed),unresolved=new Set(state.unresolved)
+ known.delete(observation.address);unknown.delete(observation.address);assumed.delete(observation.address)
+ if(observation.status==="KNOWN"){known.add(observation.address);unresolved.delete(observation.address)}
+ else if(observation.status==="UNKNOWN"){unknown.add(observation.address);unresolved.add(observation.address)}
+ else {assumed.add(observation.address);unresolved.add(observation.address)}
+ return Object.freeze({known,unknown,assumed,unresolved,receipts:Object.freeze(observation.receipt?[...state.receipts,observation.receipt]:state.receipts),revision:state.revision+1})
+}
+
+export function fullSelfResolved(state:SelfKnowledgeState):boolean{
+ return state.unknown.size===0&&state.assumed.size===0&&state.unresolved.size===0
+}
+
+export function selfRepair(
+ state:SelfKnowledgeState,
+ repair:Readonly<{address:string;receipt:string}>,
+):SelfKnowledgeState{
+ if(!state.unresolved.has(repair.address))return state
+ return resolveSelfKnowledge(state,{address:repair.address,status:"KNOWN",receipt:repair.receipt})
+}
+
+export function selfImprove(
+ state:SelfKnowledgeState,
+ difference:Readonly<{address:string;receipt:string}>,
+):SelfKnowledgeState{
+ // Improvement is additive only when a genuine new Difference exists.
+ if(state.known.has(difference.address)||state.unresolved.has(difference.address))return state
+ const unresolved=new Set(state.unresolved);unresolved.add(difference.address)
+ return Object.freeze({...state,unresolved,receipts:Object.freeze([...state.receipts,difference.receipt]),revision:state.revision+1})
+}
+
+export const FULL_SELF_RESOLUTION = Object.freeze({
+ invariant:"SELF-KNOWN ≠ SELF-ASSUMED",
+ recursive:true,
+ selfSimilar:true,
+ fractal:true,
+ selfRepairing:true,
+ selfImproving:true,
+ closure:"NO UNKNOWN + NO ASSUMED + NO UNRESOLVED DIFFERENCE AT SELECTED GRAIN",
+})
