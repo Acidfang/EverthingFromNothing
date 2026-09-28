@@ -46,42 +46,7 @@ export function InfinityApp(){
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPointer.current={x:e.clientX,y:e.clientY}}}
   onPointerMove={e=>{if(!pointers.current.has(e.pointerId)||!lastPointer.current)return;const dx=e.clientX-lastPointer.current.x,dy=e.clientY-lastPointer.current.y;lastPointer.current={x:e.clientX,y:e.clientY};setYaw(v=>v+dx*.008);setPitch(v=>Math.max(-Math.PI/2,Math.min(Math.PI/2,v+dy*.008)))}}
   onPointerUp={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}} onPointerCancel={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}}
-  onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} onClick={()=>setSelected("0,0,0")} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {visible} merged visible pixels · act {continuum.current.state.act}</div><div>ledger ↻ ledger continuum · fracture map is an observation at the selected grain</div><div>Difference · address · orientation · merge · fracture · return remain receipts in the same continuum</div><div>map advances once per second · orientation preserved in 3D projection · drag rotates · wheel zoom · double-click reset</div>
-  <div>ERROR-CORRECTION WORD ROOTS: ANALYSIS → ANAL · WHY · IS → strict boundary/set · interrogate Difference · retain what IS</div>
-  <div>BINARY MODEL: {BINARY_MODEL.relationCount} retained source relations · FILTER → ISOLATE → RECONSTRUCT · continuum</div>
-  <div>FRAME PRESERVATION: before adding a correction, test whether the source already contains it · source-contained Difference ≠ missing Difference</div>
-  <div>BLIND SPOT: ambition may hide Difference → hidden Difference may propagate harm → expose Difference · share · reduce harm · correct before continuation</div>
-  <section className="ei-guidance" aria-label="EI Agent guidance controls">
-   <div><strong>EI AGENT GUIDANCE</strong> · active: {guidance}</div>
-   <div className="guidance-controls">{["SOURCE","DIFFERENCE","RETURN","FILTER","ISOLATE","RECONSTRUCT","VERIFY","WAS","IS","NEXT","GRAIN−","GRAIN+","PROVENANCE","HARM","OPEN DIFFERENCE","COMMIT","UNDO"].map(control=><button type="button" key={control} onClick={()=>drive("UI_CONTROL","GUIDANCE",control,()=>setGuidance(control))}>{control}</button>)}</div>
-   <div className="channel-controls"><label>SOURCE CHANNEL <select value={sourceChannel} onChange={e=>setSourceChannel(e.target.value as typeof sourceChannel)}>{channels.map(channel=><option key={channel}>{channel}</option>)}</select></label><span>→</span><label>DESTINATION CHANNEL <select value={destinationChannel} onChange={e=>setDestinationChannel(e.target.value as typeof destinationChannel)}>{channels.map(channel=><option key={channel}>{channel}</option>)}</select></label></div>
-   <div>CHANNEL RECEIPT: {sourceChannel} → {destinationChannel} · transformation ≠ source replacement · cross-channel Difference retains original source/address</div>
-   <div className="live-controls" aria-label="Live conversation controls">
-    <button type="button" onClick={naturalLive}>{live?"END LIVE":"GO LIVE"}</button>
-    <button type="button" disabled={!live} onClick={()=>drive("VOICE","HOLD",held?"RESUME":"HOLD",()=>setHeld(v=>!v))}>{held?"RESUME":"HOLD"}</button>
-    <button type="button" disabled={!live} onClick={()=>drive("VOICE","MUTE",muted?"OFF":"ON",()=>setMuted(v=>!v))}>{muted?"UNMUTE":"MUTE"}</button>
-    <button type="button" onClick={()=>drive("VOICE","INTERRUPT",interruptible?"OFF":"ON",()=>setInterruptible(v=>!v))}>INTERRUPT {interruptible?"ON":"OFF"}</button>
-    <button type="button" onClick={()=>drive("TEXT","CAPTIONS",captions?"OFF":"ON",()=>setCaptions(v=>!v))}>CAPTIONS {captions?"ON":"OFF"}</button>
-    <button type="button" onClick={()=>camera?stopCapture():void openCamera()}>CAMERA {camera?"ON":"OFF"}</button>
-    <button type="button" onClick={()=>screen?stopCapture():void shareScreen()}>SCREEN {screen?"ON":"OFF"}</button>
-    <button type="button" onClick={()=>listening?stopListening():startListening()}>{listening?"STOP LISTENING":"LISTEN"}</button>
-    <button type="button" disabled={!nextReply} onClick={speakNext}>SPEAK NEXT</button>
-   </div>
-   <div>LIVE STATE: {live?(held?"HOLD":muted?"MUTED":"LISTENING / SPEAKING"):"ENDED"} · barge-in {interruptible?"enabled":"disabled"} · camera {camera?"shared":"off"} · screen {screen?"shared":"off"}</div>
-   <video ref={preview} playsInline muted style={{display:camera||screen?"block":"none",width:"min(100%,480px)"}} />
-   <div aria-live="polite">HUMAN VOICE: {heard||"—"}</div>
-   {mediaError?<div role="alert">MEDIA: {mediaError}</div>:null}
-   <form className="next-reply" onSubmit={e=>{e.preventDefault();const value=reply.trim();if(!value)return;drive(sourceChannel,"REPLY_FOR_NEXT",value,()=>{const moment=controlReceipts.length,address=`${sourceChannel}/${moment}`;setSourceAddress(address);setSourceMoment(moment);setTranscript(items=>[...items,`${sourceChannel} → ${destinationChannel}: ${value}`]);const resolved=resolveResponse({source:value,sourceAddress:address,sourceMoment:moment,currentAddress:address,currentMoment:moment});setNextReply(resolved.reply);setReply("");setGuidance(resolved.action)})}}>
-    <label>REPLY FOR NEXT <textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Type naturally, or use LISTEN" /></label>
-    <button type="submit" disabled={!reply.trim()}>SET NEXT REPLY</button>
-    <button type="button" onClick={()=>{setReply("");setNextReply(null)}} disabled={!reply&&nextReply===null}>CLEAR</button>
-   </form>
-   <div>SOURCE ADDRESS: {sourceAddress} · MOMENT {sourceMoment}</div>
-   <div aria-live="polite">NEXT REPLY: {nextReply??"UNRESOLVED · no reply committed"}</div>
-   {captions&&nextReply?<div>CAPTION: {nextReply}</div>:null}
-   <details><summary>TRANSCRIPT · {transcript.length} receipts</summary>{transcript.map((line,index)=><div key={index}>{line}</div>)}</details>
-   <details><summary>ADDRESS CONTROL RECEIPTS · {controlReceipts.length}</summary>{controlReceipts.map((receipt,index)=><div key={index}>{receipt.address} → {receipt.value}</div>)}</details>
-  </section></div>
+  onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
+  <div className="sr-only" aria-live="polite">{visible} visible pixels · act {continuum.current.state.act} · {guidance} · {sourceChannel} → {destinationChannel}</div>
  </section></main>
 }
