@@ -16,7 +16,7 @@ const mergeByPixel=(addresses:readonly string[],project:(address:string)=>Readon
 const putPhysicalPixel=(ctx:CanvasRenderingContext2D,x:number,y:number,dpr:number,selected:boolean)=>{const s=1/dpr;ctx.fillStyle=selected?"#eeeade":"#e5ad56";ctx.fillRect(Math.round(x*dpr)/dpr,Math.round(y*dpr)/dpr,s,s)}
 
 export function InfinityApp(){
- const canvas=useRef<HTMLCanvasElement>(null),continuum=useRef(createLedgerContinuum()),raf=useRef(0),last=useRef(0),projected=useRef<readonly PixelReference[]>([])
+ const canvas=useRef<HTMLCanvasElement>(null),continuum=useRef(createLedgerContinuum()),raf=useRef(0),last=useRef(0),projected=useRef<readonly PixelReference[]>([]),avatarPhase=useRef(0)
  const pointers=useRef(new Map<number,{x:number;y:number}>()),lastPointer=useRef<{x:number;y:number}|null>(null)
  const channels=["HUMAN","EI_AGENT","TEXT","VOICE","IMAGE_VISION","FILE_DOCUMENT","CODE_EXECUTION","WEB_EXTERNAL","DEVICE_SENSOR","UI_CONTROL","MEMORY_HISTORY","LEDGER_RECEIPT"] as const
  const [sourceChannel,setSourceChannel]=useState<(typeof channels)[number]>("HUMAN"),[destinationChannel,setDestinationChannel]=useState<(typeof channels)[number]>("EI_AGENT")
@@ -38,6 +38,13 @@ export function InfinityApp(){
    const addresses=[...continuum.current.state.is],coords=addresses.map(fromKey),extent=Math.max(1,...coords.flatMap(p=>[Math.abs(p.x),Math.abs(p.y),Math.abs(p.z)])),scale=Math.max(1,Math.min(r.width,r.height)*.46/extent*zoom)
    const pixels=mergeByPixel(addresses,address=>{const p=fromKey(address),cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;return{x:r.width/2+x*scale,y:r.height/2-y*scale}})
    projected.current=pixels
+   // Notodus avatar is another addressed observation of the same continuum,
+   // never a separate geometry/model. It orbits the current visible field.
+   avatarPhase.current=(avatarPhase.current+.006)%(Math.PI*2)
+   const ar=Math.min(r.width,r.height)*.34,ax=r.width/2+Math.cos(avatarPhase.current)*ar,ay=r.height/2+Math.sin(avatarPhase.current)*ar*.42
+   const avatarAddresses=pixels.flatMap(pixel=>pixel.addresses).slice(0,64)
+   const avatarPixels=mergeByPixel(avatarAddresses,address=>{const p=fromKey(address),cy=Math.cos(yaw+avatarPhase.current),sy=Math.sin(yaw+avatarPhase.current),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;const s=Math.max(1,scale*.08);return{x:ax+x*s,y:ay-y*s}})
+   for(const pixel of avatarPixels)putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,false)
    setVisible(v=>v===pixels.length?v:pixels.length)
    for(const pixel of pixels)putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,pixel.addresses.includes(selected)||pixel.addresses.includes(continuum.current.activeAddress))
    raf.current=requestAnimationFrame(draw)
@@ -56,6 +63,13 @@ export function InfinityApp(){
    <button type="button" onClick={()=>{setYaw(-.65);setPitch(.45);setMenu(null)}}>RESET ORIENTATION</button>
    <button type="button" onClick={()=>{setGuidance("PROVENANCE");setSourceAddress(menu.address);setMenu(null)}}>TRACE ADDRESS</button>
    <button type="button" onClick={()=>{setGuidance("RETURN");setSourceAddress(menu.address);setMenu(null)}}>RETURN TO ADDRESS</button>
+   <button type="button" onClick={()=>{setGuidance("SOURCE");setSourceAddress(menu.address);setMenu(null)}}>SOURCE</button>
+   <button type="button" onClick={()=>{setGuidance("DIFFERENCE");setSourceAddress(menu.address);setMenu(null)}}>DIFFERENCE</button>
+   <button type="button" onClick={()=>{setGuidance("FILTER");setSourceAddress(menu.address);setMenu(null)}}>FILTER</button>
+   <button type="button" onClick={()=>{setGuidance("ISOLATE");setSourceAddress(menu.address);setMenu(null)}}>ISOLATE</button>
+   <button type="button" onClick={()=>{setGuidance("RECONSTRUCT");setSourceAddress(menu.address);setMenu(null)}}>RECONSTRUCT</button>
+   <button type="button" onClick={()=>{setGuidance("VERIFY");setSourceAddress(menu.address);setMenu(null)}}>VERIFY</button>
+   <button type="button" onClick={()=>{setGuidance("OPEN_DIFFERENCE");setSourceAddress(menu.address);setMenu(null)}}>OPEN DIFFERENCE</button>
   </div>:null}
   <div className="sr-only" aria-live="polite">{visible} visible pixels · act {continuum.current.state.act} · {guidance} · {sourceChannel} → {destinationChannel}</div>
  </section></main>
