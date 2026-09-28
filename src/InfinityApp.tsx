@@ -14,8 +14,11 @@ const rotate=(p:V3,yaw:number,pitch:number):V3=>{const cy=Math.cos(yaw),sy=Math.
 // Every visible grain is resolved from its complete address lineage.
 // Address is the authority; rendering does not maintain a second geometry state.
 const addressPosition=(address:Address):V3=>{
- let p:V3={x:0,y:0,z:0}
- for(const branch of address.path)p=add(p,BASIS[branch])
+ let p:V3={x:0,y:0,z:0},scale=1
+ for(const branch of address.path){
+  p=add(p,mul(BASIS[branch],scale))
+  scale*=.5
+ }
  return p
 }
 
@@ -49,6 +52,6 @@ export function InfinityApp(){
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===1)gesture.current={x:e.clientX,y:e.clientY,moved:false}}}
   onPointerMove={e=>{if(pointers.current.has(e.pointerId))move(e.pointerId,e.clientX,e.clientY)}} onPointerUp={e=>release(e.pointerId,e.clientX,e.clientY)} onPointerCancel={e=>release(e.pointerId,e.clientX,e.clientY)}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · instant address-driven 3D · full address is geometry authority · grain resolved from complete lineage</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · instant address-driven 3D · full ordered address is geometry authority · each fracture retains its address scale</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
  </section></main>
 }
