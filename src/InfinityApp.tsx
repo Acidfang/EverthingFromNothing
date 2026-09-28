@@ -9,6 +9,15 @@ type DrawNode={address:Address;p:V3;depth:number}
 const BASIS:readonly V3[]=[{x:1,y:1,z:1},{x:-1,y:-1,z:1},{x:-1,y:1,z:-1},{x:1,y:-1,z:-1}]
 const add=(a:V3,b:V3):V3=>({x:a.x+b.x,y:a.y+b.y,z:a.z+b.z})
 const mul=(a:V3,s:number):V3=>({x:a.x*s,y:a.y*s,z:a.z*s})
+const ID:M3=[{x:1,y:0,z:0},{x:0,y:1,z:0},{x:0,y:0,z:1}]
+const apply=(m:M3,v:V3):V3=>({x:m[0].x*v.x+m[1].x*v.y+m[2].x*v.z,y:m[0].y*v.x+m[1].y*v.y+m[2].y*v.z,z:m[0].z*v.x+m[1].z*v.y+m[2].z*v.z})
+const compose=(a:M3,b:M3):M3=>[apply(a,b[0]),apply(a,b[1]),apply(a,b[2])]
+const BRANCH_FRAME:readonly M3[]=[
+ ID,
+ [{x:-1,y:0,z:0},{x:0,y:-1,z:0},{x:0,y:0,z:1}],
+ [{x:-1,y:0,z:0},{x:0,y:1,z:0},{x:0,y:0,z:-1}],
+ [{x:1,y:0,z:0},{x:0,y:-1,z:0},{x:0,y:0,z:-1}],
+]
 const rotate=(p:V3,yaw:number,pitch:number):V3=>{const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy;return{x,y:p.y*cp-z*sp,z:p.y*sp+z*cp}}
 
 // Field placement is read from the fracture map itself:
@@ -22,16 +31,16 @@ const nextCentre=(centre:V3,branch:number,radius:number):V3=>addressedTip(centre
 // The fracture/address field is not depth-limited.  Materialise only addresses
 // required by the finite observation window; the window never becomes a model limit.
 function buildView(observationBudget:number):DrawNode[]{
- let ledger=createRootLedger(),frontier:[Address,V3,number,number][]=[[ROOT_ADDRESS,{x:0,y:0,z:0},0,1]]
+ let ledger=createRootLedger(),frontier:[Address,V3,M3,number,number][]=[[ROOT_ADDRESS,{x:0,y:0,z:0},ID,0,1]]
  const nodes:DrawNode[]=[{address:ROOT_ADDRESS,p:{x:0,y:0,z:0},depth:0}]
  while(frontier.length&&nodes.length<observationBudget){
-  const [address,centre,depth,radius]=frontier.shift()!
+  const [address,centre,frame,depth,radius]=frontier.shift()!
   ledger=fractureAt(ledger,address)
   for(let branch=0;branch<CANONICAL_SEED.fracture.addressedChildren&&nodes.length<observationBudget;branch++){
-   const child=childAddress(address,branch),childCentre=nextCentre(centre,branch,radius)
+   const child=childAddress(address,branch),childCentre=nextCentre(centre,frame,branch,radius),childFrame=compose(frame,BRANCH_FRAME[branch])
    nodes.push({address:child,p:childCentre,depth:depth+1})
    // Every address step is one adjacency unit. Projection may scale the whole field, never separate adjacent nodes.
-   frontier.push([child,childCentre,depth+1,1])
+   frontier.push([child,childCentre,childFrame,depth+1,radius])
   }
  }
  return nodes
@@ -50,6 +59,6 @@ export function InfinityApp(){
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===1)gesture.current={x:e.clientX,y:e.clientY,moved:false}}}
   onPointerMove={e=>{if(pointers.current.has(e.pointerId))move(e.pointerId,e.clientX,e.clientY)}} onPointerUp={e=>release(e.pointerId,e.clientX,e.clientY)} onPointerCancel={e=>release(e.pointerId,e.clientX,e.clientY)}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · instant address-driven 3D · fracture addresses define their own relations · centre → tip → next centre</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · instant address-driven 3D · full fracture-twist address · inherited grain frame · centre → tip → next centre</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
  </section></main>
 }
