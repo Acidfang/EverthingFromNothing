@@ -1,5 +1,5 @@
 import { useEffect,useRef,useState } from "react"
-import { firstDifference,resolveTick,type ResolverState } from "./model/kernel"
+import { advanceLedgerContinuum,createLedgerContinuum } from "./model/kernel"
 import { fromKey } from "./model/address"
 import "./infinity.css"
 
@@ -12,13 +12,13 @@ const mergeByPixel=(addresses:readonly string[],project:(address:string)=>Readon
 const putPhysicalPixel=(ctx:CanvasRenderingContext2D,x:number,y:number,dpr:number,selected:boolean)=>{const s=1/dpr;ctx.fillStyle=selected?"#eeeade":"#e5ad56";ctx.fillRect(Math.round(x*dpr)/dpr,Math.round(y*dpr)/dpr,s,s)}
 
 export function InfinityApp(){
- const canvas=useRef<HTMLCanvasElement>(null),state=useRef<ResolverState>(firstDifference()),raf=useRef(0),last=useRef(0)
+ const canvas=useRef<HTMLCanvasElement>(null),continuum=useRef(createLedgerContinuum()),raf=useRef(0),last=useRef(0)
  const pointers=useRef(new Map<number,{x:number;y:number}>()),lastPointer=useRef<{x:number;y:number}|null>(null)
  const [zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
-   if(now-last.current>=1000){state.current=resolveTick(state.current).state;last.current=now}
-   const addresses=[...state.current.is],coords=addresses.map(fromKey),extent=Math.max(1,...coords.flatMap(p=>[Math.abs(p.x),Math.abs(p.y),Math.abs(p.z)])),scale=Math.max(1,Math.min(r.width,r.height)*.46/extent*zoom)
+   if(now-last.current>=1000){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
+   const addresses=[...continuum.current.state.is],coords=addresses.map(fromKey),extent=Math.max(1,...coords.flatMap(p=>[Math.abs(p.x),Math.abs(p.y),Math.abs(p.z)])),scale=Math.max(1,Math.min(r.width,r.height)*.46/extent*zoom)
    const pixels=mergeByPixel(addresses,address=>{const p=fromKey(address),cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;return{x:r.width/2+x*scale,y:r.height/2-y*scale}})
    setVisible(v=>v===pixels.length?v:pixels.length)
    for(const pixel of pixels)putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,pixel.addresses.includes(selected))
@@ -30,6 +30,6 @@ export function InfinityApp(){
   onPointerMove={e=>{if(!pointers.current.has(e.pointerId)||!lastPointer.current)return;const dx=e.clientX-lastPointer.current.x,dy=e.clientY-lastPointer.current.y;lastPointer.current={x:e.clientX,y:e.clientY};setYaw(v=>v+dx*.008);setPitch(v=>Math.max(-Math.PI/2,Math.min(Math.PI/2,v+dy*.008)))}}
   onPointerUp={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}} onPointerCancel={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} onClick={()=>setSelected("0,0,0")} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {visible} merged visible pixels · act {state.current.act}</div><div>fracture map draws from resolver ledger · node/address → physical pixel observation</div><div>same pixel reference + location = merged observation · contributing addresses retained by reference</div><div>map advances once per second · orientation preserved in 3D projection · drag rotates · wheel zoom · double-click reset</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {visible} merged visible pixels · act {continuum.current.state.act}</div><div>ledger ↻ ledger continuum · fracture map is an observation at the selected grain</div><div>Difference · address · orientation · merge · fracture · return remain receipts in the same continuum</div><div>map advances once per second · orientation preserved in 3D projection · drag rotates · wheel zoom · double-click reset</div></div>
  </section></main>
 }
