@@ -17,7 +17,7 @@ export function InfinityApp(){
  const pointers=useRef(new Map<number,{x:number;y:number}>()),lastPointer=useRef<{x:number;y:number}|null>(null)
  const channels=["HUMAN","EI_AGENT","TEXT","VOICE","IMAGE_VISION","FILE_DOCUMENT","CODE_EXECUTION","WEB_EXTERNAL","DEVICE_SENSOR","UI_CONTROL","MEMORY_HISTORY","LEDGER_RECEIPT"] as const
  const [sourceChannel,setSourceChannel]=useState<(typeof channels)[number]>("HUMAN"),[destinationChannel,setDestinationChannel]=useState<(typeof channels)[number]>("EI_AGENT")
- const [guidance,setGuidance]=useState("SOURCE"),[zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
+ const [guidance,setGuidance]=useState("SOURCE"),[reply,setReply]=useState(""),[nextReply,setNextReply]=useState<string|null>(null),[zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    if(now-last.current>=1000){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
@@ -43,6 +43,12 @@ export function InfinityApp(){
    <div className="guidance-controls">{["SOURCE","DIFFERENCE","RETURN","FILTER","ISOLATE","RECONSTRUCT","VERIFY","WAS","IS","NEXT","GRAIN−","GRAIN+","PROVENANCE","HARM","OPEN DIFFERENCE","COMMIT","UNDO"].map(control=><button type="button" key={control} onClick={()=>setGuidance(control)}>{control}</button>)}</div>
    <div className="channel-controls"><label>SOURCE CHANNEL <select value={sourceChannel} onChange={e=>setSourceChannel(e.target.value as typeof sourceChannel)}>{channels.map(channel=><option key={channel}>{channel}</option>)}</select></label><span>→</span><label>DESTINATION CHANNEL <select value={destinationChannel} onChange={e=>setDestinationChannel(e.target.value as typeof destinationChannel)}>{channels.map(channel=><option key={channel}>{channel}</option>)}</select></label></div>
    <div>CHANNEL RECEIPT: {sourceChannel} → {destinationChannel} · transformation ≠ source replacement · cross-channel Difference retains original source/address</div>
+   <form className="next-reply" onSubmit={e=>{e.preventDefault();const value=reply.trim();if(!value)return;setNextReply(value);setReply("");setGuidance("NEXT")}}>
+    <label>REPLY FOR NEXT <textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Reply at the current source/address" /></label>
+    <button type="submit" disabled={!reply.trim()}>SET NEXT REPLY</button>
+    <button type="button" onClick={()=>{setReply("");setNextReply(null)}} disabled={!reply&&nextReply===null}>CLEAR</button>
+   </form>
+   <div aria-live="polite">NEXT REPLY: {nextReply??"UNRESOLVED · no reply committed"}</div>
   </section></div>
  </section></main>
 }
