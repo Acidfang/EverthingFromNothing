@@ -11,27 +11,26 @@ const add=(a:V3,b:V3):V3=>({x:a.x+b.x,y:a.y+b.y,z:a.z+b.z})
 const mul=(a:V3,s:number):V3=>({x:a.x*s,y:a.y*s,z:a.z*s})
 const rotate=(p:V3,yaw:number,pitch:number):V3=>{const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy;return{x,y:p.y*cp-z*sp,z:p.y*sp+z*cp}}
 
-// Field placement is read from the fracture map itself:
-// NODE = CENTRE = PIXEL = ADDRESS
-// parent centre -> addressed tetrahedral tip -> child centre pixel.
-// A child is therefore drawn where that fracture address actually lands; there is
-// no independent screen-spacing rule between pixels.
-const addressedTip=(centre:V3,branch:number,radius:number):V3=>add(centre,mul(BASIS[branch],radius))
-const nextCentre=(centre:V3,branch:number,radius:number):V3=>addressedTip(centre,branch,radius)
+// Every visible grain is resolved from its complete address lineage.
+// Address is the authority; rendering does not maintain a second geometry state.
+const addressPosition=(address:Address):V3=>{
+ let p:V3={x:0,y:0,z:0}
+ for(const branch of address.path)p=add(p,BASIS[branch])
+ return p
+}
 
 // The fracture/address field is not depth-limited.  Materialise only addresses
 // required by the finite observation window; the window never becomes a model limit.
 function buildView(observationBudget:number):DrawNode[]{
  let ledger=createRootLedger(),frontier:[Address,number][]=[[ROOT_ADDRESS,0]]
- const nodes:DrawNode[]=[{address:ROOT_ADDRESS,p:{x:0,y:0,z:0},depth:0}]
+ const nodes:DrawNode[]=[{address:ROOT_ADDRESS,p:addressPosition(ROOT_ADDRESS),depth:0}]
  while(frontier.length&&nodes.length<observationBudget){
   const [address,depth]=frontier.shift()!
   ledger=fractureAt(ledger,address)
   for(let branch=0;branch<CANONICAL_SEED.fracture.addressedChildren&&nodes.length<observationBudget;branch++){
-   const child=childAddress(address,branch),childCentre=nextCentre(centre,frame,branch,radius),childFrame=compose(frame,BRANCH_FRAME[branch])
-   nodes.push({address:child,p:childCentre,depth:depth+1})
-   // Every address step is one adjacency unit. Projection may scale the whole field, never separate adjacent nodes.
-   frontier.push([child,childCentre,childFrame,depth+1,radius])
+   const child=childAddress(address,branch)
+   nodes.push({address:child,p:addressPosition(child),depth:depth+1})
+   frontier.push([child,depth+1])
   }
  }
  return nodes
