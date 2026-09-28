@@ -5,11 +5,11 @@ import "./infinity.css"
 
 type Channel = "NONE" | "FILTER" | "ISOLATE" | "RECONSTRUCT"
 type FieldAddress = { root:string; grain:number; act:number; x:number; y:number; z:number; depth:number; channel:Channel; subject?:string }
+type DrawnNode = { key:string; x:number; y:number; size:number; event:ReturnType<typeof eventFromKey> }
 
 const ROOT="FAMILY/NOTODUS/ZERO"
 const DEFAULT_ADDRESS:FieldAddress={root:ROOT,grain:0,act:0,x:0,y:0,z:0,depth:2,channel:"NONE",subject:"USER"}
 const encode=(a:FieldAddress)=>`${a.root}/G${a.grain}/A${a.act}/X${a.x}/Y${a.y}/Z${a.z}/D${a.depth}/${a.channel}/${a.subject||"USER"}`
-const pixelAddress=(whole:FieldAddress,px:number,py:number,w:number,h:number)=>`${encode(whole)}/PIXEL/${px},${py}/${w}x${h}/SELF=WHOLE`
 function readAddress():FieldAddress{const source=new URLSearchParams(location.hash.replace(/^#/,"")).get("field");if(!source)return DEFAULT_ADDRESS;try{return{...DEFAULT_ADDRESS,...JSON.parse(decodeURIComponent(source))}}catch{return DEFAULT_ADDRESS}}
 function writeAddress(a:FieldAddress){history.replaceState(null,"",`${location.pathname}#field=${encodeURIComponent(JSON.stringify(a))}`)}
 
@@ -17,12 +17,18 @@ export function InfinityApp(){
  const explorer=useMemo(()=>new FirstActExplorer(),[])
  const [address,setAddress]=useState<FieldAddress>(()=>readAddress())
  const [frame,setFrame]=useState(()=>explorer.frame())
+ const [zoom,setZoom]=useState(1)
  const [focus,setFocus]=useState("")
  const canvas=useRef<HTMLCanvasElement>(null)
+ const drawn=useRef<DrawnNode[]>([])
+ const pointers=useRef(new Map<number,{x:number;y:number}>())
+ const pinchDistance=useRef<number|null>(null)
 
  const sync=(next:FieldAddress)=>{
    while(explorer.frame().observer.relativeGrain>next.grain) explorer.enterWhole(0)
    while(explorer.frame().observer.relativeGrain<next.grain) explorer.returnOutward()
+   while(explorer.frame().observer.act<next.act) explorer.resolveOneTick()
+   while(explorer.frame().observer.act>next.act) explorer.returnToWas()
    let [cx,cy,cz]=explorer.frame().observer.spatialAddress.split(",").map(Number)
    while(cx<next.x){explorer.moveSpatially(0);cx++} while(cx>next.x){explorer.moveSpatially(1);cx--}
    while(cy<next.y){explorer.moveSpatially(2);cy++} while(cy>next.y){explorer.moveSpatially(3);cy--}
@@ -41,24 +47,51 @@ export function InfinityApp(){
      ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
      const q=frame.recursiveQuery.query
      const events=q.events.map(key=>({key,...eventFromKey(key)}))
-     if(!events.length)return
-     const xs=events.map(e=>e.x),ys=events.map(e=>e.y),zs=events.map(e=>e.z),gs=events.map(e=>e.grain),as=events.map(e=>e.act)
-     const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),minZ=Math.min(...zs),maxZ=Math.max(...zs),minG=Math.min(...gs),maxG=Math.max(...gs),minA=Math.min(...as),maxA=Math.max(...as)
-     const spanX=Math.max(1,maxX-minX),spanY=Math.max(1,maxY-minY),spanZ=Math.max(1,maxZ-minZ),spanG=Math.max(1,maxG-minG),spanA=Math.max(1,maxA-minA)
-     const pad=24
-     const point=(e:ReturnType<typeof eventFromKey>)=>{
-       const nx=(e.x-minX)/spanX-.5,ny=(e.y-minY)/spanY-.5,nz=(e.z-minZ)/spanZ-.5,ng=(e.grain-minG)/spanG-.5,na=(e.act-minA)/spanA-.5
-       return {x:r.width/2+nx*(r.width-pad*2)+nz*18+ng*10,y:r.height/2+ny*(r.height-pad*2)-nz*18-na*10}
+     if(!events.length){drawn.current=[];return}
+
+     // One continuous field coordinate system. An inward grain doubles its integer
+     // address while halving its unit, so parent/child positions remain coincident.
+     // Act is chronology, not a spatial offset.
+     const world=events.map(e=>{const unit=2**e.grain;return{...e,unit,wx:e.x*unit,wy:e.y*unit,wz:e.z*unit}})
+     const centre=eventFromKey(q.centre),centreUnit=2**centre.grain
+     const cwx=centre.x*centreUnit,cwy=centre.y*centreUnit,cwz=centre.z*centreUnit
+     const iso=(wx:number,wy:number,wz:number)=>({x:(wx-cwx)+(wz-cwz)*.5,y:(wy-cwy)-(wz-cwz)*.5})
+     const projected=world.map(e=>({...e,...iso(e.wx,e.wy,e.wz)}))
+     const extent=Math.max(1,...projected.flatMap(p=>[Math.abs(p.x)+p.unit,Math.abs(p.y)+p.unit]))
+     const base=Math.max(1,Math.min(r.width,r.height)*.44/extent)
+     const scale=base*zoom
+     const nodes:DrawnNode[]=[]
+
+     // Adjacency remains field state only: never draw connector geometry.
+     for(const e of projected){
+       const p={x:r.width/2+e.x*scale,y:r.height/2+e.y*scale}
+       const size=Math.max(1,e.unit*scale)
+       const isCentre=e.key===q.centre
+       ctx.fillStyle=isCentre?"#eeeade":"#e5ad56"
+       ctx.fillRect(Math.round(p.x-size/2),Math.round(p.y-size/2),Math.max(1,Math.round(size)),Math.max(1,Math.round(size)))
+       nodes.push({key:e.key,x:p.x,y:p.y,size,event:e})
      }
-     // Relations/adjacency belong to field state. Projection renders addressed grains only.
-     // Never infer or draw an edge from adjacency, proximity, grain, face, WAS/IS/NEXT,
-     // inward/outward, or any other retained relation.
-     for(const e of events){const p=point(e);const centre=e.key===q.centre;ctx.fillStyle=centre?"#eeeade":"#e5ad56";ctx.fillRect(Math.round(p.x),Math.round(p.y),centre?2:1,centre?2:1)}
+     drawn.current=nodes
    }
    draw();addEventListener("resize",draw);return()=>removeEventListener("resize",draw)
- },[frame,address])
+ },[frame,zoom])
 
- const inspect=(clientX:number,clientY:number)=>{const c=canvas.current;if(!c)return;const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;const px=Math.max(0,Math.min(c.width-1,Math.floor((clientX-r.left)*dpr))),py=Math.max(0,Math.min(c.height-1,Math.floor((clientY-r.top)*dpr)));setFocus(pixelAddress(address,px,py,c.width,c.height))}
+ const selectAt=(clientX:number,clientY:number)=>{const c=canvas.current;if(!c)return;const r=c.getBoundingClientRect(),x=clientX-r.left,y=clientY-r.top
+   let best:DrawnNode|null=null,bestDistance=Infinity
+   for(const node of drawn.current){const d=Math.hypot(x-node.x,y-node.y);const hit=Math.max(6,node.size*.7);if(d<=hit&&d<bestDistance){best=node;bestDistance=d}}
+   if(!best)return
+   const e=best.event
+   const next={...address,grain:e.grain,act:e.act,x:e.x,y:e.y,z:e.z}
+   setFocus(encode(next));resolveAddress(next)
+ }
+ const updatePointer=(id:number,x:number,y:number)=>{pointers.current.set(id,{x,y});if(pointers.current.size===2){const [a,b]=[...pointers.current.values()];const distance=Math.hypot(a.x-b.x,a.y-b.y);if(pinchDistance.current!==null&&pinchDistance.current>0)setZoom(z=>Math.max(.125,Math.min(64,z*distance/pinchDistance.current!)));pinchDistance.current=distance}}
+ const releasePointer=(id:number)=>{pointers.current.delete(id);if(pointers.current.size<2)pinchDistance.current=null}
 
- return <main className="infinity-map"><section className="infinity-field" aria-label="Self-addressing recursive fracture map"><canvas ref={canvas} className="infinity-canvas" onPointerDown={e=>inspect(e.clientX,e.clientY)} onPointerMove={e=>{if(e.buttons)inspect(e.clientX,e.clientY)}}/><div className="infinity-readout" aria-live="polite"><div>{focus||encode(address)}</div><div>{frame.recursiveQuery.eventCount} addressed states · {frame.recursiveQuery.relationCount} relations · frontier {frame.recursiveQuery.frontierCount} · act {address.act}</div></div></section></main>
+ return <main className="infinity-map"><section className="infinity-field" aria-label="Self-addressing recursive fracture map"><canvas ref={canvas} className="infinity-canvas"
+   onWheel={e=>{e.preventDefault();setZoom(z=>Math.max(.125,Math.min(64,z*Math.exp(-e.deltaY*.0015))))}}
+   onDoubleClick={()=>setZoom(1)}
+   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);updatePointer(e.pointerId,e.clientX,e.clientY);if(pointers.current.size===1)selectAt(e.clientX,e.clientY)}}
+   onPointerMove={e=>{if(pointers.current.has(e.pointerId))updatePointer(e.pointerId,e.clientX,e.clientY)}}
+   onPointerUp={e=>releasePointer(e.pointerId)} onPointerCancel={e=>releasePointer(e.pointerId)} />
+   <div className="infinity-readout" aria-live="polite"><div>{focus||encode(address)}</div><div>{frame.recursiveQuery.eventCount} addressed states · {frame.recursiveQuery.relationCount} relations · frontier {frame.recursiveQuery.frontierCount} · act {address.act} · zoom {zoom.toFixed(2)}×</div></div></section></main>
 }
