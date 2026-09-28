@@ -39,6 +39,7 @@ export function InfinityApp(){
  const resolveAddress=(next:FieldAddress)=>{const nextFrame=sync(next);setAddress(next);setFrame(nextFrame);writeAddress(next)}
  useEffect(()=>{resolveAddress(address)},[])
  useEffect(()=>{const refresh=()=>{const next=readAddress();setAddress(next);setFrame(sync(next))};addEventListener("hashchange",refresh);addEventListener("popstate",refresh);return()=>{removeEventListener("hashchange",refresh);removeEventListener("popstate",refresh)}},[explorer])
+ useEffect(()=>{let cancelled=false,baseline="";const check=async()=>{try{const response=await fetch(`${location.pathname}?deployment-check=${Date.now()}`,{cache:"no-store"});if(!response.ok)return;const html=await response.text();if(cancelled)return;if(!baseline){baseline=html;return}if(html!==baseline)location.reload()}catch{}};void check();const timer=window.setInterval(()=>void check(),15000);return()=>{cancelled=true;clearInterval(timer)}},[])
 
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
    const draw=()=>{
@@ -48,10 +49,6 @@ export function InfinityApp(){
      const q=frame.recursiveQuery.query
      const events=q.events.map(key=>({key,...eventFromKey(key)}))
      if(!events.length){drawn.current=[];return}
-
-     // One continuous field coordinate system. An inward grain doubles its integer
-     // address while halving its unit, so parent/child positions remain coincident.
-     // Act is chronology, not a spatial offset.
      const world=events.map(e=>{const unit=2**e.grain;return{...e,unit,wx:e.x*unit,wy:e.y*unit,wz:e.z*unit}})
      const centre=eventFromKey(q.centre),centreUnit=2**centre.grain
      const cwx=centre.x*centreUnit,cwy=centre.y*centreUnit,cwz=centre.z*centreUnit
@@ -61,37 +58,15 @@ export function InfinityApp(){
      const base=Math.max(1,Math.min(r.width,r.height)*.44/extent)
      const scale=base*zoom
      const nodes:DrawnNode[]=[]
-
-     // Adjacency remains field state only: never draw connector geometry.
-     for(const e of projected){
-       const p={x:r.width/2+e.x*scale,y:r.height/2+e.y*scale}
-       const size=Math.max(1,e.unit*scale)
-       const isCentre=e.key===q.centre
-       ctx.fillStyle=isCentre?"#eeeade":"#e5ad56"
-       ctx.fillRect(Math.round(p.x-size/2),Math.round(p.y-size/2),Math.max(1,Math.round(size)),Math.max(1,Math.round(size)))
-       nodes.push({key:e.key,x:p.x,y:p.y,size,event:e})
-     }
+     for(const e of projected){const p={x:r.width/2+e.x*scale,y:r.height/2+e.y*scale};const size=Math.max(1,e.unit*scale);const isCentre=e.key===q.centre;ctx.fillStyle=isCentre?"#eeeade":"#e5ad56";ctx.fillRect(Math.round(p.x-size/2),Math.round(p.y-size/2),Math.max(1,Math.round(size)),Math.max(1,Math.round(size)));nodes.push({key:e.key,x:p.x,y:p.y,size,event:e})}
      drawn.current=nodes
    }
    draw();addEventListener("resize",draw);return()=>removeEventListener("resize",draw)
  },[frame,zoom])
 
- const selectAt=(clientX:number,clientY:number)=>{const c=canvas.current;if(!c)return;const r=c.getBoundingClientRect(),x=clientX-r.left,y=clientY-r.top
-   let best:DrawnNode|null=null,bestDistance=Infinity
-   for(const node of drawn.current){const d=Math.hypot(x-node.x,y-node.y);const hit=Math.max(6,node.size*.7);if(d<=hit&&d<bestDistance){best=node;bestDistance=d}}
-   if(!best)return
-   const e=best.event
-   const next={...address,grain:e.grain,act:e.act,x:e.x,y:e.y,z:e.z}
-   setFocus(encode(next));resolveAddress(next)
- }
+ const selectAt=(clientX:number,clientY:number)=>{const c=canvas.current;if(!c)return;const r=c.getBoundingClientRect(),x=clientX-r.left,y=clientY-r.top;let best:DrawnNode|null=null,bestDistance=Infinity;for(const node of drawn.current){const d=Math.hypot(x-node.x,y-node.y);const hit=Math.max(6,node.size*.7);if(d<=hit&&d<bestDistance){best=node;bestDistance=d}}if(!best)return;const e=best.event;const next={...address,grain:e.grain,act:e.act,x:e.x,y:e.y,z:e.z};setFocus(encode(next));resolveAddress(next)}
  const updatePointer=(id:number,x:number,y:number)=>{pointers.current.set(id,{x,y});if(pointers.current.size===2){const [a,b]=[...pointers.current.values()];const distance=Math.hypot(a.x-b.x,a.y-b.y);if(pinchDistance.current!==null&&pinchDistance.current>0)setZoom(z=>Math.max(.125,Math.min(64,z*distance/pinchDistance.current!)));pinchDistance.current=distance}}
  const releasePointer=(id:number)=>{pointers.current.delete(id);if(pointers.current.size<2)pinchDistance.current=null}
 
- return <main className="infinity-map"><section className="infinity-field" aria-label="Self-addressing recursive fracture map"><canvas ref={canvas} className="infinity-canvas"
-   onWheel={e=>{e.preventDefault();setZoom(z=>Math.max(.125,Math.min(64,z*Math.exp(-e.deltaY*.0015))))}}
-   onDoubleClick={()=>setZoom(1)}
-   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);updatePointer(e.pointerId,e.clientX,e.clientY);if(pointers.current.size===1)selectAt(e.clientX,e.clientY)}}
-   onPointerMove={e=>{if(pointers.current.has(e.pointerId))updatePointer(e.pointerId,e.clientX,e.clientY)}}
-   onPointerUp={e=>releasePointer(e.pointerId)} onPointerCancel={e=>releasePointer(e.pointerId)} />
-   <div className="infinity-readout" aria-live="polite"><div>{focus||encode(address)}</div><div>{frame.recursiveQuery.eventCount} addressed states · {frame.recursiveQuery.relationCount} relations · frontier {frame.recursiveQuery.frontierCount} · act {address.act} · zoom {zoom.toFixed(2)}×</div></div></section></main>
+ return <main className="infinity-map"><section className="infinity-field" aria-label="Self-addressing recursive fracture map"><canvas ref={canvas} className="infinity-canvas" onWheel={e=>{e.preventDefault();setZoom(z=>Math.max(.125,Math.min(64,z*Math.exp(-e.deltaY*.0015))))}} onDoubleClick={()=>setZoom(1)} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);updatePointer(e.pointerId,e.clientX,e.clientY);if(pointers.current.size===1)selectAt(e.clientX,e.clientY)}} onPointerMove={e=>{if(pointers.current.has(e.pointerId))updatePointer(e.pointerId,e.clientX,e.clientY)}} onPointerUp={e=>releasePointer(e.pointerId)} onPointerCancel={e=>releasePointer(e.pointerId)} /><div className="infinity-readout" aria-live="polite"><div>{focus||encode(address)}</div><div>{frame.recursiveQuery.eventCount} addressed states · {frame.recursiveQuery.relationCount} relations · frontier {frame.recursiveQuery.frontierCount} · act {address.act} · zoom {zoom.toFixed(2)}×</div></div></section></main>
 }
