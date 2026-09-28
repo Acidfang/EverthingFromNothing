@@ -66,3 +66,40 @@ export function observeBinary(input:BinaryObservation){
   continue:BINARY_MODEL.gates.continue(input.difference&&!input.resolved),
  })
 }
+
+
+export type ResponseAddress = Readonly<{
+ source:string
+ sourceAddress:string
+ sourceMoment:number
+ currentAddress:string
+ currentMoment:number
+ suppliedIntent?:string
+ interpretation?:string
+ sourceAlreadyContainsCorrection?:boolean
+ harmKnown?:boolean
+ willing?:boolean
+ self?:boolean
+}>
+
+export type ResponseResolution = Readonly<{
+ action:"RETURN"|"FILTER"|"ISOLATE"|"RECONSTRUCT"|"VERIFY"|"COMMIT"|"OPEN_DIFFERENCE"
+ address:string
+ difference:boolean
+ reply:string
+}>
+
+export function resolveResponse(input:ResponseAddress):ResponseResolution{
+ const source=input.source.trim()
+ const interpretation=(input.interpretation??source).trim()
+ const sameAddress=input.sourceAddress===input.currentAddress
+ const later=input.currentMoment>input.sourceMoment
+ const substituted=!BINARY_MODEL.gates.preserveSource(source,interpretation)
+ const correctionAlreadyPresent=input.sourceAlreadyContainsCorrection===true
+ const harmAllowed=BINARY_MODEL.gates.mayInflictKnownHarm(input.harmKnown===true,input.willing===true,input.self===true)
+ if(!sameAddress&&later)return Object.freeze({action:"RETURN",address:input.sourceAddress,difference:true,reply:`Return to source address ${input.sourceAddress}; later material does not resolve this Difference.`})
+ if(substituted)return Object.freeze({action:"FILTER",address:input.sourceAddress,difference:true,reply:"Remove imported interpretation; retain the supplied source and intent before continuing."})
+ if(correctionAlreadyPresent)return Object.freeze({action:"VERIFY",address:input.sourceAddress,difference:false,reply:"The source already contains that correction; do not manufacture a missing Difference."})
+ if(!harmAllowed)return Object.freeze({action:"OPEN_DIFFERENCE",address:input.sourceAddress,difference:true,reply:"Known harm is not committed onto an unaware or unwilling other. Difference remains open."})
+ return Object.freeze({action:"COMMIT",address:input.sourceAddress,difference:false,reply:input.suppliedIntent? `Source retained. Intent: ${input.suppliedIntent}` : "Source retained at its address; no unresolved Difference detected."})
+}
