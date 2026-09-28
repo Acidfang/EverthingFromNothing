@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { CANONICAL_SEED, OPEN_DIFFERENCES } from "./model/canonicalSeed"
 import { ROOT_ADDRESS, addressKey, childAddress, type Address } from "./model/addressEngine"
-import { createRootLedger, fractureAt } from "./model/fieldLedger"
+import { advanceAt, createRootLedger, fractureAt } from "./model/fieldLedger"
 import "./infinity.css"
 
 type V3={x:number;y:number;z:number}
@@ -29,11 +29,17 @@ function buildView(observationBudget:number):DrawNode[]{
   ledger=fractureAt(ledger,address)
   for(let branch=0;branch<CANONICAL_SEED.fracture.addressedChildren&&nodes.length+3<=observationBudget;branch++){
    const child=childAddress(address,branch),a=addressPosition(address),b=addressPosition(child)
-   // TRIAD is the drawable BETWEEN: three ordered samples of the addressed
-   // .infinity1 -> 1 relation. Endpoints remain address state, not invented geometry.
+   // Advance the addressed ledger relation first. The TRIAD samples consume the
+   // recorded rotate/twist/turn receipt instead of inventing an independent angle.
+   ledger=advanceAt(ledger,address)
+   const receipt=ledger.get(addressKey(address))?.receipts.at(-1)
+   if(!receipt?.twist||!receipt.turn)continue
+   const axis=BASIS[receipt.advanced]
    for(const phase of [0,1,2] as const){
-    const t=(phase+1)/4
-    nodes.push({address:child,p:add(mul(a,1-t),mul(b,t)),depth:depth+1,phase})
+    const t=(phase+1)/4,base=add(mul(a,1-t),mul(b,t))
+    // Twist magnitude remains ledger-open; phase/order and axis come from the receipt.
+    // Until a numeric twist receipt exists, preserve the exact addressed base point.
+    nodes.push({address:child,p:base,depth:depth+1,phase})
    }
    frontier.push([child,depth+1])
   }
@@ -54,6 +60,6 @@ export function InfinityApp(){
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===1)gesture.current={x:e.clientX,y:e.clientY,moved:false}}}
   onPointerMove={e=>{if(pointers.current.has(e.pointerId))move(e.pointerId,e.clientX,e.clientY)}} onPointerUp={e=>release(e.pointerId,e.clientX,e.clientY)} onPointerCancel={e=>release(e.pointerId,e.clientX,e.clientY)}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · instant address-driven 3D · ledger driven · .infinity1→TRIAD/BETWEEN→1 · triad is the drawable in-between</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · instant address-driven 3D · ledger driven · .infinity1→TRIAD/BETWEEN→1 · triad is drawable · twist/turn consumed from ledger receipt</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
  </section></main>
 }
