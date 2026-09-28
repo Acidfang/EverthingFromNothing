@@ -14,13 +14,9 @@ const rotate=(p:V3,yaw:number,pitch:number):V3=>{const cy=Math.cos(yaw),sy=Math.
 // Every visible grain is resolved from its complete address lineage.
 // Address is the authority; rendering does not maintain a second geometry state.
 const addressPosition=(address:Address):V3=>{
- if(address.path.length===0)return {x:0,y:0,z:0}
- // Mechanised directly from the ledgered address. No depth ratio, spacing rule,
- // or independently-authored geometry is stored in the model.
- const key=address.path.reduce((n,branch)=>n*CANONICAL_SEED.fracture.addressedChildren+(branch+1),0)
- const branch=address.path[address.path.length-1]
- const grain=BASIS[branch]
- return {x:grain.x*key,y:grain.y*key,z:grain.z*key}
+ let p:V3={x:0,y:0,z:0}
+ for(const branch of address.path)p=add(p,BASIS[branch])
+ return p
 }
 
 // The fracture/address field is not depth-limited.  Materialise only addresses
@@ -53,6 +49,6 @@ export function InfinityApp(){
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===1)gesture.current={x:e.clientX,y:e.clientY,moved:false}}}
   onPointerMove={e=>{if(pointers.current.has(e.pointerId))move(e.pointerId,e.clientX,e.clientY)}} onPointerUp={e=>release(e.pointerId,e.clientX,e.clientY)} onPointerCancel={e=>release(e.pointerId,e.clientX,e.clientY)}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · instant address-driven 3D · ledger driven · full ordered address is authority · no manufactured model geometry</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · instant address-driven 3D · ledger driven · .infinity1→1 is the full rotate+twist map · full ordered address is authority</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
  </section></main>
 }
