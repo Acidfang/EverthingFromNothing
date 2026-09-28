@@ -31,10 +31,11 @@ export type TickLedger = Readonly<{
 export type LedgerContinuum = Readonly<{
   state: ResolverState
   receipts: readonly TickLedger[]
+  activeAddress: string
 }>
 
 export function createLedgerContinuum(): LedgerContinuum {
-  return Object.freeze({ state: firstDifference(), receipts: Object.freeze([]) })
+  return Object.freeze({ state: firstDifference(), receipts: Object.freeze([]), activeAddress: key(ORIGIN) })
 }
 
 export function advanceLedgerContinuum(continuum: LedgerContinuum): LedgerContinuum {
@@ -42,6 +43,7 @@ export function advanceLedgerContinuum(continuum: LedgerContinuum): LedgerContin
   return Object.freeze({
     state: resolved.state,
     receipts: Object.freeze([...continuum.receipts, resolved.ledger]),
+    activeAddress: [...resolved.state.is][0] ?? continuum.activeAddress,
   })
 }
 
