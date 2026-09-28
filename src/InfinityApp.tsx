@@ -30,8 +30,8 @@ function buildView(observationBudget:number):DrawNode[]{
   for(let branch=0;branch<CANONICAL_SEED.fracture.addressedChildren&&nodes.length<observationBudget;branch++){
    const child=childAddress(address,branch),childCentre=nextCentre(centre,branch,radius)
    nodes.push({address:child,p:childCentre,depth:depth+1})
-   // Scale is a projection concern only; it does not constrain address continuation.
-   frontier.push([child,childCentre,depth+1,radius/(depth+2)])
+   // Every address step is one adjacency unit. Projection may scale the whole field, never separate adjacent nodes.
+   frontier.push([child,childCentre,depth+1,1])
   }
  }
  return nodes
@@ -50,6 +50,6 @@ export function InfinityApp(){
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===1)gesture.current={x:e.clientX,y:e.clientY,moved:false}}}
   onPointerMove={e=>{if(pointers.current.has(e.pointerId))move(e.pointerId,e.clientX,e.clientY)}} onPointerUp={e=>release(e.pointerId,e.clientX,e.clientY)} onPointerCancel={e=>release(e.pointerId,e.clientX,e.clientY)}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
-  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · adjacency = address parent/child · centre → tip → next centre</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
+  <div className="infinity-readout" aria-live="polite"><div>{selected} · {nodes.length} visible addressed nodes · unbounded address continuation</div><div>NODE = CENTRE = PIXEL = ADDRESS · parent/child nodes occupy adjacent address units · centre → tip → next centre</div><div>4 children/address · 6 pair gates · 4 triad gates · fixed ZERO lineage</div><div>finite observation only · full fracture map remains unfiltered · all communication forms are addressed in-field · wheel/pinch zoom {zoom.toFixed(2)}× · drag rotates · click selects · double-click resets</div><div>OPEN MODEL DIFFERENCES: {OPEN_DIFFERENCES.join(" · ")}</div></div>
  </section></main>
 }
