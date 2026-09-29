@@ -5,6 +5,8 @@ import { BINARY_MODEL,EVERYTHING_METHOD,FULL_SELF_RESOLUTION,WHOLE_INVARIANT,res
 import "./infinity.css"
 
 type PixelReference=Readonly<{x:number;y:number;addresses:readonly string[]}>
+type ProjectedAddress=Readonly<{x:number;y:number}>
+type FieldEdge=Readonly<{from:string;to:string}>
 type ControlAddress=`EI/${string}/${string}`
 const controlAddress=(channel:string,control:string):ControlAddress=>`EI/${channel}/${control}`
 const addressEvent=(address:ControlAddress,value:string)=>Object.freeze({address,value})
@@ -14,6 +16,18 @@ const mergeByPixel=(addresses:readonly string[],project:(address:string)=>Readon
  return Object.freeze([...pixels.values()].map(p=>Object.freeze({x:p.x,y:p.y,addresses:Object.freeze(p.addresses)})))
 }
 const putPhysicalPixel=(ctx:CanvasRenderingContext2D,x:number,y:number,dpr:number,selected:boolean)=>{const s=1/dpr;ctx.fillStyle=selected?"#eeeade":"#e5ad56";ctx.fillRect(Math.round(x*dpr)/dpr,Math.round(y*dpr)/dpr,s,s)}
+const causalEdges=(continuum:ReturnType<typeof createLedgerContinuum>):readonly FieldEdge[]=>{
+ const latest=continuum.receipts.at(-1)
+ if(!latest)return Object.freeze([])
+ const edges:FieldEdge[]=[]
+ for(const entry of latest.entries)for(const arrival of entry.arrivals)edges.push(Object.freeze({from:arrival.source,to:entry.address}))
+ return Object.freeze(edges)
+}
+const drawEdges=(ctx:CanvasRenderingContext2D,edges:readonly FieldEdge[],points:ReadonlyMap<string,ProjectedAddress>,alpha:number)=>{
+ ctx.save();ctx.strokeStyle=`rgba(229,173,86,${alpha})`;ctx.lineWidth=.5
+ for(const edge of edges){const a=points.get(edge.from),b=points.get(edge.to);if(!a||!b)continue;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+ ctx.restore()
+}
 
 export function InfinityApp(){
  const canvas=useRef<HTMLCanvasElement>(null),continuum=useRef(createLedgerContinuum()),raf=useRef(0),last=useRef(0),projected=useRef<readonly PixelReference[]>([]),avatarPhase=useRef(0)
@@ -35,15 +49,22 @@ export function InfinityApp(){
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    if(now-last.current>=1000&&WHOLE_INVARIANT.recursive&&FULL_SELF_RESOLUTION.selfSimilar){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
-   const addresses=[...continuum.current.state.is],coords=addresses.map(fromKey),extent=Math.max(1,...coords.flatMap(p=>[Math.abs(p.x),Math.abs(p.y),Math.abs(p.z)])),scale=Math.max(1,Math.min(r.width,r.height)*.46/extent*zoom)
-   const pixels=mergeByPixel(addresses,address=>{const p=fromKey(address),cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;return{x:r.width/2+x*scale,y:r.height/2-y*scale}})
+   const addresses=Object.freeze([...new Set([...continuum.current.state.was,...continuum.current.state.is])]),coords=addresses.map(fromKey),extent=Math.max(1,...coords.flatMap(p=>[Math.abs(p.x),Math.abs(p.y),Math.abs(p.z)])),scale=Math.max(1,Math.min(r.width,r.height)*.46/extent*zoom)
+   const projectMain=(address:string):ProjectedAddress=>{const p=fromKey(address),cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;return{x:r.width/2+x*scale,y:r.height/2-y*scale}}
+   const mainByAddress=new Map(addresses.map(address=>[address,projectMain(address)] as const))
+   const pixels=mergeByPixel([...continuum.current.state.is],projectMain)
    projected.current=pixels
+   const edges=causalEdges(continuum.current)
+   drawEdges(ctx,edges,mainByAddress,.34)
    // Notodus avatar is another addressed observation of the same continuum,
    // never a separate geometry/model. It orbits the current visible field.
    avatarPhase.current=(avatarPhase.current+.006)%(Math.PI*2)
    const ar=Math.min(r.width,r.height)*.34,ax=r.width/2+Math.cos(avatarPhase.current)*ar,ay=r.height/2+Math.sin(avatarPhase.current)*ar*.42
-   const avatarAddresses=pixels.flatMap(pixel=>pixel.addresses).slice(0,64)
-   const avatarPixels=mergeByPixel(avatarAddresses,address=>{const p=fromKey(address),cy=Math.cos(yaw+avatarPhase.current),sy=Math.sin(yaw+avatarPhase.current),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;const s=Math.max(1,scale*.08);return{x:ax+x*s,y:ay-y*s}})
+   const avatarAddresses=addresses
+   const projectAvatar=(address:string):ProjectedAddress=>{const p=fromKey(address),cy=Math.cos(yaw+avatarPhase.current),sy=Math.sin(yaw+avatarPhase.current),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;const s=Math.max(1,scale*.08);return{x:ax+x*s,y:ay-y*s}}
+   const avatarByAddress=new Map(avatarAddresses.map(address=>[address,projectAvatar(address)] as const))
+   const avatarPixels=mergeByPixel([...continuum.current.state.is],projectAvatar)
+   drawEdges(ctx,edges,avatarByAddress,.5)
    for(const pixel of avatarPixels)putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,false)
    setVisible(v=>v===pixels.length?v:pixels.length)
    for(const pixel of pixels)putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,pixel.addresses.includes(selected)||pixel.addresses.includes(continuum.current.activeAddress))
