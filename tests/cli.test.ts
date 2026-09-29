@@ -25,9 +25,11 @@ test("CLI options build the same inspectable frame without a UI", () => {
   assert.doesNotThrow(() => JSON.parse(JSON.stringify(frame)))
 })
 
-test("CLI rejects out-of-range computation requests", () => {
+test("CLI rejects invalid computation requests while preserving unbounded query depth", () => {
   assert.throws(() => parseArguments(["--ticks", "-1"]), /between 0 and 64/)
-  assert.throws(() => parseArguments(["--depth", "5"]), /between 0 and 4/)
+  assert.throws(() => parseArguments(["--depth", "-1"]), /zero or greater/)
+  assert.equal(parseArguments(["--depth", "5"]).queryDepth, 5)
+  assert.equal(parseArguments(["--depth", "64"]).queryDepth, 64)
   assert.throws(() => parseArguments(["--enter-face", "6"]), /between 0 and 5/)
   assert.throws(() => parseArguments(["--unknown"]), /Unknown argument/)
 })
