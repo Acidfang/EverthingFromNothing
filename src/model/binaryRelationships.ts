@@ -139,7 +139,7 @@ export function resolveEverything<T>(
 
 export const EVERYTHING_METHOD = Object.freeze({
  invariant:"ADDRESS → SOURCE → DIFFERENCE → RESOLVE → RECEIPT → RETURN",
- domains:Object.freeze(["FRACTURE","PIXEL","GRAIN","ORIENTATION","VOICE","TEXT","VISION","FILE","CODE","WEB","DEVICE","UI","MEMORY","GUIDANCE","RESPONSE","HARM","PROVENANCE"] as const),
+ domains:Object.freeze(["HUMAN","EI_AGENT","FRACTURE","PIXEL","GRAIN","ORIENTATION","VOICE","TEXT","VISION","FILE","CODE","WEB","DEVICE","UI","MEMORY","GUIDANCE","RESPONSE","HARM","PROVENANCE"] as const),
 })
 
 
@@ -249,7 +249,7 @@ export type SelfKnowledgeState = Readonly<{
 }>
 
 export function createSelfKnowledgeState():SelfKnowledgeState{
- return Object.freeze({known:new Set(),unknown:new Set(),assumed:new Set(),unresolved:new Set(),receipts:Object.freeze([]),revision:0})
+ return Object.freeze({known:new Set<string>(),unknown:new Set<string>(),assumed:new Set<string>(),unresolved:new Set<string>(),receipts:Object.freeze([] as string[]),revision:0})
 }
 
 export function resolveSelfKnowledge(
