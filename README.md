@@ -114,3 +114,11 @@ The graphical surface is rendered directly from the same exact scene graph
 exported by the model. Desktop and narrow-screen verification evidence is
 retained in [`qa/verified.json`](qa/verified.json). The complete public behavior
 and publication gates are defined in [`SPEC.md`](SPEC.md).
+
+## Fracture field inventory
+
+[NOTHING through WAS / IS / NEXT](docs/FRACTURE-FIELD-INVENTORY.md) inventories the
+source-backed fields, relations, action terms, receipts, selected projections and
+open dependencies. Each entry retains parents, support, source, status and gap.
+The [JSON companion](docs/FRACTURE-FIELD-INVENTORY.json) preserves the same inventory
+and exact binary source relations for addressed reuse.
