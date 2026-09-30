@@ -1,6 +1,30 @@
+import { CANONICAL_SEED } from "./canonicalSeed"
+import { BINARY_MODEL, WHOLE_INVARIANT } from "./binaryRelationships"
+import { COMMUNICATION_INVARIANT } from "./communication"
+import { THREE_TETRAHEDRON_DRAWING } from "./three-tetrahedron-drawing"
+
+export const LIFE_LOGIC_BINDING = Object.freeze({
+  root: CANONICAL_SEED.zero,
+  temporalRoles: CANONICAL_SEED.temporalRoles,
+  transition: CANONICAL_SEED.transition,
+  binaryRelations: BINARY_MODEL,
+  whole: WHOLE_INVARIANT,
+  communication: COMMUNICATION_INVARIANT,
+  threeTetrahedronPresentation: THREE_TETRAHEDRON_DRAWING,
+  method: Object.freeze(["FILTER","ISOLATE","RECONSTRUCT"] as const),
+  recursiveGrain: true,
+  sourceRetained: true,
+  differenceCreatesFractureNotNewRoot: true,
+  fractureReturnsToContainingWhole: true,
+  nextIsAvailableNotEstablishedUntilAct: true,
+  receiptReturnsToProducingAddress: true,
+} as const)
+
 export const COMPLETION_RELATION = Object.freeze({
   protocol: "DCA-ADDRESSED-FRACTURE-COMPLETION/1",
-  root: "EXISTING_STATED_ADDRESSES",
+  root: LIFE_LOGIC_BINDING.root,
+  source: "EXISTING_STATED_ADDRESSES",
+  lifeLogic: LIFE_LOGIC_BINDING,
   invariant: "INTENT != QUEUED != EXECUTED != VERIFIED",
   relation: "STATED_ADDRESS -> DIFFERENCE/FRACTURE -> EXISTING_OWNER -> ACT -> RETURNED_EVIDENCE -> RECEIPT_ADDRESS",
   boundary: "This projection does not create a new Root, collapse WAS into IS, infer recipient feedback, or permanently finish the evolving mechanism.",
