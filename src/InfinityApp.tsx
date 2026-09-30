@@ -2,6 +2,7 @@ import { useEffect,useRef,useState } from "react"
 import { advanceLedgerContinuum,createLedgerContinuum } from "./model/kernel"
 import { fromKey } from "./model/address"
 import { BINARY_MODEL,EVERYTHING_METHOD,FULL_SELF_RESOLUTION,WHOLE_INVARIANT,resolveResponse } from "./model/binaryRelationships"
+import { THREE_TETRAHEDRON_DRAWING } from "./model/three-tetrahedron-drawing"
 import "./infinity.css"
 
 type PixelReference=Readonly<{x:number;y:number;addresses:readonly string[]}>
@@ -66,6 +67,26 @@ export function InfinityApp(){
    const stateByAddress=new Map(stateAddresses.map(address=>[address,projectState(address)] as const))
    const edges=causalEdges(continuum.current)
    const detail=Math.max(0,Math.min(1,(zoom-1)/7))\n   if(detail>0){drawEdges(ctx,edges,stateByAddress,.22*detail);for(const address of continuum.current.state.is){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
+
+   // Canonical three-tetrahedron presentation: one shared ZERO, no spatial separation.
+   // The three complete tetrahedra occupy the same geometry; cyclic WAS/IS/NEXT
+   // order is the Difference carried by each presentation.
+   const centre={x:r.width/2,y:r.height/2},scale=Math.min(r.width,r.height)*.18
+   const projectVertex=(p:Readonly<{x:number;y:number;z:number}>,phase:number)=>{
+    const a=yaw+phase,b=pitch,ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b)
+    const x=p.x*ca-p.z*sa,z=p.x*sa+p.z*ca,y=p.y*cb-z*sb
+    return{x:centre.x+x*scale,y:centre.y-y*scale}
+   }
+   const edges4=[[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]] as const
+   ctx.save();ctx.lineWidth=1
+   THREE_TETRAHEDRON_DRAWING.presentations.forEach((tetra,i)=>{
+    const pts=tetra.vertices.map(p=>projectVertex(p,i*Math.PI*2/3))
+    ctx.strokeStyle=["rgba(229,173,86,.92)","rgba(238,234,222,.72)","rgba(229,173,86,.48)"][i]
+    for(const [a,b] of edges4){ctx.beginPath();ctx.moveTo(pts[a].x,pts[a].y);ctx.lineTo(pts[b].x,pts[b].y);ctx.stroke()}
+   })
+   ctx.fillStyle="#eeeade";ctx.beginPath();ctx.arc(centre.x,centre.y,2.5,0,Math.PI*2);ctx.fill()
+   ctx.font="11px sans-serif";ctx.textAlign="center";ctx.fillText("ZERO · 3 TETRAHEDRA · WAS / IS / NEXT",centre.x,centre.y+scale*1.8)
+   ctx.restore()
 
    // Avatar and avatar-camera are observations of this same field, not separate
    // bounded models. Their frame may rotate while address relations stay whole.
