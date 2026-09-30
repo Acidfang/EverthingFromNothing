@@ -127,6 +127,6 @@ export function InfinityApp(){
    <button type="button" onClick={()=>{setGuidance("VERIFY");setSourceAddress(menu.address);setMenu(null)}}>VERIFY</button>
    <button type="button" onClick={()=>{setGuidance("OPEN_DIFFERENCE");setSourceAddress(menu.address);setMenu(null)}}>OPEN DIFFERENCE</button>
   </div>:null}
-  <div className="communication-invariant" aria-label="Communication interaction invariant"><strong>COMMUNICATION</strong> · {COMMUNICATION_INVARIANT.stages.join(" → ")} · identity retained · Difference explicit · receipt required</div>\n  <div className="sr-only" aria-live="polite">{visible} visible pixels · act {continuum.current.state.act} · center of intent {intentCenter} · {guidance} · {sourceChannel} → {destinationChannel}</div>
+  <div className="communication-invariant" aria-label="Communication interaction invariant"><strong>COMMUNICATION</strong> · {COMMUNICATION_INVARIANT.stages.join(" → ")} · WAS / IS / NEXT at every stage · identity retained · Difference explicit · receipt required</div>\n  <div className="sr-only" aria-live="polite">{visible} visible pixels · act {continuum.current.state.act} · center of intent {intentCenter} · {guidance} · {sourceChannel} → {destinationChannel}</div>
  </section></main>
 }
