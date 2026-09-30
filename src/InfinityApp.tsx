@@ -56,11 +56,7 @@ export function InfinityApp(){
    const source=/^-?\\d+,-?\\d+,-?\\d+$/.test(sourceAddress)?sourceAddress:"0,0,0"
    const o=fromKey(source),pixelStep=1/Math.max(.125,zoom),cx=Math.floor(r.width/2),cy=Math.floor(r.height/2)
    const addressForPixel=(x:number,y:number)=>`${o.x+Math.round((x-cx)*pixelStep)},${o.y+Math.round((cy-y)*pixelStep)},${o.z}`
-   ctx.fillStyle="#e5ad56"
-   // At the human grain the web resolves as a solid field. Do not materialize
-   // one JS object per physical pixel: address state is derived lazily from
-   // the base/source relation only when a pixel is actually interrogated.
-   ctx.fillRect(0,0,r.width,r.height)
+   // Default grain-out presents the resolved whole, not the proto-grain carrier.\n   // The underlying field remains addressable but is visually suppressed until\n   // a finer grain is explicitly requested.\n   ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    projected.current=Object.freeze([])
 
    // Differences already resolved by the continuum are state overlays within
@@ -69,8 +65,7 @@ export function InfinityApp(){
    const projectState=(address:string):ProjectedAddress=>{const p=relativeTo(address,source);return{x:r.width/2+p.x/pixelStep,y:r.height/2-p.y/pixelStep}}
    const stateByAddress=new Map(stateAddresses.map(address=>[address,projectState(address)] as const))
    const edges=causalEdges(continuum.current)
-   drawEdges(ctx,edges,stateByAddress,.22)
-   for(const address of continuum.current.state.is){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}
+   const detail=Math.max(0,Math.min(1,(zoom-1)/7))\n   if(detail>0){drawEdges(ctx,edges,stateByAddress,.22*detail);for(const address of continuum.current.state.is){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
 
    // Avatar and avatar-camera are observations of this same field, not separate
    // bounded models. Their frame may rotate while address relations stay whole.
@@ -78,11 +73,11 @@ export function InfinityApp(){
    const ar=Math.min(r.width,r.height)*.34,ax=r.width/2+Math.cos(avatarPhase.current)*ar,ay=r.height/2+Math.sin(avatarPhase.current)*ar*.42
    putPhysicalPixel(ctx,ax,ay,dpr,false)
    const insetW=Math.max(150,Math.min(300,r.width*.28)),insetH=Math.max(110,Math.min(220,r.height*.28)),ix=r.width-insetW-16,iy=16
-   ctx.save();ctx.beginPath();ctx.rect(ix,iy,insetW,insetH);ctx.clip();ctx.fillStyle="#e5ad56";ctx.fillRect(ix,iy,insetW,insetH)
+   ctx.save();ctx.beginPath();ctx.rect(ix,iy,insetW,insetH);ctx.clip();ctx.fillStyle="#050708";ctx.fillRect(ix,iy,insetW,insetH)
    const turn=avatarPhase.current,ct=Math.cos(turn),st=Math.sin(turn)
    const cameraPoints=new Map<string,ProjectedAddress>()
    for(const address of stateAddresses){const p=relativeTo(address,source),rx=p.x*ct-p.y*st,ry=p.x*st+p.y*ct;cameraPoints.set(address,{x:ix+insetW/2+rx/pixelStep,y:iy+insetH/2-ry/pixelStep})}
-   drawEdges(ctx,edges,cameraPoints,.22)
+   if(detail>0)drawEdges(ctx,edges,cameraPoints,.22*detail)
    ctx.restore();ctx.strokeStyle="rgba(238,234,222,.75)";ctx.lineWidth=1;ctx.strokeRect(ix+.5,iy+.5,insetW-1,insetH-1)
    const resolvedPixelCount=Math.max(1,c.width*c.height)
    setVisible(v=>v===resolvedPixelCount?v:resolvedPixelCount)
