@@ -66,11 +66,15 @@ export function InfinityApp(){
  view.current={zoom,selected,sourceAddress,yaw,pitch,paused,roleState}
  useEffect(()=>{const c=canvas.current;if(!c)return;const output=c.getContext("2d");if(!output)return
   const staging=document.createElement("canvas"),ctx=staging.getContext("2d",{willReadFrequently:true});if(!ctx)return
+  let lastPresented="",lastFrameAt=0
   let disposed=false,timer:ReturnType<typeof setTimeout>|undefined,activeDraw:ReturnType<typeof createAddressedDraw>|undefined
   const draw=(now:number)=>{if(disposed)return
    // One coherent view snapshot finishes before the newest queued view is consumed.
    const {zoom,selected,sourceAddress,yaw,pitch,roleState}=view.current
    const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1,width=Math.max(1,Math.floor(r.width*dpr)),height=Math.max(1,Math.floor(r.height*dpr))
+   const frameIdentity=[width,height,zoom,selected,sourceAddress,yaw,pitch,roleState.step].join("|")
+   if(pendingActs.current===0&&((view.current.paused&&frameIdentity===lastPresented)||(!view.current.paused&&now-lastFrameAt<1000/15))){raf.current=requestAnimationFrame(draw);return}
+   lastFrameAt=now
    staging.width=width;staging.height=height;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    // The canvas is a finite observation window onto an unbounded addressed field.
    // Every physical screen pixel has an address-state relative to one source.
@@ -135,7 +139,7 @@ export function InfinityApp(){
     if(Math.max(1,Math.floor(current.width*(devicePixelRatio||1)))!==width||Math.max(1,Math.floor(current.height*(devicePixelRatio||1)))!==height){job.cancel();raf.current=requestAnimationFrame(draw);return}
     const receipt=job.assign(262144,(index)=>{const offset=index*4;presented.data[offset]=framed.data[offset];presented.data[offset+1]=framed.data[offset+1];presented.data[offset+2]=framed.data[offset+2];presented.data[offset+3]=framed.data[offset+3]})
     if(!receipt.complete){timer=setTimeout(batch,0);return}
-    c.width=width;c.height=height;output.putImageData(presented,0,0)
+    c.width=width;c.height=height;output.putImageData(presented,0,0);lastPresented=frameIdentity
     const requested=pendingActs.current>0,playback=!view.current.paused&&now-last.current>=1000&&WHOLE_INVARIANT.recursive&&FULL_SELF_RESOLUTION.selfSimilar
     if(mayAdvanceAfterDraw(receipt,true)&&(requested||playback)){if(requested)pendingActs.current--;setDrawReceipt(receipt);advance();last.current=now}
     else setDrawReceipt(previous=>previous&&previous.width===width&&previous.height===height?previous:receipt)
