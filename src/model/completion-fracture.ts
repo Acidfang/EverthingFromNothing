@@ -18,6 +18,9 @@ export const LIFE_LOGIC_BINDING = Object.freeze({
   fractureReturnsToContainingWhole: true,
   nextIsAvailableNotEstablishedUntilAct: true,
   receiptReturnsToProducingAddress: true,
+  appliesAtEveryGrain: true,
+  appliesAtEveryNode: true,
+  localWholeAtEveryAddress: true,
 } as const)
 
 export const COMPLETION_RELATION = Object.freeze({
@@ -27,7 +30,7 @@ export const COMPLETION_RELATION = Object.freeze({
   lifeLogic: LIFE_LOGIC_BINDING,
   invariant: "INTENT != QUEUED != EXECUTED != VERIFIED",
   relation: "STATED_ADDRESS -> DIFFERENCE/FRACTURE -> EXISTING_OWNER -> ACT -> RETURNED_EVIDENCE -> RECEIPT_ADDRESS",
-  boundary: "This projection does not create a new Root, collapse WAS into IS, infer recipient feedback, or permanently finish the evolving mechanism.",
+  boundary: "The same complete mechanism is available at every Grain and every Node/address. Each Node is a locally addressable Whole with WAS / IS / available NEXT, Difference/fracture, FILTER / ISOLATE / RECONSTRUCT, act, verification and receipt-return. Recursion changes Grain/address, not the mechanism. This projection does not create a new Root, collapse WAS into IS, infer recipient feedback, or permanently finish the evolving mechanism.",
 } as const)
 
 export type CompletionState = "RETAINED"|"QUEUED"|"EXECUTED"|"VERIFIED"|"BLOCKED"|"UNRESOLVED"
