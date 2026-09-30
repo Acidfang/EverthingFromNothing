@@ -56,7 +56,10 @@ export function InfinityApp(){
    const source=/^-?\\d+,-?\\d+,-?\\d+$/.test(sourceAddress)?sourceAddress:"0,0,0"
    const o=fromKey(source),pixelStep=1/Math.max(.125,zoom),cx=Math.floor(r.width/2),cy=Math.floor(r.height/2)
    const addressForPixel=(x:number,y:number)=>`${o.x+Math.round((x-cx)*pixelStep)},${o.y+Math.round((cy-y)*pixelStep)},${o.z}`
-   // Default grain-out presents the resolved whole, not the proto-grain carrier.\n   // The underlying field remains addressable but is visually suppressed until\n   // a finer grain is explicitly requested.\n   ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
+   // Default grain-out presents the resolved whole, not the proto-grain carrier.
+   // The underlying field remains addressable but is visually suppressed until
+   // a finer grain is explicitly requested.
+   ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    projected.current=Object.freeze([])
 
    // Differences already resolved by the continuum are state overlays within
@@ -65,7 +68,8 @@ export function InfinityApp(){
    const projectState=(address:string):ProjectedAddress=>{const p=relativeTo(address,source);return{x:r.width/2+p.x/pixelStep,y:r.height/2-p.y/pixelStep}}
    const stateByAddress=new Map(stateAddresses.map(address=>[address,projectState(address)] as const))
    const edges=causalEdges(continuum.current)
-   const detail=Math.max(0,Math.min(1,(zoom-1)/7))\n   if(detail>0){drawEdges(ctx,edges,stateByAddress,.22*detail);for(const address of continuum.current.state.is){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
+   const detail=Math.max(0,Math.min(1,(zoom-1)/7))
+   if(detail>0){drawEdges(ctx,edges,stateByAddress,.22*detail);for(const address of continuum.current.state.is){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
 
    // Avatar and avatar-camera are observations of this same field, not separate
    // bounded models. Their frame may rotate while address relations stay whole.
