@@ -16,6 +16,8 @@ const mergeByPixel=(addresses:readonly string[],project:(address:string)=>Readon
  return Object.freeze([...pixels.values()].map(p=>Object.freeze({x:p.x,y:p.y,addresses:Object.freeze(p.addresses)})))
 }
 const putPhysicalPixel=(ctx:CanvasRenderingContext2D,x:number,y:number,dpr:number,selected:boolean)=>{const s=1/dpr;ctx.fillStyle=selected?"#eeeade":"#e5ad56";ctx.fillRect(Math.round(x*dpr)/dpr,Math.round(y*dpr)/dpr,s,s)}
+const relativeTo=(address:string,source:string)=>{const p=fromKey(address),o=fromKey(source);return{x:p.x-o.x,y:p.y-o.y,z:p.z-o.z}}
+const visibleAtGrain=(address:string,source:string,grain:number)=>{const p=relativeTo(address,source);return Math.max(Math.abs(p.x),Math.abs(p.y),Math.abs(p.z))<=grain}
 const causalEdges=(continuum:ReturnType<typeof createLedgerContinuum>):readonly FieldEdge[]=>{
  const latest=continuum.receipts.at(-1)
  if(!latest)return Object.freeze([])
@@ -49,27 +51,47 @@ export function InfinityApp(){
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    if(now-last.current>=1000&&WHOLE_INVARIANT.recursive&&FULL_SELF_RESOLUTION.selfSimilar){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
-   const addresses=Object.freeze([...new Set([...continuum.current.state.was,...continuum.current.state.is])]),coords=addresses.map(fromKey),extent=Math.max(1,...coords.flatMap(p=>[Math.abs(p.x),Math.abs(p.y),Math.abs(p.z)])),scale=Math.max(1,Math.min(r.width,r.height)*.46/extent*zoom)
-   const projectMain=(address:string):ProjectedAddress=>{const p=fromKey(address),cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;return{x:r.width/2+x*scale,y:r.height/2-y*scale}}
+   // One source address re-addresses the whole matrix. WAS/IS remain relations of
+   // the same continuum; they are not independent coordinate roots.
+   const allAddresses=Object.freeze([...new Set([...continuum.current.state.was,...continuum.current.state.is])])
+   const source=allAddresses.includes(sourceAddress)?sourceAddress:"0,0,0"
+   const grain=Math.max(1,Math.ceil(8/zoom))
+   const addresses=Object.freeze(allAddresses.filter(address=>visibleAtGrain(address,source,grain)))
+   const coords=addresses.map(address=>relativeTo(address,source)),extent=Math.max(1,...coords.flatMap(p=>[Math.abs(p.x),Math.abs(p.y),Math.abs(p.z)])),scale=Math.max(1,Math.min(r.width,r.height)*.46/extent*zoom)
+   const rotate=(address:string,turn:number)=>{const p=relativeTo(address,source),cy=Math.cos(turn),sy=Math.sin(turn),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;return{x,y}}
+   const projectMain=(address:string):ProjectedAddress=>{const p=rotate(address,yaw);return{x:r.width/2+p.x*scale,y:r.height/2-p.y*scale}}
    const mainByAddress=new Map(addresses.map(address=>[address,projectMain(address)] as const))
-   const pixels=mergeByPixel([...continuum.current.state.is],projectMain)
+   const visibleIs=[...continuum.current.state.is].filter(address=>visibleAtGrain(address,source,grain))
+   const pixels=mergeByPixel(visibleIs,projectMain)
    projected.current=pixels
-   const edges=causalEdges(continuum.current)
+   const edges=causalEdges(continuum.current).filter(edge=>mainByAddress.has(edge.from)&&mainByAddress.has(edge.to))
    drawEdges(ctx,edges,mainByAddress,.34)
-   // Notodus avatar is another addressed observation of the same continuum,
-   // never a separate geometry/model. It orbits the current visible field.
+
+   // The avatar is an observation address in the same field. Its orbit changes
+   // the observer frame, never the underlying field or adjacency.
    avatarPhase.current=(avatarPhase.current+.006)%(Math.PI*2)
    const ar=Math.min(r.width,r.height)*.34,ax=r.width/2+Math.cos(avatarPhase.current)*ar,ay=r.height/2+Math.sin(avatarPhase.current)*ar*.42
-   const avatarAddresses=addresses
-   const projectAvatar=(address:string):ProjectedAddress=>{const p=fromKey(address),cy=Math.cos(yaw+avatarPhase.current),sy=Math.sin(yaw+avatarPhase.current),cp=Math.cos(pitch),sp=Math.sin(pitch),x=p.x*cy-p.z*sy,z=p.x*sy+p.z*cy,y=p.y*cp-z*sp;const s=Math.max(1,scale*.08);return{x:ax+x*s,y:ay-y*s}}
-   const avatarByAddress=new Map(avatarAddresses.map(address=>[address,projectAvatar(address)] as const))
-   const avatarPixels=mergeByPixel([...continuum.current.state.is],projectAvatar)
+   const projectAvatar=(address:string):ProjectedAddress=>{const p=rotate(address,yaw+avatarPhase.current),s=Math.max(1,scale*.08);return{x:ax+p.x*s,y:ay-p.y*s}}
+   const avatarByAddress=new Map(addresses.map(address=>[address,projectAvatar(address)] as const))
+   const avatarPixels=mergeByPixel(visibleIs,projectAvatar)
    drawEdges(ctx,edges,avatarByAddress,.5)
    for(const pixel of avatarPixels)putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,false)
+
+   // Avatar camera: the locked view from the orbiting observer back into this
+   // same addressed field. Rotation comes only from the avatar's current frame.
+   const insetW=Math.max(150,Math.min(300,r.width*.28)),insetH=Math.max(110,Math.min(220,r.height*.28)),ix=r.width-insetW-16,iy=16
+   ctx.save();ctx.beginPath();ctx.rect(ix,iy,insetW,insetH);ctx.clip();ctx.fillStyle="#050708";ctx.fillRect(ix,iy,insetW,insetH)
+   const cameraScale=Math.max(1,Math.min(insetW,insetH)*.42/extent)
+   const projectCamera=(address:string):ProjectedAddress=>{const p=rotate(address,yaw+avatarPhase.current+Math.PI);return{x:ix+insetW/2+p.x*cameraScale,y:iy+insetH/2-p.y*cameraScale}}
+   const cameraByAddress=new Map(addresses.map(address=>[address,projectCamera(address)] as const))
+   drawEdges(ctx,edges,cameraByAddress,.5)
+   for(const pixel of mergeByPixel(visibleIs,projectCamera))putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,pixel.addresses.includes(source))
+   ctx.restore();ctx.strokeStyle="rgba(229,173,86,.55)";ctx.lineWidth=1;ctx.strokeRect(ix+.5,iy+.5,insetW-1,insetH-1)
+
    setVisible(v=>v===pixels.length?v:pixels.length)
-   for(const pixel of pixels)putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,pixel.addresses.includes(selected)||pixel.addresses.includes(continuum.current.activeAddress))
+   for(const pixel of pixels)putPhysicalPixel(ctx,pixel.x,pixel.y,dpr,pixel.addresses.includes(selected)||pixel.addresses.includes(source))
    raf.current=requestAnimationFrame(draw)
-  };raf.current=requestAnimationFrame(draw);return()=>cancelAnimationFrame(raf.current)},[zoom,yaw,pitch,selected])
+  };raf.current=requestAnimationFrame(draw);return()=>cancelAnimationFrame(raf.current)},[zoom,yaw,pitch,selected,sourceAddress])
  return <main className="infinity-map"><section className="infinity-field" aria-label="Ledger-driven fracture field"><canvas ref={canvas} className="infinity-canvas"
   onWheel={e=>{e.preventDefault();setZoom(z=>Math.max(.125,Math.min(64,z*Math.exp(-e.deltaY*.0015))))}}
   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPointer.current={x:e.clientX,y:e.clientY};const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top;let best:PixelReference|undefined,dist=Infinity;for(const pixel of projected.current){const d=(pixel.x-x)**2+(pixel.y-y)**2;if(d<dist){dist=d;best=pixel}}if(best&&dist<=144)setSelected(best.addresses[0])}}
