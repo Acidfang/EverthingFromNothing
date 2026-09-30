@@ -1,8 +1,9 @@
-import { useEffect,useRef,useState } from "react"
-import { advanceLedgerContinuum,createLedgerContinuum } from "./model/kernel"
+import { useEffect,useMemo,useRef,useState } from "react"
+import { advanceLedgerContinuum,createLedgerContinuum,resolveTick } from "./model/kernel"
 import { fromKey } from "./model/address"
 import { BINARY_MODEL,EVERYTHING_METHOD,FULL_SELF_RESOLUTION,WHOLE_INVARIANT,resolveResponse } from "./model/binaryRelationships"
-import { THREE_TETRAHEDRON_DRAWING } from "./model/three-tetrahedron-drawing"
+import { constrainedNodes,directedTetra } from "./model/constrained-node"
+import { MODEL_DIRECTIONS,projectInDirection } from "./model/directional-view"
 import { COMMUNICATION_INVARIANT,communicate } from "./model/communication"
 import { createAddressedDraw,mayAdvanceAfterDraw,type DrawReceipt } from "./model/addressed-draw"
 import { FieldAddressOverlay } from "./FieldAddressOverlay"
@@ -38,6 +39,7 @@ const drawEdges=(ctx:CanvasRenderingContext2D,edges:readonly FieldEdge[],points:
 }
 
 export function InfinityApp(){
+ const [direction,setDirection]=useState(0),[fieldRole,setFieldRole]=useState<"WAS"|"IS"|"NEXT">("IS"),[traversalReceipt,setTraversalReceipt]=useState("IS · initial addressed field")
  const [inspecting,setInspecting]=useState(false),[paused,setPaused]=useState(true),[act,setAct]=useState(0),[roleState,setRoleState]=useState(INITIAL_SYSTEM_STATE)
  const [drawReceipt,setDrawReceipt]=useState<DrawReceipt|null>(null)
  const pendingActs=useRef(0)
@@ -57,22 +59,25 @@ export function InfinityApp(){
  const startListening=()=>{const Ctor=(window as any).SpeechRecognition||(window as any).webkitSpeechRecognition;if(!Ctor){setMediaError("Speech recognition is unavailable in this browser");drive("VOICE","LISTEN","UNAVAILABLE",()=>{});return}speechRecognition.current?.stop?.();const recognition=new Ctor();speechRecognition.current=recognition;recognition.continuous=true;recognition.interimResults=true;recognition.onresult=(event:any)=>{let value="";let finalValue="";for(let i=event.resultIndex;i<event.results.length;i++){const part=event.results[i][0].transcript;value+=part;if(event.results[i].isFinal)finalValue+=part}setHeard(value);if(finalValue.trim())drive("VOICE","HEARD",finalValue.trim(),()=>{const moment=controlReceipts.length;const address=`HUMAN/${moment}`;setSourceAddress(address);setSourceMoment(moment);const interaction=communicate({id:`VOICE/${moment}`,source:{participant:"HUMAN",address,was:`HUMAN/${Math.max(0,moment-1)}`,is:address,next:`HUMAN/${moment+1}`},destination:{participant:"EI_AGENT",address:`EI_AGENT/${moment}`,was:`EI_AGENT/${Math.max(0,moment-1)}`,is:`EI_AGENT/${moment}`,next:`EI_AGENT/${moment+1}`},channel:"VOICE",expression:finalValue.trim()});setTranscript(items=>[...items,`HUMAN → EI_AGENT: ${interaction.expression} · ${interaction.receipt}`]);const resolved=resolveResponse({source:interaction.expression,sourceAddress:address,sourceMoment:moment,currentAddress:address,currentMoment:moment});setGuidance(resolved.action);setNextReply(resolved.reply)})};recognition.onend=()=>setListening(false);recognition.onerror=(event:any)=>{setListening(false);setMediaError(String(event.error??"Speech recognition error"))};recognition.start();drive("VOICE","LISTEN","START",()=>setListening(true))}
  const stopListening=()=>{speechRecognition.current?.stop?.();speechRecognition.current=null;drive("VOICE","LISTEN","STOP",()=>setListening(false))}
  const naturalLive=()=>{if(live){stopListening();stopCapture();if("speechSynthesis" in window)window.speechSynthesis.cancel();drive("UI_CONTROL","LIVE_SESSION","END",()=>setLive(false));return}drive("UI_CONTROL","LIVE_SESSION","START",()=>setLive(true));startListening()}
- const [guidance,setGuidance]=useState("SOURCE"),[reply,setReply]=useState(""),[nextReply,setNextReply]=useState<string|null>(null),[sourceAddress,setSourceAddress]=useState("HUMAN/0"),[sourceMoment,setSourceMoment]=useState(0),[intentCenter,setIntentCenter]=useState("0,0,0"),[menu,setMenu]=useState<{x:number;y:number;address:string}|null>(null),[zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
+ const [guidance,setGuidance]=useState("SOURCE"),[reply,setReply]=useState(""),[nextReply,setNextReply]=useState<string|null>(null),[sourceAddress,setSourceAddress]=useState("HUMAN/0"),[sourceMoment,setSourceMoment]=useState(0),[intentCenter,setIntentCenter]=useState("0,0,0"),[menu,setMenu]=useState<{x:number;y:number;address:string}|null>(null),[zoom,setZoom]=useState(16),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
  const advance=()=>{continuum.current=advanceLedgerContinuum(continuum.current);setAct(continuum.current.state.act);setRoleState(state=>transition(state).after)}
  const requestAdvance=()=>{pendingActs.current+=1;setPaused(true)}
  const selectAddress=(address:string)=>{setSelected(address);setSourceAddress(address);setIntentCenter(address)}
  const closeInspector=()=>{setInspecting(false);inspectButton.current?.focus()}
- const view=useRef({zoom,selected,sourceAddress,yaw,pitch,paused,roleState})
- view.current={zoom,selected,sourceAddress,yaw,pitch,paused,roleState}
+ const calculated=useMemo(()=>resolveTick(continuum.current.state),[act])
+ const following=useMemo(()=>resolveTick(calculated.state),[calculated])
+ const traverse=(role:"WAS"|"IS"|"NEXT")=>{setTraversalReceipt(`${fieldRole} → ${role} @ ${selected} · Act ${act} · ${role==="NEXT"?"calculated, not committed":"retained state"}`);setFieldRole(role)}
+ const view=useRef({zoom,selected,sourceAddress,yaw,pitch,paused,roleState,direction,fieldRole,calculated,following})
+ view.current={zoom,selected,sourceAddress,yaw,pitch,paused,roleState,direction,fieldRole,calculated,following}
  useEffect(()=>{const c=canvas.current;if(!c)return;const output=c.getContext("2d");if(!output)return
   const staging=document.createElement("canvas"),ctx=staging.getContext("2d",{willReadFrequently:true});if(!ctx)return
   let lastPresented="",lastFrameAt=0
   let disposed=false,timer:ReturnType<typeof setTimeout>|undefined,activeDraw:ReturnType<typeof createAddressedDraw>|undefined
   const draw=(now:number)=>{if(disposed)return
    // One coherent view snapshot finishes before the newest queued view is consumed.
-   const {zoom,selected,sourceAddress,yaw,pitch,roleState}=view.current
+   const {zoom,selected,sourceAddress,yaw,pitch,roleState,direction,fieldRole,calculated,following}=view.current
    const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1,width=Math.max(1,Math.floor(r.width*dpr)),height=Math.max(1,Math.floor(r.height*dpr))
-   const frameIdentity=[width,height,zoom,selected,sourceAddress,yaw,pitch,roleState.step].join("|")
+   const frameIdentity=[width,height,zoom,selected,sourceAddress,yaw,pitch,direction,fieldRole,roleState.step].join("|")
    if(pendingActs.current===0&&((view.current.paused&&frameIdentity===lastPresented)||(!view.current.paused&&now-lastFrameAt<1000/15))){raf.current=requestAnimationFrame(draw);return}
    lastFrameAt=now
    staging.width=width;staging.height=height;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
@@ -82,38 +87,36 @@ export function InfinityApp(){
    const o=fromKey(source),pixelStep=1/Math.max(.125,zoom),cx=Math.floor(r.width/2),cy=Math.floor(r.height/2)
    const addressForPixel=(x:number,y:number)=>`${o.x+Math.round((x-cx)*pixelStep)},${o.y+Math.round((cy-y)*pixelStep)},${o.z}`
    // Default grain-out presents the resolved whole, not the proto-grain carrier.\n   // The underlying field remains addressable but is visually suppressed until\n   // a finer grain is explicitly requested.\n   ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
-   projected.current=Object.freeze([])
 
    // Differences already resolved by the continuum are state overlays within
    // the field; they do not define or bound the field itself.
-   const stateAddresses=Object.freeze([...new Set([...continuum.current.state.was,...continuum.current.state.is])])
-   const projectState=(address:string):ProjectedAddress=>{const p=relativeTo(address,source);return{x:r.width/2+p.x/pixelStep,y:r.height/2-p.y/pixelStep}}
+   const activeField=fieldRole==="WAS"?continuum.current.state.was:fieldRole==="NEXT"?calculated.state.is:continuum.current.state.is
+   const stateAddresses=Object.freeze([...activeField])
+   const projectPoint=(p:Readonly<{x:number;y:number;z:number}>):ProjectedAddress=>{const ca=Math.cos(yaw),sa=Math.sin(yaw),cb=Math.cos(pitch),sb=Math.sin(pitch),rx=p.x*ca-p.z*sa,rz=p.x*sa+p.z*ca,q=projectInDirection({x:rx,y:p.y*cb-rz*sb,z:p.y*sb+rz*cb},direction);return{x:r.width/2+q.x/pixelStep,y:r.height/2-q.y/pixelStep}}
+   const projectState=(address:string)=>projectPoint(relativeTo(address,source))
    const stateByAddress=new Map(stateAddresses.map(address=>[address,projectState(address)] as const))
-   const edges=causalEdges(continuum.current)
-   const detail=Math.max(0,Math.min(1,(zoom-1)/7))
-   if(detail>0){drawEdges(ctx,edges,stateByAddress,.22*detail);for(const address of continuum.current.state.is){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
+   const frameProjected=mergeByPixel(stateAddresses,projectState)
+   const ledger=fieldRole==="NEXT"?calculated.ledger:fieldRole==="WAS"?continuum.current.receipts.at(-2):continuum.current.receipts.at(-1)
+   const edges:readonly FieldEdge[]=ledger?.entries.flatMap(entry=>entry.arrivals.map(arrival=>({from:arrival.source,to:entry.address})))??[]
+   const edgeByAddress=new Map([...new Set(edges.flatMap(edge=>[edge.from,edge.to]))].map(address=>[address,projectState(address)] as const))
+   const detail=Math.max(.35,Math.min(1,zoom/8))
+   if(detail>0){drawEdges(ctx,edges,edgeByAddress,.22*detail);for(const address of activeField){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
 
-   // Canonical three-tetrahedron presentation: one shared ZERO, no spatial separation.
-   // The three complete tetrahedra occupy the same geometry; cyclic WAS/IS/NEXT
-   // order is the Difference carried by each presentation.
-   const centre={x:r.width/2,y:r.height/2},scale=Math.min(r.width,r.height)*.18
-   const projectVertex=(p:Readonly<{x:number;y:number;z:number}>)=>{
-    const a=yaw,b=pitch,ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b)
-    const x=p.x*ca-p.z*sa,z=p.x*sa+p.z*ca,y=p.y*cb-z*sb
-    return{x:centre.x+x*scale,y:centre.y-y*scale}
+   const successor=fieldRole==="WAS"?continuum.current.receipts.at(-1):fieldRole==="IS"?calculated.ledger:following.ledger
+   const constraints=successor?constrainedNodes(activeField,successor):[]
+   ctx.save();ctx.lineWidth=.7
+   for(const node of constraints){const anchor=relativeTo(node.address,source),q=projectPoint(anchor)
+    if(!node.next.length){ctx.strokeStyle="#929c9f";ctx.strokeRect(q.x-2,q.y-2,4,4);continue}
+    ctx.strokeStyle=node.next.length===1?"#e5ad56":"rgba(229,173,86,.48)";ctx.setLineDash(node.next.length>1?[2,2]:[])
+    for(const candidate of node.next){const tetra=directedTetra(candidate.delta);if(!tetra)continue;const points=tetra.map(p=>projectPoint({x:anchor.x+p.x,y:anchor.y+p.y,z:anchor.z+p.z}));for(const [a,b] of [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]){ctx.beginPath();ctx.moveTo(points[a].x,points[a].y);ctx.lineTo(points[b].x,points[b].y);ctx.stroke()}}
    }
-   const edges4=[[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]] as const
-   ctx.save();ctx.lineWidth=1
-   THREE_TETRAHEDRON_DRAWING.presentations.forEach((tetra,i)=>{
-    const pts=tetra.vertices.map(p=>projectVertex(p))
-    ctx.strokeStyle=["rgba(229,173,86,.92)","rgba(238,234,222,.72)","rgba(229,173,86,.48)"][i]
-    for(const [a,b] of edges4){ctx.beginPath();ctx.moveTo(pts[a].x,pts[a].y);ctx.lineTo(pts[b].x,pts[b].y);ctx.stroke()}
-   })
-   // Fixed geometry, source-defined role handoff. No invented spatial twist.
-   const roles=[roleState.temporal.was,roleState.temporal.is,roleState.temporal.next,"PROGRESSION"]
-   THREE_TETRAHEDRON_DRAWING.vertices.forEach((vertex,index)=>{const point=projectVertex(vertex);ctx.fillStyle=roles[index]==="IS"?"#eeeade":"#e5ad56";ctx.fillRect(point.x-2,point.y-2,4,4);ctx.font="11px monospace";ctx.textAlign="center";ctx.fillText(roles[index],point.x,point.y-10)})
-   ctx.fillStyle="#eeeade";ctx.beginPath();ctx.arc(centre.x,centre.y,2.5,0,Math.PI*2);ctx.fill()
-   ctx.font="11px sans-serif";ctx.textAlign="center";ctx.fillText("ZERO · 3 TETRAHEDRA · WAS / IS / NEXT",centre.x,centre.y+scale*1.8);ctx.font="9px monospace";ctx.fillText("SELECTED slot-to-vertex view · exact twist open",centre.x,centre.y+scale*1.8+16)
+   ctx.restore()
+   // Source points are modelling directions, not a solid to showcase.
+   // The selected direction basis above projects every live address and edge.
+   const centre={x:r.width/2,y:r.height/2},vector=MODEL_DIRECTIONS[direction]
+   ctx.save();ctx.fillStyle="#eeeade";ctx.fillRect(centre.x-1,centre.y-1,2,2)
+   ctx.font="11px monospace";ctx.textAlign="center";ctx.fillText(`ZERO · ${fieldRole} · OBSERVER ${direction+1} (${vector.x},${vector.y},${vector.z})`,centre.x,centre.y+30)
+   ctx.font="9px monospace";ctx.fillText("Per-node tips: admitted next · dashed: alternatives · glyph roll selected",centre.x,centre.y+46)
    ctx.restore()
 
    // Avatar and avatar-camera are observations of this same field, not separate
@@ -139,7 +142,7 @@ export function InfinityApp(){
     if(Math.max(1,Math.floor(current.width*(devicePixelRatio||1)))!==width||Math.max(1,Math.floor(current.height*(devicePixelRatio||1)))!==height){job.cancel();raf.current=requestAnimationFrame(draw);return}
     const receipt=job.assign(262144,(index)=>{const offset=index*4;presented.data[offset]=framed.data[offset];presented.data[offset+1]=framed.data[offset+1];presented.data[offset+2]=framed.data[offset+2];presented.data[offset+3]=framed.data[offset+3]})
     if(!receipt.complete){timer=setTimeout(batch,0);return}
-    c.width=width;c.height=height;output.putImageData(presented,0,0);lastPresented=frameIdentity
+    c.width=width;c.height=height;output.putImageData(presented,0,0);projected.current=frameProjected;lastPresented=frameIdentity
     const requested=pendingActs.current>0,playback=!view.current.paused&&now-last.current>=1000&&WHOLE_INVARIANT.recursive&&FULL_SELF_RESOLUTION.selfSimilar
     if(mayAdvanceAfterDraw(receipt,true)&&(requested||playback)){if(requested)pendingActs.current--;setDrawReceipt(receipt);advance();last.current=now}
     else setDrawReceipt(previous=>previous&&previous.width===width&&previous.height===height?previous:receipt)
@@ -147,15 +150,15 @@ export function InfinityApp(){
    };batch()
   };raf.current=requestAnimationFrame(draw);return()=>{disposed=true;activeDraw?.cancel();if(timer!==undefined)clearTimeout(timer);cancelAnimationFrame(raf.current)}},[])
  return <main className="infinity-map"><section className="infinity-field" aria-label="Ledger-driven fracture field">
-  <div className="field-tools"><button ref={inspectButton} type="button" aria-expanded={inspecting} onClick={()=>setInspecting(value=>!value)}>Inspect addresses</button><button type="button" onClick={()=>setPaused(value=>!value)}>{paused?"Play shared Act":"Pause playback"}</button><button type="button" onClick={requestAdvance}>Advance one Act</button><button type="button" onClick={()=>{setYaw(-.65);setPitch(.45)}}>Reset view</button><button type="button" onClick={()=>setYaw(value=>value+.15)}>Turn view left</button><button type="button" onClick={()=>setPitch(value=>Math.min(Math.PI/2,value+.15))}>Tilt view up</button></div>
-  {inspecting?<FieldAddressOverlay selected={selected} onSelect={selectAddress} continuum={continuum.current} paused={paused} onPause={()=>setPaused(value=>!value)} onStep={requestAdvance} onClose={closeInspector}/>:null}
-  <div className="field-view-status" aria-live="polite">Act {act} · {paused?"paused":"playback"} · slots {roleState.temporal.was} / {roleState.temporal.is} / {roleState.temporal.next} · view {yaw.toFixed(2)} / {pitch.toFixed(2)} · Exact twist transform unresolved · {drawReceipt?`${drawReceipt.assigned}/${drawReceipt.width*drawReceipt.height} pixels completed before TIME`:"framing before TIME"}</div>
+  <div className="field-tools"><label>Model relation <select aria-label="Model relation" value={fieldRole} onChange={e=>traverse(e.target.value as "WAS"|"IS"|"NEXT")}><option>WAS</option><option>IS</option><option>NEXT</option></select></label><label>Observer projection <select aria-label="Observer projection" value={direction} onChange={e=>{setDirection(Number(e.target.value));drive("UI_CONTROL","OBSERVER_DIRECTION",e.target.value,()=>{})}}>{MODEL_DIRECTIONS.map((v,i)=><option key={i} value={i}>{i+1}: {v.x},{v.y},{v.z}</option>)}</select></label><button ref={inspectButton} type="button" aria-expanded={inspecting} onClick={()=>setInspecting(value=>!value)}>Inspect addresses</button><button type="button" onClick={()=>setPaused(value=>!value)}>{paused?"Play shared Act":"Pause playback"}</button><button type="button" onClick={requestAdvance}>Advance one Act</button><button type="button" onClick={()=>{setYaw(-.65);setPitch(.45)}}>Reset view</button><button type="button" onClick={()=>setYaw(value=>value+.15)}>Turn view left</button><button type="button" onClick={()=>setZoom(z=>Math.min(64,z*2))}>Grain in</button><button type="button" onClick={()=>setZoom(z=>Math.max(.125,z/2))}>Grain out</button><button type="button" onClick={()=>setPitch(value=>Math.min(Math.PI/2,value+.15))}>Tilt view up</button></div>
+  {inspecting?<FieldAddressOverlay fieldRole={fieldRole} selected={selected} onSelect={selectAddress} onFollowNext={address=>{setTraversalReceipt(`${fieldRole} @ ${selected} → ${fieldRole==="WAS"?"IS":"proposed NEXT"} @ ${address} · Act ${act} · navigation only`);selectAddress(address);setFieldRole(fieldRole==="WAS"?"IS":"NEXT")}} continuum={continuum.current} paused={paused} onPause={()=>setPaused(value=>!value)} onStep={requestAdvance} onClose={closeInspector}/>:null}
+  <div className="field-view-status" aria-live="polite">Act {act} · {paused?"paused":"playback"} · slots {roleState.temporal.was} / {roleState.temporal.is} / {roleState.temporal.next} · view {yaw.toFixed(2)} / {pitch.toFixed(2)} · {traversalReceipt} · observer {direction+1} · SELECTED observer basis; six-face rule unchanged · Exact twist transform unresolved · {drawReceipt?`${drawReceipt.assigned}/${drawReceipt.width*drawReceipt.height} pixels completed before TIME`:"framing before TIME"}</div>
   <canvas ref={canvas} className="infinity-canvas"
   onWheel={e=>{e.preventDefault();setZoom(z=>Math.max(.125,Math.min(64,z*Math.exp(-e.deltaY*.0015))))}}
-  onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPointer.current={x:e.clientX,y:e.clientY};const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(validSpatialAddress(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),address=`${o.x+Math.round((x-box.width/2)*step)},${o.y+Math.round((box.height/2-y)*step)},${o.z}`;setSelected(address)}}
+  onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPointer.current={x:e.clientX,y:e.clientY};const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(validSpatialAddress(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),hit=projected.current.reduce<PixelReference|null>((best,p)=>Math.hypot(p.x-x,p.y-y)<12&&(!best||Math.hypot(p.x-x,p.y-y)<Math.hypot(best.x-x,best.y-y))?p:best,null),address=hit?.addresses[0]??selected;setSelected(address)}}
   onPointerMove={e=>{if(!pointers.current.has(e.pointerId))return;const prior=pointers.current.get(e.pointerId)!;pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===2){const pts=[...pointers.current.values()],before=pts.map(p=>({...p}));const movedIndex=[...pointers.current.keys()].indexOf(e.pointerId);before[movedIndex]=prior;const d=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),od=Math.hypot(before[0].x-before[1].x,before[0].y-before[1].y);if(od>0)setZoom(z=>Math.max(.125,Math.min(64,z*d/od)));return}if(!lastPointer.current)return;const dx=e.clientX-lastPointer.current.x,dy=e.clientY-lastPointer.current.y;lastPointer.current={x:e.clientX,y:e.clientY};setYaw(v=>v+dx*.008);setPitch(v=>Math.max(-Math.PI/2,Math.min(Math.PI/2,v+dy*.008)))}}
   onPointerUp={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}} onPointerCancel={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}}
-  onContextMenu={e=>{e.preventDefault();const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(validSpatialAddress(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),address=`${o.x+Math.round((x-box.width/2)*step)},${o.y+Math.round((box.height/2-y)*step)},${o.z}`;setSelected(address);setIntentCenter(address);setSourceAddress(address);setGuidance("SOURCE");drive("UI_CONTROL","CENTER_OF_INTENT",address,()=>{});setMenu({x,y,address})}}
+  onContextMenu={e=>{e.preventDefault();const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(validSpatialAddress(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),hit=projected.current.reduce<PixelReference|null>((best,p)=>Math.hypot(p.x-x,p.y-y)<12&&(!best||Math.hypot(p.x-x,p.y-y)<Math.hypot(best.x-x,best.y-y))?p:best,null),address=hit?.addresses[0]??selected;setSelected(address);setIntentCenter(address);setSourceAddress(address);setGuidance("SOURCE");drive("UI_CONTROL","CENTER_OF_INTENT",address,()=>{});setMenu({x,y,address})}}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
   {menu?<div className="map-context-menu" style={{position:"absolute",left:menu.x,top:menu.y,zIndex:5}} onPointerLeave={()=>setMenu(null)}>
    <button type="button" onClick={()=>{setSelected(menu.address);setMenu(null)}}>SET ZERO HERE</button>

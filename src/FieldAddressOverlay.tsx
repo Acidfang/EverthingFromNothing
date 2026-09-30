@@ -8,15 +8,18 @@ const graph=inventory.binary_relation_order
 const nodes=new Map(graph.nodes.map(node=>[node.id,node]))
 const entries=new Map(inventory.entries.map(entry=>[entry.id,entry]))
 const refinementIds=["can-be","can-next","cant-next"]
-type Props=Readonly<{selected:string;onSelect:(address:string)=>void;continuum:LedgerContinuum;paused:boolean;onPause:()=>void;onStep:()=>void;onClose:()=>void}>
+type Props=Readonly<{fieldRole:"WAS"|"IS"|"NEXT";selected:string;onSelect:(address:string)=>void;onFollowNext:(address:string)=>void;continuum:LedgerContinuum;paused:boolean;onPause:()=>void;onStep:()=>void;onClose:()=>void}>
 
-export function FieldAddressOverlay({selected,onSelect,continuum,paused,onPause,onStep,onClose}:Props){
+export function FieldAddressOverlay({fieldRole,selected,onSelect,onFollowNext,continuum,paused,onPause,onStep,onClose}:Props){
  const [query,setQuery]=useState(""),[route,setRoute]=useState({ids:["nothing"],index:0}),[role,setRole]=useState<"WAS"|"IS"|"NEXT">("IS"),[coordinate,setCoordinate]=useState(selected),[error,setError]=useState("")
  const search=useRef<HTMLInputElement>(null)
  const id=route.ids[route.index],node=nodes.get(id)!,entry=entries.get(id)
  const matched=searchInventory(graph.nodes,query),relations=relationsAt(graph.relations,id)
  const preview=useMemo(()=>resolveTick(continuum.state),[continuum])
  const receipt=continuum.receipts.at(-1)?.entries.find(item=>item.address===selected)
+ const following=useMemo(()=>resolveTick(preview.state),[preview])
+ const successor=fieldRole==="WAS"?continuum.receipts.at(-1):fieldRole==="IS"?preview.ledger:following.ledger
+ const allowedNext=(successor?.entries??[]).filter(item=>item.remainsDifferent&&item.arrivals.some(arrival=>arrival.source===selected))
  const nextReceipt=preview.ledger.entries.find(item=>item.address===selected)
  const go=(target:string)=>{if(!nodes.has(target)||target===id)return;setRoute(current=>({ids:[...current.ids.slice(0,current.index+1),target],index:current.index+1}));setRole("IS")}
  useEffect(()=>{search.current?.focus()},[])
@@ -30,6 +33,7 @@ export function FieldAddressOverlay({selected,onSelect,continuum,paused,onPause,
    <div className="address-actions"><button type="button" onClick={onPause}>{paused?"Resume shared Act":"Pause shared Act"}</button><button type="button" onClick={onStep}>Advance one Act</button><span>Act {continuum.state.act}</span></div>
    <dl className="address-frame"><div><dt>WAS</dt><dd>{continuum.state.was.has(selected)?"DIFFERENT":"SAME"}</dd></div><div><dt>IS</dt><dd>{continuum.state.is.has(selected)?"DIFFERENT":"SAME"}</dd></div><div><dt>NEXT · calculated</dt><dd>{preview.state.is.has(selected)?"DIFFERENT":"SAME"}</dd></div></dl>
    <p>SELECTED six-face parity model · NEXT is a preview until the shared Act advances. Address navigation does not advance time.</p>
+   <details><summary>Allowed NEXT directions</summary><p>From displayed {fieldRole}. {allowedNext.length} surviving successor addresses in the selected kernel. Multiple candidates remain alternatives; inspecting one does not commit it or exclude the others.</p>{allowedNext.map(item=><button type="button" key={item.address} disabled={fieldRole==="NEXT"} onClick={()=>onFollowNext(item.address)}>{fieldRole==="WAS"?"Inspect IS":"Inspect proposed"} {item.address}</button>)}{fieldRole==="NEXT"?<p>These are calculated beyond the displayed NEXT frame; they are not committed or traversed as current state.</p>:null}{allowedNext.length===0?<p>No admissible successor returned for this source at this Act.</p>:null}</details>
    <details><summary>Returned evidence and source arrivals</summary>
     <p>{receipt?`Receipt ${continuum.state.act-1} → ${continuum.state.act}: ${receipt.arrivalCount} arrivals · ${receipt.result}`:"No returned receipt at this address in the latest Act. SAME is absence of a represented Difference in this selected model."}</p>
     {receipt?.arrivals.map(arrival=><button type="button" key={arrival.source+arrival.face} onClick={()=>onSelect(arrival.source)}>SOURCE {arrival.source} · face {arrival.face}</button>)}
@@ -57,6 +61,8 @@ export function FieldAddressOverlay({selected,onSelect,continuum,paused,onPause,
   </section>
   <details><summary>Four unresolved geometry gaps</summary><ul>{OPEN_DIFFERENCES.map(gap=><li key={gap}>{gap}</li>)}</ul><p>Source declares twist, rotate and turn. Exact spatial twist remains unspecified; camera orientation is a viewing operation.</p></details>
   <details><summary>Retained source symbols · {inventory.retained_binary_relations.length}</summary>{inventory.retained_binary_relations.map(symbol=><p key={symbol}>{symbol}</p>)}</details>
+  <p><a href="./private-vault.html" target="_blank" rel="noreferrer">Open private local encrypted vault</a> · empty until you add data; passphrase protection, not account identity</p>
+  <p><a href="./dca-atom-modeler.html" target="_blank" rel="noreferrer">Open separate DCA spiral modeler</a></p>
   <footer>Selection and search stay in this page’s memory. No private address data is loaded or sent. Source-stated and derived claims remain scoped; runtime identity is unverified.</footer>
  </aside>
 }

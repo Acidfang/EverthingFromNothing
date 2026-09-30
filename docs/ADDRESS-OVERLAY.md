@@ -35,11 +35,17 @@ finite pixel once, incomplete/cancelled gates and replacement completion.
 ## Turn and twist boundary
 
 View dragging now reads the latest yaw/pitch rather than a stale effect closure.
-All three tetrahedron presentations share geometry; arbitrary per-presentation
-120-degree spatial offsets were removed. The fixed nodes show the declared
-NEXT→IS, IS→WAS, WAS→NEXT role handoff after an Act. This discrete handoff is not
-an implementation of an exact spatial twist or the full sequential-follow node
-trajectory. Fracture cardinality, absolute coordinate basis, exact twist transform
+The tetrahedron-solid showcase and arbitrary per-presentation 120-degree
+spatial offsets were removed. Model-relation selection constructs the visible
+field from retained WAS, current IS or calculated NEXT sets and their actual
+arrival records; it returns a traversal receipt without advancing the Act.
+A separate SELECTED observer projection uses each retained source direction
+vector as its view normal. That changes every projected point and edge but does
+not establish a four-direction transition law. The logical NEXT→IS, IS→WAS,
+WAS→NEXT handoff remains distinct from spatial twist. No particular geometric
+vertex is asserted to be a temporal role. The six-face kernel and canonical
+four-direction modelling relation remain unreconciled; full sequential-follow
+node trajectory and exact spatial twist remain open. Fracture cardinality, absolute coordinate basis, exact twist transform
 and projection geometry remain explicitly unresolved.
 
 ## Privacy boundary
@@ -48,3 +54,15 @@ The main public overlay imports only committed technical inventory. Search and
 selection are in-memory. There is no authenticated owner backend and a field
 address is not an access-control credential. Do not add private user content to
 source, build assets, URL parameters, screenshots or test fixtures.
+
+## Constrained little nodes
+
+The current user correction models each node as a little tetrahedron at its
+allowed address, pointing where it is allowed to go. The adapter derives each
+anchor from the live selected kernel address and each tip displacement from an
+actual successor ledger entry that remains DIFFERENT and retains that source
+arrival. Multiple survivors are dashed alternative glyphs, not a chosen fact.
+Zero/no admitted displacement has no invented tip. The inspector can follow
+each proposed successor without committing it. Glyph size and axial roll are
+SELECTED visual conventions; exact twist and the canonical direction-to-kernel
+reconciliation remain open. Nothing uses hash/random orientations.
