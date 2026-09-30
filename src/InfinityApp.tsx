@@ -67,7 +67,8 @@ export function InfinityApp(){
    const projectState=(address:string):ProjectedAddress=>{const p=relativeTo(address,source);return{x:r.width/2+p.x/pixelStep,y:r.height/2-p.y/pixelStep}}
    const stateByAddress=new Map(stateAddresses.map(address=>[address,projectState(address)] as const))
    const edges=causalEdges(continuum.current)
-   const detail=Math.max(0,Math.min(1,(zoom-1)/7))\n   if(detail>0){drawEdges(ctx,edges,stateByAddress,.22*detail);for(const address of continuum.current.state.is){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
+   const detail=Math.max(0,Math.min(1,(zoom-1)/7))
+   if(detail>0){drawEdges(ctx,edges,stateByAddress,.22*detail);for(const address of continuum.current.state.is){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
 
    // Canonical three-tetrahedron presentation: one shared ZERO, no spatial separation.
    // The three complete tetrahedra occupy the same geometry; cyclic WAS/IS/NEXT
