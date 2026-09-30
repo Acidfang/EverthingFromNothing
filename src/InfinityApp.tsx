@@ -113,8 +113,8 @@ export function InfinityApp(){
      <label>EQUIPMENT<input value={fixIntake.equipment} onChange={e=>setFix("equipment",e.target.value)} /></label><label>COST / BUDGET<input value={fixIntake.cost} onChange={e=>setFix("cost",e.target.value)} /></label>
     </div>
     <label>SELECTED HELP<input value={fixIntake.help} onChange={e=>setFix("help",e.target.value)} placeholder="Only the work you want help with." /></label>
-    <section className="fix-result"><small>WHAT YOU CAN DO</small><strong>{fixProjection.canDo}</strong><p>Guidance: {fixProjection.guidancePrice} · Requested work: {fixProjection.requestedWorkPrice}</p></section>
-   </div>:<div className="fix-array"><p>Same intake, same address, array projection.</p><ol>{MR_FIX_IT_FLOW.map((step,index)=><li key={step}><span>{String(index+1).padStart(2,"0")}</span><strong>{step}</strong><small>{index===0?fixProjection.intake.intent||"OPEN":index===7?fixProjection.canDo:index===8?fixProjection.selectedHelp:fixProjection.intake[step.toLowerCase() as keyof typeof fixProjection.intake]||"OPEN"}</small></li>)}</ol></div>}
+    <section className="fix-result"><small>REPORTED ABILITY · NOT YET ASSESSED</small><strong>{fixProjection.reportedAbility}</strong><p>Guidance: {fixProjection.guidancePrice} · Budget supplied: {fixProjection.statedBudget} · Requested-work price: {fixProjection.requestedWorkPrice}</p></section>
+   </div>:<div className="fix-array"><p>Same intake, same address, array projection. Assessment and pricing remain unresolved.</p><ol>{MR_FIX_IT_FLOW.map((step,index)=><li key={step}><span>{String(index+1).padStart(2,"0")}</span><strong>{step}</strong><small>{index===0?fixProjection.intake.intent||"OPEN":index===7?fixProjection.reportedAbility:index===8?fixProjection.selectedHelp:fixProjection.intake[step.toLowerCase() as keyof typeof fixProjection.intake]||"OPEN"}</small></li>)}</ol></div>}
   </aside>:null}
   {menu?<div className="map-context-menu" style={{position:"absolute",left:menu.x,top:menu.y,zIndex:5}} onPointerLeave={()=>setMenu(null)}>
    <button type="button" onClick={()=>{setSelected(menu.address);setMenu(null)}}>SET ZERO HERE</button>

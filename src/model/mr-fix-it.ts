@@ -31,19 +31,20 @@ export function fixAddress(intake: FixIntake): string {
 }
 
 export function deriveFixProjection(intake: FixIntake) {
-  const canDo = clean(intake.ability)
-    ? `You can do: ${clean(intake.ability)}`
-    : "What you can safely do remains open."
+  const reportedAbility = clean(intake.ability)
+    ? `You said you can: ${clean(intake.ability)}`
+    : "Your ability has not been established."
   const selectedHelp = clean(intake.help)
     ? clean(intake.help)
     : "No paid work selected. Guidance remains free."
   return Object.freeze({
     address: fixAddress(intake),
     intake: Object.freeze({ ...intake }),
-    canDo,
+    reportedAbility,
     selectedHelp,
     guidancePrice: "FREE" as const,
-    requestedWorkPrice: clean(intake.cost) || "QUOTE ONLY AFTER REQUEST" as const,
+    statedBudget: clean(intake.cost) || "NOT PROVIDED",
+    requestedWorkPrice: "UNRESOLVED — NO QUOTE PRODUCED" as const,
   })
 }
 

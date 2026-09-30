@@ -18,7 +18,8 @@ test("public and array views derive from one addressed intake", () => {
   assert.equal(projection.address, fixAddress(intake))
   assert.equal(projection.address, "PUBLIC/MR-FIX-IT/repair-the-leaking-tap")
   assert.equal(projection.guidancePrice, "FREE")
-  assert.equal(projection.requestedWorkPrice, "$40 parts allowance")
+  assert.equal(projection.statedBudget, "$40 parts allowance")
+  assert.equal(projection.requestedWorkPrice, "UNRESOLVED — NO QUOTE PRODUCED")
   assert.equal(projection.intake, projection.intake)
 })
 
@@ -32,7 +33,8 @@ test("the retained intake path includes every established decision boundary", ()
 test("guidance stays free until requested work is selected and priced", () => {
   const projection = deriveFixProjection({ ...intake, cost: "", help: "" })
   assert.equal(projection.guidancePrice, "FREE")
-  assert.equal(projection.requestedWorkPrice, "QUOTE ONLY AFTER REQUEST")
+  assert.equal(projection.statedBudget, "NOT PROVIDED")
+  assert.equal(projection.requestedWorkPrice, "UNRESOLVED — NO QUOTE PRODUCED")
   assert.equal(projection.selectedHelp, "No paid work selected. Guidance remains free.")
 })
 
