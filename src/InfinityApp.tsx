@@ -34,6 +34,7 @@ const drawEdges=(ctx:CanvasRenderingContext2D,edges:readonly FieldEdge[],points:
 
 export function InfinityApp(){
  const canvas=useRef<HTMLCanvasElement>(null),continuum=useRef(createLedgerContinuum()),raf=useRef(0),last=useRef(0),projected=useRef<readonly PixelReference[]>([]),avatarPhase=useRef(0)
+ const fixPanel=useRef<HTMLElement>(null)
  const pointers=useRef(new Map<number,{x:number;y:number}>()),lastPointer=useRef<{x:number;y:number}|null>(null)
  const channels=EVERYTHING_METHOD.domains
  const [sourceChannel,setSourceChannel]=useState<(typeof channels)[number]>("HUMAN"),[destinationChannel,setDestinationChannel]=useState<(typeof channels)[number]>("EI_AGENT")
@@ -53,6 +54,7 @@ export function InfinityApp(){
  const [fixIntake,setFixIntake]=useState({intent:"",skill:"",risk:"",worries:"",ability:"",equipment:"",cost:"",help:""})
  const fixProjection=deriveFixProjection(fixIntake)
  const setFix=(key:keyof typeof fixIntake,value:string)=>setFixIntake(current=>({...current,[key]:value}))
+ useEffect(()=>{fixPanel.current?.scrollTo({top:0})},[fixMode])
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    if(now-last.current>=1000&&WHOLE_INVARIANT.recursive&&FULL_SELF_RESOLUTION.selfSimilar){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
@@ -100,7 +102,7 @@ export function InfinityApp(){
   onContextMenu={e=>{e.preventDefault();const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(/^-?\\d+,-?\\d+,-?\\d+$/.test(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),address=`${o.x+Math.round((x-box.width/2)*step)},${o.y+Math.round((box.height/2-y)*step)},${o.z}`;setSelected(address);setIntentCenter(address);setSourceAddress(address);setGuidance("SOURCE");drive("UI_CONTROL","CENTER_OF_INTENT",address,()=>{});setMenu({x,y,address})}}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
   <button className="mr-fix-it-toggle" type="button" aria-expanded={showFixIt} onClick={()=>setShowFixIt(value=>!value)}>MR FIX IT</button>
-  {showFixIt?<aside className="mr-fix-it" aria-label="Mr Fix It addressed projection">
+  {showFixIt?<aside ref={fixPanel} className="mr-fix-it" aria-label="Mr Fix It addressed projection">
    <header><div><small>{fixProjection.address}</small><h1>What do you want to accomplish?</h1></div><button type="button" onClick={()=>setShowFixIt(false)}>×</button></header>
    <div className="fix-mode" role="group" aria-label="Projection"><button className={fixMode==="PUBLIC"?"selected":""} type="button" onClick={()=>setFixMode("PUBLIC")}>PUBLIC VIEW</button><button className={fixMode==="ARRAY"?"selected":""} type="button" onClick={()=>setFixMode("ARRAY")}>ARRAY VIEW</button></div>
    {fixMode==="PUBLIC"?<div className="fix-public">
