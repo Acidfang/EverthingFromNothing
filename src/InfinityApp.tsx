@@ -56,17 +56,12 @@ export function InfinityApp(){
    const source=/^-?\\d+,-?\\d+,-?\\d+$/.test(sourceAddress)?sourceAddress:"0,0,0"
    const o=fromKey(source),pixelStep=1/Math.max(.125,zoom),cx=Math.floor(r.width/2),cy=Math.floor(r.height/2)
    const addressForPixel=(x:number,y:number)=>`${o.x+Math.round((x-cx)*pixelStep)},${o.y+Math.round((cy-y)*pixelStep)},${o.z}`
-   const pixels:PixelReference[]=[]
    ctx.fillStyle="#e5ad56"
-   // At the human grain the web is dense enough to resolve as a solid field.
-   // Address identity is retained per physical pixel instead of sparse points
-   // being projected onto the screen after the model is calculated.
-   for(let py=0;py<c.height;py++)for(let px=0;px<c.width;px++){
-    const x=px/dpr,y=py/dpr,address=addressForPixel(x,y)
-    pixels.push(Object.freeze({x,y,addresses:Object.freeze([address])}))
-    ctx.fillRect(x,y,1/dpr,1/dpr)
-   }
-   projected.current=Object.freeze(pixels)
+   // At the human grain the web resolves as a solid field. Do not materialize
+   // one JS object per physical pixel: address state is derived lazily from
+   // the base/source relation only when a pixel is actually interrogated.
+   ctx.fillRect(0,0,r.width,r.height)
+   projected.current=Object.freeze([])
 
    // Differences already resolved by the continuum are state overlays within
    // the field; they do not define or bound the field itself.
@@ -89,15 +84,16 @@ export function InfinityApp(){
    for(const address of stateAddresses){const p=relativeTo(address,source),rx=p.x*ct-p.y*st,ry=p.x*st+p.y*ct;cameraPoints.set(address,{x:ix+insetW/2+rx/pixelStep,y:iy+insetH/2-ry/pixelStep})}
    drawEdges(ctx,edges,cameraPoints,.22)
    ctx.restore();ctx.strokeStyle="rgba(238,234,222,.75)";ctx.lineWidth=1;ctx.strokeRect(ix+.5,iy+.5,insetW-1,insetH-1)
-   setVisible(v=>v===pixels.length?v:pixels.length)
+   const resolvedPixelCount=Math.max(1,c.width*c.height)
+   setVisible(v=>v===resolvedPixelCount?v:resolvedPixelCount)
    raf.current=requestAnimationFrame(draw)
   };raf.current=requestAnimationFrame(draw);return()=>cancelAnimationFrame(raf.current)},[zoom,selected,sourceAddress])
  return <main className="infinity-map"><section className="infinity-field" aria-label="Ledger-driven fracture field"><canvas ref={canvas} className="infinity-canvas"
   onWheel={e=>{e.preventDefault();setZoom(z=>Math.max(.125,Math.min(64,z*Math.exp(-e.deltaY*.0015))))}}
-  onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPointer.current={x:e.clientX,y:e.clientY};const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top;let best:PixelReference|undefined,dist=Infinity;for(const pixel of projected.current){const d=(pixel.x-x)**2+(pixel.y-y)**2;if(d<dist){dist=d;best=pixel}}if(best&&dist<=144)setSelected(best.addresses[0])}}
+  onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPointer.current={x:e.clientX,y:e.clientY};const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(/^-?\\d+,-?\\d+,-?\\d+$/.test(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),address=`${o.x+Math.round((x-box.width/2)*step)},${o.y+Math.round((box.height/2-y)*step)},${o.z}`;setSelected(address)}}
   onPointerMove={e=>{if(!pointers.current.has(e.pointerId))return;const prior=pointers.current.get(e.pointerId)!;pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===2){const pts=[...pointers.current.values()],before=pts.map(p=>({...p}));const movedIndex=[...pointers.current.keys()].indexOf(e.pointerId);before[movedIndex]=prior;const d=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),od=Math.hypot(before[0].x-before[1].x,before[0].y-before[1].y);if(od>0)setZoom(z=>Math.max(.125,Math.min(64,z*d/od)));return}if(!lastPointer.current)return;const dx=e.clientX-lastPointer.current.x,dy=e.clientY-lastPointer.current.y;lastPointer.current={x:e.clientX,y:e.clientY};setYaw(v=>v+dx*.008);setPitch(v=>Math.max(-Math.PI/2,Math.min(Math.PI/2,v+dy*.008)))}}
   onPointerUp={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}} onPointerCancel={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}}
-  onContextMenu={e=>{e.preventDefault();const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top;let best:PixelReference|undefined,dist=Infinity;for(const pixel of projected.current){const d=(pixel.x-x)**2+(pixel.y-y)**2;if(d<dist){dist=d;best=pixel}}if(!best||dist>144){setMenu(null);return}const address=best.addresses[0];setSelected(address);setIntentCenter(address);setSourceAddress(address);setGuidance("SOURCE");drive("UI_CONTROL","CENTER_OF_INTENT",address,()=>{});setMenu({x:best.x,y:best.y,address})}}
+  onContextMenu={e=>{e.preventDefault();const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(/^-?\\d+,-?\\d+,-?\\d+$/.test(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),address=`${o.x+Math.round((x-box.width/2)*step)},${o.y+Math.round((box.height/2-y)*step)},${o.z}`;setSelected(address);setIntentCenter(address);setSourceAddress(address);setGuidance("SOURCE");drive("UI_CONTROL","CENTER_OF_INTENT",address,()=>{});setMenu({x,y,address})}}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
   {menu?<div className="map-context-menu" style={{position:"absolute",left:menu.x,top:menu.y,zIndex:5}} onPointerLeave={()=>setMenu(null)}>
    <button type="button" onClick={()=>{setSelected(menu.address);setMenu(null)}}>SET ZERO HERE</button>
