@@ -1,7 +1,7 @@
-import { CANONICAL_SEED } from "./canonicalSeed"
-import { BINARY_MODEL, WHOLE_INVARIANT } from "./binaryRelationships"
-import { COMMUNICATION_INVARIANT } from "./communication"
-import { THREE_TETRAHEDRON_DRAWING } from "./three-tetrahedron-drawing"
+import { CANONICAL_SEED } from "./canonicalSeed.ts"
+import { BINARY_MODEL, WHOLE_INVARIANT } from "./binaryRelationships.ts"
+import { COMMUNICATION_INVARIANT } from "./communication.ts"
+import { THREE_TETRAHEDRON_DRAWING } from "./three-tetrahedron-drawing.ts"
 
 export const LIFE_LOGIC_BINDING = Object.freeze({
   root: CANONICAL_SEED.zero,
