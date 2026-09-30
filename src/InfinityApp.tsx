@@ -2,6 +2,7 @@ import { useEffect,useRef,useState } from "react"
 import { advanceLedgerContinuum,createLedgerContinuum } from "./model/kernel"
 import { fromKey } from "./model/address"
 import { BINARY_MODEL,EVERYTHING_METHOD,FULL_SELF_RESOLUTION,WHOLE_INVARIANT,resolveResponse } from "./model/binaryRelationships"
+import { deriveFixProjection, MR_FIX_IT_FLOW } from "./model/mr-fix-it"
 import "./infinity.css"
 
 type PixelReference=Readonly<{x:number;y:number;addresses:readonly string[]}>
@@ -48,6 +49,10 @@ export function InfinityApp(){
  const stopListening=()=>{speechRecognition.current?.stop?.();speechRecognition.current=null;drive("VOICE","LISTEN","STOP",()=>setListening(false))}
  const naturalLive=()=>{if(live){stopListening();stopCapture();if("speechSynthesis" in window)window.speechSynthesis.cancel();drive("UI_CONTROL","LIVE_SESSION","END",()=>setLive(false));return}drive("UI_CONTROL","LIVE_SESSION","START",()=>setLive(true));startListening()}
  const [guidance,setGuidance]=useState("SOURCE"),[reply,setReply]=useState(""),[nextReply,setNextReply]=useState<string|null>(null),[sourceAddress,setSourceAddress]=useState("HUMAN/0"),[sourceMoment,setSourceMoment]=useState(0),[intentCenter,setIntentCenter]=useState("0,0,0"),[menu,setMenu]=useState<{x:number;y:number;address:string}|null>(null),[zoom,setZoom]=useState(1),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
+ const [showFixIt,setShowFixIt]=useState(false),[fixMode,setFixMode]=useState<"PUBLIC"|"ARRAY">("PUBLIC")
+ const [fixIntake,setFixIntake]=useState({intent:"",skill:"",risk:"",worries:"",ability:"",equipment:"",cost:"",help:""})
+ const fixProjection=deriveFixProjection(fixIntake)
+ const setFix=(key:keyof typeof fixIntake,value:string)=>setFixIntake(current=>({...current,[key]:value}))
  useEffect(()=>{const c=canvas.current;if(!c)return;const ctx=c.getContext("2d");if(!ctx)return
   const draw=(now:number)=>{const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
    if(now-last.current>=1000&&WHOLE_INVARIANT.recursive&&FULL_SELF_RESOLUTION.selfSimilar){continuum.current=advanceLedgerContinuum(continuum.current);last.current=now}
@@ -94,6 +99,21 @@ export function InfinityApp(){
   onPointerUp={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}} onPointerCancel={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}}
   onContextMenu={e=>{e.preventDefault();const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(/^-?\\d+,-?\\d+,-?\\d+$/.test(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),address=`${o.x+Math.round((x-box.width/2)*step)},${o.y+Math.round((box.height/2-y)*step)},${o.z}`;setSelected(address);setIntentCenter(address);setSourceAddress(address);setGuidance("SOURCE");drive("UI_CONTROL","CENTER_OF_INTENT",address,()=>{});setMenu({x,y,address})}}
   onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
+  <button className="mr-fix-it-toggle" type="button" aria-expanded={showFixIt} onClick={()=>setShowFixIt(value=>!value)}>MR FIX IT</button>
+  {showFixIt?<aside className="mr-fix-it" aria-label="Mr Fix It addressed projection">
+   <header><div><small>{fixProjection.address}</small><h1>What do you want to accomplish?</h1></div><button type="button" onClick={()=>setShowFixIt(false)}>×</button></header>
+   <div className="fix-mode" role="group" aria-label="Projection"><button className={fixMode==="PUBLIC"?"selected":""} type="button" onClick={()=>setFixMode("PUBLIC")}>PUBLIC VIEW</button><button className={fixMode==="ARRAY"?"selected":""} type="button" onClick={()=>setFixMode("ARRAY")}>ARRAY VIEW</button></div>
+   {fixMode==="PUBLIC"?<div className="fix-public">
+    <label>INTENDED ACCOMPLISHMENT<textarea value={fixIntake.intent} onChange={e=>setFix("intent",e.target.value)} placeholder="Tell me what needs to become true." /></label>
+    <div className="fix-grid">
+     <label>SKILL<input value={fixIntake.skill} onChange={e=>setFix("skill",e.target.value)} /></label><label>RISK<input value={fixIntake.risk} onChange={e=>setFix("risk",e.target.value)} /></label>
+     <label>WORRIES<input value={fixIntake.worries} onChange={e=>setFix("worries",e.target.value)} /></label><label>ABILITY<input value={fixIntake.ability} onChange={e=>setFix("ability",e.target.value)} /></label>
+     <label>EQUIPMENT<input value={fixIntake.equipment} onChange={e=>setFix("equipment",e.target.value)} /></label><label>COST / BUDGET<input value={fixIntake.cost} onChange={e=>setFix("cost",e.target.value)} /></label>
+    </div>
+    <label>SELECTED HELP<input value={fixIntake.help} onChange={e=>setFix("help",e.target.value)} placeholder="Only the work you want help with." /></label>
+    <section className="fix-result"><small>WHAT YOU CAN DO</small><strong>{fixProjection.canDo}</strong><p>Guidance: {fixProjection.guidancePrice} · Requested work: {fixProjection.requestedWorkPrice}</p></section>
+   </div>:<div className="fix-array"><p>Same intake, same address, array projection.</p><ol>{MR_FIX_IT_FLOW.map((step,index)=><li key={step}><span>{String(index+1).padStart(2,"0")}</span><strong>{step}</strong><small>{index===0?fixProjection.intake.intent||"OPEN":index===7?fixProjection.canDo:index===8?fixProjection.selectedHelp:fixProjection.intake[step.toLowerCase() as keyof typeof fixProjection.intake]||"OPEN"}</small></li>)}</ol></div>}
+  </aside>:null}
   {menu?<div className="map-context-menu" style={{position:"absolute",left:menu.x,top:menu.y,zIndex:5}} onPointerLeave={()=>setMenu(null)}>
    <button type="button" onClick={()=>{setSelected(menu.address);setMenu(null)}}>SET ZERO HERE</button>
    <button type="button" onClick={()=>{setSelected(menu.address);setZoom(z=>Math.min(64,z*2));setMenu(null)}}>ENTER / ZOOM</button>
