@@ -122,3 +122,13 @@ source-backed fields, relations, action terms, receipts, selected projections an
 open dependencies. Each entry retains parents, support, source, status and gap.
 The [JSON companion](docs/FRACTURE-FIELD-INVENTORY.json) preserves the same inventory
 and exact binary source relations for addressed reuse.
+
+### Bounded reproducibility checks
+
+Open **Inspect addresses → Pattern layer · reproducible checks** to filter the
+127-entry source inventory by linked runnable checks, successful execution, or
+matching repeated runs. Four fixed synthetic checks exercise graph integrity,
+declared-state replay, admitted glyph directions, and a finite completion barrier.
+Inputs, expected and actual returns, source parents and remaining differences are
+inspectable. A repeated software result is not proof of source faithfulness or
+physical theory. See [the reproducibility gate](docs/REPRODUCIBILITY-GATE.md).

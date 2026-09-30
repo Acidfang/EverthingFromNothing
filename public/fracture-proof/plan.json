@@ -1,0 +1,4562 @@
+{
+  "schema": "fracture-video-proof/v4",
+  "sourceRepository": "Acidfang/EverthingFromNothing",
+  "sourceHashes": {
+    "src/model/video-pattern.ts": "bd301702332f87e97367034eef2a8517b525e9fb4fe4a8831da873f167139ca4",
+    "src/model/pattern-layer.ts": "43ca82dfa41f84dcf87a024fcde8018b9639bdc9941873e37412157089c51c5e",
+    "sources/FRACTURE-FIELD-INVENTORY.json": "be90c552ebdca59abb647e81d408aa4506b9e732bf34de8b3eea45dc3eea748a",
+    "src/model/addressed-draw.ts": "30a3a3fa7151d73c9bbf79006b86aef02d869fb7e2f3d4931662f3bfbf5d902c",
+    "pattern-adapter.mjs": "f23f0a7351f4e319a6dc02cf84a15629cbc3392ae169254174d8ae28555d12b5",
+    "sources/FRACTURE-SOURCE-RELATIONS.md": "ada6c96f5e9e3006965dc39e382d2a89a240628f6b74539fb744b787f2e2febc"
+  },
+  "selected": {
+    "width": 1280,
+    "height": 720,
+    "fps": 0.6666666666666666,
+    "holdFrames": 1,
+    "acts": 8,
+    "projection": "Display layout for existing addressed records; not world geometry",
+    "scene": "Add-only video presentation pattern attached at existing scene container",
+    "focusOrder": "source-address, was, is, next, frame, delta-update, render-boundary, receipt; selected presentation sequence only"
+  },
+  "claims": {
+    "derived": "Existing record content and causal parents are read from the retained map",
+    "selected": "Only added pattern content/display focus, finite raster, colors and playback duration",
+    "unchanged": "Original map/container definitions, source relations and world Act",
+    "unresolved": "No new semantic video/world model or spatial law is claimed"
+  },
+  "acts": [
+    {
+      "act": 0,
+      "input": {
+        "patternId": "requested-video-pattern",
+        "focusId": "source-address",
+        "containerId": "scene"
+      },
+      "state": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "source-address",
+          "group": "Address, Whole, node and membership",
+          "term": "source address / retained source",
+          "parents": [
+            "address"
+          ],
+          "status": "DERIVED",
+          "support": "ADDRESS → SOURCE → DIFFERENCE → RESOLVE → RECEIPT → RETURN retains the source and causal context.",
+          "sources": [
+            {
+              "path": "src/model/binaryRelationships.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/binaryRelationships.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "ADDRESS → SOURCE → DIFFERENCE → RESOLVE → RECEIPT → RETURN retains the source and causal context.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 18,
+          "inventory_binary_address": "00010101"
+        },
+        "parents": [
+          {
+            "id": "address",
+            "group": "Address, Whole, node and membership",
+            "term": "address + return address",
+            "parents": [
+              "grain"
+            ],
+            "status": "GIVEN",
+            "support": "Canonical seed requires an address and return; unresolved Difference remains open at that address.",
+            "sources": [
+              {
+                "path": "src/model/canonicalSeed.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "src/model/canonicalSeed.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Canonical seed requires an address and return; unresolved Difference remains open at that address.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 17,
+            "inventory_binary_address": "00010100"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "wasState": null,
+      "nextState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "was",
+          "group": "Time, state, branch and landmark",
+          "term": "WAS / WAS*",
+          "parents": [
+            "is",
+            "repository-address"
+          ],
+          "status": "DERIVED",
+          "support": "Backward reconstruction is constrained by receipts, landmarks and causal parents; alternatives remain when evidence is incomplete.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "docs/FIELD-ADDRESS.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "Exact only where retained evidence determines the prior state.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "docs/FIELD-ADDRESS.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Backward reconstruction is constrained by receipts, landmarks and causal parents; alternatives remain when evidence is incomplete.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "Exact only where retained evidence determines the prior state.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 30,
+          "inventory_binary_address": "00100010"
+        },
+        "parents": [
+          {
+            "id": "is",
+            "group": "Time, state, branch and landmark",
+            "term": "IS / NOW",
+            "parents": [
+              "field",
+              "manifestation"
+            ],
+            "status": "GIVEN",
+            "support": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 29,
+            "inventory_binary_address": "00100001"
+          },
+          {
+            "id": "repository-address",
+            "group": "Address, Whole, node and membership",
+            "term": "repository + path + blob SHA + role + successor",
+            "parents": [
+              "source-address",
+              "parent"
+            ],
+            "status": "GIVEN",
+            "support": "Retained artifact address survives live-file consolidation or retirement; Git history holds exact earlier body.",
+            "sources": [
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Retained artifact address survives live-file consolidation or retirement; Git history holds exact earlier body.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 28,
+            "inventory_binary_address": "00011111"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "stateHash": "03e872e31f3d7e90892a28bedd030e631bf361cf780978dbb543921d4e937562",
+      "nextHash": "ccf69799cc18bf9daf4f312e214546ed1f8ce01df55bb7f4ae5a34d5120b74be"
+    },
+    {
+      "act": 1,
+      "input": {
+        "patternId": "requested-video-pattern",
+        "focusId": "was",
+        "containerId": "scene"
+      },
+      "state": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "was",
+          "group": "Time, state, branch and landmark",
+          "term": "WAS / WAS*",
+          "parents": [
+            "is",
+            "repository-address"
+          ],
+          "status": "DERIVED",
+          "support": "Backward reconstruction is constrained by receipts, landmarks and causal parents; alternatives remain when evidence is incomplete.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "docs/FIELD-ADDRESS.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "Exact only where retained evidence determines the prior state.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "docs/FIELD-ADDRESS.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Backward reconstruction is constrained by receipts, landmarks and causal parents; alternatives remain when evidence is incomplete.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "Exact only where retained evidence determines the prior state.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 30,
+          "inventory_binary_address": "00100010"
+        },
+        "parents": [
+          {
+            "id": "is",
+            "group": "Time, state, branch and landmark",
+            "term": "IS / NOW",
+            "parents": [
+              "field",
+              "manifestation"
+            ],
+            "status": "GIVEN",
+            "support": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 29,
+            "inventory_binary_address": "00100001"
+          },
+          {
+            "id": "repository-address",
+            "group": "Address, Whole, node and membership",
+            "term": "repository + path + blob SHA + role + successor",
+            "parents": [
+              "source-address",
+              "parent"
+            ],
+            "status": "GIVEN",
+            "support": "Retained artifact address survives live-file consolidation or retirement; Git history holds exact earlier body.",
+            "sources": [
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Retained artifact address survives live-file consolidation or retirement; Git history holds exact earlier body.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 28,
+            "inventory_binary_address": "00011111"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "wasState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "source-address",
+          "group": "Address, Whole, node and membership",
+          "term": "source address / retained source",
+          "parents": [
+            "address"
+          ],
+          "status": "DERIVED",
+          "support": "ADDRESS → SOURCE → DIFFERENCE → RESOLVE → RECEIPT → RETURN retains the source and causal context.",
+          "sources": [
+            {
+              "path": "src/model/binaryRelationships.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/binaryRelationships.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "ADDRESS → SOURCE → DIFFERENCE → RESOLVE → RECEIPT → RETURN retains the source and causal context.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 18,
+          "inventory_binary_address": "00010101"
+        },
+        "parents": [
+          {
+            "id": "address",
+            "group": "Address, Whole, node and membership",
+            "term": "address + return address",
+            "parents": [
+              "grain"
+            ],
+            "status": "GIVEN",
+            "support": "Canonical seed requires an address and return; unresolved Difference remains open at that address.",
+            "sources": [
+              {
+                "path": "src/model/canonicalSeed.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "src/model/canonicalSeed.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Canonical seed requires an address and return; unresolved Difference remains open at that address.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 17,
+            "inventory_binary_address": "00010100"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "nextState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "is",
+          "group": "Time, state, branch and landmark",
+          "term": "IS / NOW",
+          "parents": [
+            "field",
+            "manifestation"
+          ],
+          "status": "GIVEN",
+          "support": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "docs/FIELD-ADDRESS.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "docs/FIELD-ADDRESS.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 29,
+          "inventory_binary_address": "00100001"
+        },
+        "parents": [
+          {
+            "id": "field",
+            "group": "Primitive boundary and admission",
+            "term": "Notodus / relational field / Φ",
+            "parents": [
+              "grain"
+            ],
+            "status": "DERIVED",
+            "support": "Addressable grains compose the relational field; Φ is the addressable field between 0 and 1 in the stated model.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "src/model/binaryRelationships.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "The full source expression N=ZΦT⋈Fνα⋈ΠLρ is retained, not replaced by this prose.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "src/model/binaryRelationships.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Addressable grains compose the relational field; Φ is the addressable field between 0 and 1 in the stated model.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "The full source expression N=ZΦT⋈Fνα⋈ΠLρ is retained, not replaced by this prose.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 13,
+            "inventory_binary_address": "00001111"
+          },
+          {
+            "id": "manifestation",
+            "group": "Primitive boundary and admission",
+            "term": "1 / ✓ / committed output",
+            "parents": [
+              "field"
+            ],
+            "status": "GIVEN",
+            "support": "1 is manifested/committed output; source retains 1≡✓ and 0→Φ→1→0↺.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "src/model/binaryRelationships.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Computed possibility alone does not constitute manifestation.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "src/model/binaryRelationships.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "1 is manifested/committed output; source retains 1≡✓ and 0→Φ→1→0↺.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Computed possibility alone does not constitute manifestation.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 14,
+            "inventory_binary_address": "00010000"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "stateHash": "ccf69799cc18bf9daf4f312e214546ed1f8ce01df55bb7f4ae5a34d5120b74be",
+      "nextHash": "a103c00ff8dbfb1239ff23f7cb19f9d2049389cabf6e5a2342eb6abe723f9c19"
+    },
+    {
+      "act": 2,
+      "input": {
+        "patternId": "requested-video-pattern",
+        "focusId": "is",
+        "containerId": "scene"
+      },
+      "state": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "is",
+          "group": "Time, state, branch and landmark",
+          "term": "IS / NOW",
+          "parents": [
+            "field",
+            "manifestation"
+          ],
+          "status": "GIVEN",
+          "support": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "docs/FIELD-ADDRESS.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "docs/FIELD-ADDRESS.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 29,
+          "inventory_binary_address": "00100001"
+        },
+        "parents": [
+          {
+            "id": "field",
+            "group": "Primitive boundary and admission",
+            "term": "Notodus / relational field / Φ",
+            "parents": [
+              "grain"
+            ],
+            "status": "DERIVED",
+            "support": "Addressable grains compose the relational field; Φ is the addressable field between 0 and 1 in the stated model.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "src/model/binaryRelationships.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "The full source expression N=ZΦT⋈Fνα⋈ΠLρ is retained, not replaced by this prose.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "src/model/binaryRelationships.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Addressable grains compose the relational field; Φ is the addressable field between 0 and 1 in the stated model.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "The full source expression N=ZΦT⋈Fνα⋈ΠLρ is retained, not replaced by this prose.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 13,
+            "inventory_binary_address": "00001111"
+          },
+          {
+            "id": "manifestation",
+            "group": "Primitive boundary and admission",
+            "term": "1 / ✓ / committed output",
+            "parents": [
+              "field"
+            ],
+            "status": "GIVEN",
+            "support": "1 is manifested/committed output; source retains 1≡✓ and 0→Φ→1→0↺.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "src/model/binaryRelationships.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Computed possibility alone does not constitute manifestation.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "src/model/binaryRelationships.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "1 is manifested/committed output; source retains 1≡✓ and 0→Φ→1→0↺.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Computed possibility alone does not constitute manifestation.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 14,
+            "inventory_binary_address": "00010000"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "wasState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "was",
+          "group": "Time, state, branch and landmark",
+          "term": "WAS / WAS*",
+          "parents": [
+            "is",
+            "repository-address"
+          ],
+          "status": "DERIVED",
+          "support": "Backward reconstruction is constrained by receipts, landmarks and causal parents; alternatives remain when evidence is incomplete.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "docs/FIELD-ADDRESS.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "Exact only where retained evidence determines the prior state.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "docs/FIELD-ADDRESS.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Backward reconstruction is constrained by receipts, landmarks and causal parents; alternatives remain when evidence is incomplete.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "Exact only where retained evidence determines the prior state.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 30,
+          "inventory_binary_address": "00100010"
+        },
+        "parents": [
+          {
+            "id": "is",
+            "group": "Time, state, branch and landmark",
+            "term": "IS / NOW",
+            "parents": [
+              "field",
+              "manifestation"
+            ],
+            "status": "GIVEN",
+            "support": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 29,
+            "inventory_binary_address": "00100001"
+          },
+          {
+            "id": "repository-address",
+            "group": "Address, Whole, node and membership",
+            "term": "repository + path + blob SHA + role + successor",
+            "parents": [
+              "source-address",
+              "parent"
+            ],
+            "status": "GIVEN",
+            "support": "Retained artifact address survives live-file consolidation or retirement; Git history holds exact earlier body.",
+            "sources": [
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Retained artifact address survives live-file consolidation or retirement; Git history holds exact earlier body.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 28,
+            "inventory_binary_address": "00011111"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "nextState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "next",
+          "group": "Time, state, branch and landmark",
+          "term": "available NEXT / proposed NEXT",
+          "parents": [
+            "can-be",
+            "moment"
+          ],
+          "status": "GIVEN",
+          "support": "NEXT is available rather than established until Act. Proposed NEXT is distinct from performed NEXT.",
+          "sources": [
+            {
+              "path": "src/model/canonicalSeed.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/completion-fracture.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/canonicalSeed.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/completion-fracture.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "NEXT is available rather than established until Act. Proposed NEXT is distinct from performed NEXT.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 33,
+          "inventory_binary_address": "00100101"
+        },
+        "parents": [
+          {
+            "id": "can-be",
+            "group": "Time, state, branch and landmark",
+            "term": "CAN BE / CAN BE*",
+            "parents": [
+              "is",
+              "recurrence"
+            ],
+            "status": "DERIVED",
+            "support": "Forward reachable successor relations retain branches and uncertainty; calculated branches do not become IS without act/output.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Forward reachable successor relations retain branches and uncertainty; calculated branches do not become IS without act/output.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 32,
+            "inventory_binary_address": "00100100"
+          },
+          {
+            "id": "moment",
+            "group": "Primitive boundary and admission",
+            "term": "Moment order",
+            "parents": [
+              "closure-first"
+            ],
+            "status": "DERIVED",
+            "support": "Moment mechanism makes ordered succession expressible; pre-temporal entailment is not a sequence of events.",
+            "sources": [
+              {
+                "path": "SPEC.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "SPEC.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Moment mechanism makes ordered succession expressible; pre-temporal entailment is not a sequence of events.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 10,
+            "inventory_binary_address": "00001100"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "stateHash": "a103c00ff8dbfb1239ff23f7cb19f9d2049389cabf6e5a2342eb6abe723f9c19",
+      "nextHash": "ec43e391999fe684ef8d6f4fd5c7c0a167e156d016f7f85bcc035cf8f10a7b03"
+    },
+    {
+      "act": 3,
+      "input": {
+        "patternId": "requested-video-pattern",
+        "focusId": "next",
+        "containerId": "scene"
+      },
+      "state": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "next",
+          "group": "Time, state, branch and landmark",
+          "term": "available NEXT / proposed NEXT",
+          "parents": [
+            "can-be",
+            "moment"
+          ],
+          "status": "GIVEN",
+          "support": "NEXT is available rather than established until Act. Proposed NEXT is distinct from performed NEXT.",
+          "sources": [
+            {
+              "path": "src/model/canonicalSeed.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/completion-fracture.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/canonicalSeed.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/completion-fracture.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "NEXT is available rather than established until Act. Proposed NEXT is distinct from performed NEXT.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 33,
+          "inventory_binary_address": "00100101"
+        },
+        "parents": [
+          {
+            "id": "can-be",
+            "group": "Time, state, branch and landmark",
+            "term": "CAN BE / CAN BE*",
+            "parents": [
+              "is",
+              "recurrence"
+            ],
+            "status": "DERIVED",
+            "support": "Forward reachable successor relations retain branches and uncertainty; calculated branches do not become IS without act/output.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Forward reachable successor relations retain branches and uncertainty; calculated branches do not become IS without act/output.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 32,
+            "inventory_binary_address": "00100100"
+          },
+          {
+            "id": "moment",
+            "group": "Primitive boundary and admission",
+            "term": "Moment order",
+            "parents": [
+              "closure-first"
+            ],
+            "status": "DERIVED",
+            "support": "Moment mechanism makes ordered succession expressible; pre-temporal entailment is not a sequence of events.",
+            "sources": [
+              {
+                "path": "SPEC.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "SPEC.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Moment mechanism makes ordered succession expressible; pre-temporal entailment is not a sequence of events.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 10,
+            "inventory_binary_address": "00001100"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "wasState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "is",
+          "group": "Time, state, branch and landmark",
+          "term": "IS / NOW",
+          "parents": [
+            "field",
+            "manifestation"
+          ],
+          "status": "GIVEN",
+          "support": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "docs/FIELD-ADDRESS.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "docs/FIELD-ADDRESS.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Populated current field/landmark; all currently resolvable relations, not one privileged thread.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 29,
+          "inventory_binary_address": "00100001"
+        },
+        "parents": [
+          {
+            "id": "field",
+            "group": "Primitive boundary and admission",
+            "term": "Notodus / relational field / Φ",
+            "parents": [
+              "grain"
+            ],
+            "status": "DERIVED",
+            "support": "Addressable grains compose the relational field; Φ is the addressable field between 0 and 1 in the stated model.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "src/model/binaryRelationships.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "The full source expression N=ZΦT⋈Fνα⋈ΠLρ is retained, not replaced by this prose.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "src/model/binaryRelationships.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Addressable grains compose the relational field; Φ is the addressable field between 0 and 1 in the stated model.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "The full source expression N=ZΦT⋈Fνα⋈ΠLρ is retained, not replaced by this prose.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 13,
+            "inventory_binary_address": "00001111"
+          },
+          {
+            "id": "manifestation",
+            "group": "Primitive boundary and admission",
+            "term": "1 / ✓ / committed output",
+            "parents": [
+              "field"
+            ],
+            "status": "GIVEN",
+            "support": "1 is manifested/committed output; source retains 1≡✓ and 0→Φ→1→0↺.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "src/model/binaryRelationships.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Computed possibility alone does not constitute manifestation.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "src/model/binaryRelationships.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "1 is manifested/committed output; source retains 1≡✓ and 0→Φ→1→0↺.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Computed possibility alone does not constitute manifestation.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 14,
+            "inventory_binary_address": "00010000"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "nextState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "frame",
+          "group": "Time, state, branch and landmark",
+          "term": "bounded active FRAME",
+          "parents": [
+            "local-whole",
+            "open"
+          ],
+          "status": "GIVEN",
+          "support": "A frame is a bounded active subject whose close does not erase established relations.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "A frame is a bounded active subject whose close does not erase established relations.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 40,
+          "inventory_binary_address": "00101100"
+        },
+        "parents": [
+          {
+            "id": "local-whole",
+            "group": "Address, Whole, node and membership",
+            "term": "local Whole at every node/address",
+            "parents": [
+              "address",
+              "field"
+            ],
+            "status": "GIVEN",
+            "support": "Completion relation states every Node is a locally addressable Whole with WAS / IS / available NEXT and the same mechanism at every Grain.",
+            "sources": [
+              {
+                "path": "src/model/completion-fracture.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "src/model/completion-fracture.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Completion relation states every Node is a locally addressable Whole with WAS / IS / available NEXT and the same mechanism at every Grain.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 20,
+            "inventory_binary_address": "00010111"
+          },
+          {
+            "id": "open",
+            "group": "Time, state, branch and landmark",
+            "term": "OPEN / unknown-but-wanted",
+            "parents": [
+              "address",
+              "recurrence"
+            ],
+            "status": "GIVEN",
+            "support": "OPEN → CHECK → Difference?; absent Difference remains OPEN; resolution can reopen.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "OPEN → CHECK → Difference?; absent Difference remains OPEN; resolution can reopen.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 36,
+            "inventory_binary_address": "00101000"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "stateHash": "ec43e391999fe684ef8d6f4fd5c7c0a167e156d016f7f85bcc035cf8f10a7b03",
+      "nextHash": "d172475e9753b6076369ce7e61c5575ae751d74c069686490e14d7a4ae7af660"
+    },
+    {
+      "act": 4,
+      "input": {
+        "patternId": "requested-video-pattern",
+        "focusId": "frame",
+        "containerId": "scene"
+      },
+      "state": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "frame",
+          "group": "Time, state, branch and landmark",
+          "term": "bounded active FRAME",
+          "parents": [
+            "local-whole",
+            "open"
+          ],
+          "status": "GIVEN",
+          "support": "A frame is a bounded active subject whose close does not erase established relations.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "A frame is a bounded active subject whose close does not erase established relations.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 40,
+          "inventory_binary_address": "00101100"
+        },
+        "parents": [
+          {
+            "id": "local-whole",
+            "group": "Address, Whole, node and membership",
+            "term": "local Whole at every node/address",
+            "parents": [
+              "address",
+              "field"
+            ],
+            "status": "GIVEN",
+            "support": "Completion relation states every Node is a locally addressable Whole with WAS / IS / available NEXT and the same mechanism at every Grain.",
+            "sources": [
+              {
+                "path": "src/model/completion-fracture.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "src/model/completion-fracture.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Completion relation states every Node is a locally addressable Whole with WAS / IS / available NEXT and the same mechanism at every Grain.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 20,
+            "inventory_binary_address": "00010111"
+          },
+          {
+            "id": "open",
+            "group": "Time, state, branch and landmark",
+            "term": "OPEN / unknown-but-wanted",
+            "parents": [
+              "address",
+              "recurrence"
+            ],
+            "status": "GIVEN",
+            "support": "OPEN → CHECK → Difference?; absent Difference remains OPEN; resolution can reopen.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "OPEN → CHECK → Difference?; absent Difference remains OPEN; resolution can reopen.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 36,
+            "inventory_binary_address": "00101000"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "wasState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "next",
+          "group": "Time, state, branch and landmark",
+          "term": "available NEXT / proposed NEXT",
+          "parents": [
+            "can-be",
+            "moment"
+          ],
+          "status": "GIVEN",
+          "support": "NEXT is available rather than established until Act. Proposed NEXT is distinct from performed NEXT.",
+          "sources": [
+            {
+              "path": "src/model/canonicalSeed.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/completion-fracture.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/canonicalSeed.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/completion-fracture.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "NEXT is available rather than established until Act. Proposed NEXT is distinct from performed NEXT.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 33,
+          "inventory_binary_address": "00100101"
+        },
+        "parents": [
+          {
+            "id": "can-be",
+            "group": "Time, state, branch and landmark",
+            "term": "CAN BE / CAN BE*",
+            "parents": [
+              "is",
+              "recurrence"
+            ],
+            "status": "DERIVED",
+            "support": "Forward reachable successor relations retain branches and uncertainty; calculated branches do not become IS without act/output.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "docs/FIELD-ADDRESS.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "docs/FIELD-ADDRESS.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Forward reachable successor relations retain branches and uncertainty; calculated branches do not become IS without act/output.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 32,
+            "inventory_binary_address": "00100100"
+          },
+          {
+            "id": "moment",
+            "group": "Primitive boundary and admission",
+            "term": "Moment order",
+            "parents": [
+              "closure-first"
+            ],
+            "status": "DERIVED",
+            "support": "Moment mechanism makes ordered succession expressible; pre-temporal entailment is not a sequence of events.",
+            "sources": [
+              {
+                "path": "SPEC.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "SPEC.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Moment mechanism makes ordered succession expressible; pre-temporal entailment is not a sequence of events.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 10,
+            "inventory_binary_address": "00001100"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "nextState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "delta-update",
+          "group": "Time, state, branch and landmark",
+          "term": "LANDMARK₀ + Δ → affected fracture → LANDMARK₁",
+          "parents": [
+            "landmark",
+            "fracture"
+          ],
+          "status": "DERIVED",
+          "support": "New Difference changes affected relations without rebuilding reality from nothing.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "New Difference changes affected relations without rebuilding reality from nothing.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 39,
+          "inventory_binary_address": "00101011"
+        },
+        "parents": [
+          {
+            "id": "landmark",
+            "group": "Time, state, branch and landmark",
+            "term": "LANDMARK / current committed snapshot",
+            "parents": [
+              "is",
+              "fracture"
+            ],
+            "status": "DERIVED",
+            "support": "Fracture currently addressable relations, populate resolvable addresses, preserve unresolved as OPEN, retain landmark.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Fracture currently addressable relations, populate resolvable addresses, preserve unresolved as OPEN, retain landmark.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 38,
+            "inventory_binary_address": "00101010"
+          },
+          {
+            "id": "fracture",
+            "group": "Primitive boundary and admission",
+            "term": "fracture",
+            "parents": [
+              "relation"
+            ],
+            "status": "DERIVED",
+            "support": "Difference/relation → fracture → addressable grains is the declared foundational chain.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "fracture-cardinality remains OPEN; do not insert a fixed branch count.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Difference/relation → fracture → addressable grains is the declared foundational chain.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "fracture-cardinality remains OPEN; do not insert a fixed branch count.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 11,
+            "inventory_binary_address": "00001101"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "stateHash": "d172475e9753b6076369ce7e61c5575ae751d74c069686490e14d7a4ae7af660",
+      "nextHash": "eeaab9db8213a3ba4b93100cb34a49c176034d3aba43dcf8e86ad0ded44b4731"
+    },
+    {
+      "act": 5,
+      "input": {
+        "patternId": "requested-video-pattern",
+        "focusId": "delta-update",
+        "containerId": "scene"
+      },
+      "state": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "delta-update",
+          "group": "Time, state, branch and landmark",
+          "term": "LANDMARK₀ + Δ → affected fracture → LANDMARK₁",
+          "parents": [
+            "landmark",
+            "fracture"
+          ],
+          "status": "DERIVED",
+          "support": "New Difference changes affected relations without rebuilding reality from nothing.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "New Difference changes affected relations without rebuilding reality from nothing.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 39,
+          "inventory_binary_address": "00101011"
+        },
+        "parents": [
+          {
+            "id": "landmark",
+            "group": "Time, state, branch and landmark",
+            "term": "LANDMARK / current committed snapshot",
+            "parents": [
+              "is",
+              "fracture"
+            ],
+            "status": "DERIVED",
+            "support": "Fracture currently addressable relations, populate resolvable addresses, preserve unresolved as OPEN, retain landmark.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Fracture currently addressable relations, populate resolvable addresses, preserve unresolved as OPEN, retain landmark.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 38,
+            "inventory_binary_address": "00101010"
+          },
+          {
+            "id": "fracture",
+            "group": "Primitive boundary and admission",
+            "term": "fracture",
+            "parents": [
+              "relation"
+            ],
+            "status": "DERIVED",
+            "support": "Difference/relation → fracture → addressable grains is the declared foundational chain.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "fracture-cardinality remains OPEN; do not insert a fixed branch count.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Difference/relation → fracture → addressable grains is the declared foundational chain.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "fracture-cardinality remains OPEN; do not insert a fixed branch count.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 11,
+            "inventory_binary_address": "00001101"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "wasState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "frame",
+          "group": "Time, state, branch and landmark",
+          "term": "bounded active FRAME",
+          "parents": [
+            "local-whole",
+            "open"
+          ],
+          "status": "GIVEN",
+          "support": "A frame is a bounded active subject whose close does not erase established relations.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "A frame is a bounded active subject whose close does not erase established relations.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 40,
+          "inventory_binary_address": "00101100"
+        },
+        "parents": [
+          {
+            "id": "local-whole",
+            "group": "Address, Whole, node and membership",
+            "term": "local Whole at every node/address",
+            "parents": [
+              "address",
+              "field"
+            ],
+            "status": "GIVEN",
+            "support": "Completion relation states every Node is a locally addressable Whole with WAS / IS / available NEXT and the same mechanism at every Grain.",
+            "sources": [
+              {
+                "path": "src/model/completion-fracture.ts",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "src/model/completion-fracture.ts",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Completion relation states every Node is a locally addressable Whole with WAS / IS / available NEXT and the same mechanism at every Grain.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 20,
+            "inventory_binary_address": "00010111"
+          },
+          {
+            "id": "open",
+            "group": "Time, state, branch and landmark",
+            "term": "OPEN / unknown-but-wanted",
+            "parents": [
+              "address",
+              "recurrence"
+            ],
+            "status": "GIVEN",
+            "support": "OPEN → CHECK → Difference?; absent Difference remains OPEN; resolution can reopen.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "OPEN → CHECK → Difference?; absent Difference remains OPEN; resolution can reopen.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 36,
+            "inventory_binary_address": "00101000"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "nextState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "render-boundary",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "presentation consumes returned state",
+          "parents": [
+            "whole-envelope",
+            "presentation"
+          ],
+          "status": "GIVEN",
+          "support": "No hidden causal fetch while rendering; compose/deduplicate declared requirements before presentation.",
+          "sources": [
+            {
+              "path": "infinity/PROTOCOL.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "SPEC.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "infinity/PROTOCOL.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "SPEC.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "No hidden causal fetch while rendering; compose/deduplicate declared requirements before presentation.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 98,
+          "inventory_binary_address": "01101010"
+        },
+        "parents": [
+          {
+            "id": "whole-envelope",
+            "group": "Finite Whole envelope and selected executable projections",
+            "term": "complete declared Whole envelope",
+            "parents": [
+              "local-whole",
+              "address",
+              "parent"
+            ],
+            "status": "GIVEN",
+            "support": "Centre/address, finite radius/Grain boundary, returned field, WAS/IS/available NEXT, inward/outward and six Face relations, frontier, ancestry, Difference/channel and receipt travel together.",
+            "sources": [
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Centre/address, finite radius/Grain boundary, returned field, WAS/IS/available NEXT, inward/outward and six Face relations, frontier, ancestry, Difference/channel and receipt travel together.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 83,
+            "inventory_binary_address": "01011011"
+          },
+          {
+            "id": "presentation",
+            "group": "Finite Whole envelope and selected executable projections",
+            "term": "NOW, WAS, CAN BE, Fracture, Threads, Open grains, WHY, Closure, Difference, Observation gate",
+            "parents": [
+              "scene",
+              "landmark",
+              "can-be"
+            ],
+            "status": "GIVEN",
+            "support": "THEORY’s ten minimum GUI surfaces expose integrated state, provenance and genuine decision boundaries.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Minimum requirements are not a claim each surface is fully implemented.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "THEORY’s ten minimum GUI surfaces expose integrated state, provenance and genuine decision boundaries.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Minimum requirements are not a claim each surface is fully implemented.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 97,
+            "inventory_binary_address": "01101001"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "stateHash": "eeaab9db8213a3ba4b93100cb34a49c176034d3aba43dcf8e86ad0ded44b4731",
+      "nextHash": "07163bfeae7e72af51397608a75305efb2e5e4f04115625d2c615ca3de459d14"
+    },
+    {
+      "act": 6,
+      "input": {
+        "patternId": "requested-video-pattern",
+        "focusId": "render-boundary",
+        "containerId": "scene"
+      },
+      "state": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "render-boundary",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "presentation consumes returned state",
+          "parents": [
+            "whole-envelope",
+            "presentation"
+          ],
+          "status": "GIVEN",
+          "support": "No hidden causal fetch while rendering; compose/deduplicate declared requirements before presentation.",
+          "sources": [
+            {
+              "path": "infinity/PROTOCOL.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "SPEC.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "infinity/PROTOCOL.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "SPEC.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "No hidden causal fetch while rendering; compose/deduplicate declared requirements before presentation.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 98,
+          "inventory_binary_address": "01101010"
+        },
+        "parents": [
+          {
+            "id": "whole-envelope",
+            "group": "Finite Whole envelope and selected executable projections",
+            "term": "complete declared Whole envelope",
+            "parents": [
+              "local-whole",
+              "address",
+              "parent"
+            ],
+            "status": "GIVEN",
+            "support": "Centre/address, finite radius/Grain boundary, returned field, WAS/IS/available NEXT, inward/outward and six Face relations, frontier, ancestry, Difference/channel and receipt travel together.",
+            "sources": [
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Centre/address, finite radius/Grain boundary, returned field, WAS/IS/available NEXT, inward/outward and six Face relations, frontier, ancestry, Difference/channel and receipt travel together.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 83,
+            "inventory_binary_address": "01011011"
+          },
+          {
+            "id": "presentation",
+            "group": "Finite Whole envelope and selected executable projections",
+            "term": "NOW, WAS, CAN BE, Fracture, Threads, Open grains, WHY, Closure, Difference, Observation gate",
+            "parents": [
+              "scene",
+              "landmark",
+              "can-be"
+            ],
+            "status": "GIVEN",
+            "support": "THEORY’s ten minimum GUI surfaces expose integrated state, provenance and genuine decision boundaries.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Minimum requirements are not a claim each surface is fully implemented.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "THEORY’s ten minimum GUI surfaces expose integrated state, provenance and genuine decision boundaries.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Minimum requirements are not a claim each surface is fully implemented.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 97,
+            "inventory_binary_address": "01101001"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "wasState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "delta-update",
+          "group": "Time, state, branch and landmark",
+          "term": "LANDMARK₀ + Δ → affected fracture → LANDMARK₁",
+          "parents": [
+            "landmark",
+            "fracture"
+          ],
+          "status": "DERIVED",
+          "support": "New Difference changes affected relations without rebuilding reality from nothing.",
+          "sources": [
+            {
+              "path": "THEORY.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "THEORY.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "New Difference changes affected relations without rebuilding reality from nothing.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 39,
+          "inventory_binary_address": "00101011"
+        },
+        "parents": [
+          {
+            "id": "landmark",
+            "group": "Time, state, branch and landmark",
+            "term": "LANDMARK / current committed snapshot",
+            "parents": [
+              "is",
+              "fracture"
+            ],
+            "status": "DERIVED",
+            "support": "Fracture currently addressable relations, populate resolvable addresses, preserve unresolved as OPEN, retain landmark.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Fracture currently addressable relations, populate resolvable addresses, preserve unresolved as OPEN, retain landmark.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 38,
+            "inventory_binary_address": "00101010"
+          },
+          {
+            "id": "fracture",
+            "group": "Primitive boundary and admission",
+            "term": "fracture",
+            "parents": [
+              "relation"
+            ],
+            "status": "DERIVED",
+            "support": "Difference/relation → fracture → addressable grains is the declared foundational chain.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "fracture-cardinality remains OPEN; do not insert a fixed branch count.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Difference/relation → fracture → addressable grains is the declared foundational chain.",
+                "claim_status": "DERIVED"
+              },
+              "NEXT": {
+                "open_remainder": "fracture-cardinality remains OPEN; do not insert a fixed branch count.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 11,
+            "inventory_binary_address": "00001101"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "nextState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "receipt",
+          "group": "Evidence, output and completion",
+          "term": "returned evidence / receipt address",
+          "parents": [
+            "op-act",
+            "op-verify",
+            "op-return"
+          ],
+          "status": "DERIVED",
+          "support": "An Act’s evidence returns to the producing address; intent, queued, executed and verified are distinct.",
+          "sources": [
+            {
+              "path": "src/model/completion-fracture.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/completion-fracture.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "An Act’s evidence returns to the producing address; intent, queued, executed and verified are distinct.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 66,
+          "inventory_binary_address": "01001000"
+        },
+        "parents": [
+          {
+            "id": "op-act",
+            "group": "Operators over compatible grains",
+            "term": "ACT",
+            "parents": [
+              "next"
+            ],
+            "status": "GIVEN",
+            "support": "Listed source action term: perform the selected executable continuation. Action applicability is grain-dependent, not a mandate to run every operator.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Listed source action term: perform the selected executable continuation. Action applicability is grain-dependent, not a mandate to run every operator.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 55,
+            "inventory_binary_address": "00111100"
+          },
+          {
+            "id": "op-verify",
+            "group": "Operators over compatible grains",
+            "term": "VERIFY",
+            "parents": [
+              "manifestation"
+            ],
+            "status": "GIVEN",
+            "support": "Listed source action term: check returned evidence for the specific claimed result. Action applicability is grain-dependent, not a mandate to run every operator.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Listed source action term: check returned evidence for the specific claimed result. Action applicability is grain-dependent, not a mandate to run every operator.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 56,
+            "inventory_binary_address": "00111101"
+          },
+          {
+            "id": "op-return",
+            "group": "Operators over compatible grains",
+            "term": "RETURN",
+            "parents": [
+              "source-address"
+            ],
+            "status": "GIVEN",
+            "support": "Listed source action term: return receipt to the producing/source address. Action applicability is grain-dependent, not a mandate to run every operator.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Listed source action term: return receipt to the producing/source address. Action applicability is grain-dependent, not a mandate to run every operator.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 60,
+            "inventory_binary_address": "01000001"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "stateHash": "07163bfeae7e72af51397608a75305efb2e5e4f04115625d2c615ca3de459d14",
+      "nextHash": "65a6e7b754584b38584defb6f34a739af3c645cf93383546bc3f4c047419902b"
+    },
+    {
+      "act": 7,
+      "input": {
+        "patternId": "requested-video-pattern",
+        "focusId": "receipt",
+        "containerId": "scene"
+      },
+      "state": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "receipt",
+          "group": "Evidence, output and completion",
+          "term": "returned evidence / receipt address",
+          "parents": [
+            "op-act",
+            "op-verify",
+            "op-return"
+          ],
+          "status": "DERIVED",
+          "support": "An Act’s evidence returns to the producing address; intent, queued, executed and verified are distinct.",
+          "sources": [
+            {
+              "path": "src/model/completion-fracture.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/completion-fracture.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "An Act’s evidence returns to the producing address; intent, queued, executed and verified are distinct.",
+              "claim_status": "DERIVED"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 66,
+          "inventory_binary_address": "01001000"
+        },
+        "parents": [
+          {
+            "id": "op-act",
+            "group": "Operators over compatible grains",
+            "term": "ACT",
+            "parents": [
+              "next"
+            ],
+            "status": "GIVEN",
+            "support": "Listed source action term: perform the selected executable continuation. Action applicability is grain-dependent, not a mandate to run every operator.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Listed source action term: perform the selected executable continuation. Action applicability is grain-dependent, not a mandate to run every operator.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 55,
+            "inventory_binary_address": "00111100"
+          },
+          {
+            "id": "op-verify",
+            "group": "Operators over compatible grains",
+            "term": "VERIFY",
+            "parents": [
+              "manifestation"
+            ],
+            "status": "GIVEN",
+            "support": "Listed source action term: check returned evidence for the specific claimed result. Action applicability is grain-dependent, not a mandate to run every operator.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Listed source action term: check returned evidence for the specific claimed result. Action applicability is grain-dependent, not a mandate to run every operator.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 56,
+            "inventory_binary_address": "00111101"
+          },
+          {
+            "id": "op-return",
+            "group": "Operators over compatible grains",
+            "term": "RETURN",
+            "parents": [
+              "source-address"
+            ],
+            "status": "GIVEN",
+            "support": "Listed source action term: return receipt to the producing/source address. Action applicability is grain-dependent, not a mandate to run every operator.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              },
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  },
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Listed source action term: return receipt to the producing/source address. Action applicability is grain-dependent, not a mandate to run every operator.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Executable behavior/evidence must be supplied for the actual addressed use; listing an operator does not implement a worker.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 60,
+            "inventory_binary_address": "01000001"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "wasState": {
+        "binding": {
+          "id": "requested-video-pattern",
+          "containerId": "scene",
+          "sourceIds": [
+            "frame",
+            "render-boundary",
+            "receipt",
+            "expected-actual"
+          ],
+          "kind": "video",
+          "output": "fracture-proof/video.mp4",
+          "scope": "Add-only source-linked presentation pattern. Existing map/container records and world Act are unchanged.",
+          "containerLocator": "01100111"
+        },
+        "entry": {
+          "id": "render-boundary",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "presentation consumes returned state",
+          "parents": [
+            "whole-envelope",
+            "presentation"
+          ],
+          "status": "GIVEN",
+          "support": "No hidden causal fetch while rendering; compose/deduplicate declared requirements before presentation.",
+          "sources": [
+            {
+              "path": "infinity/PROTOCOL.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "SPEC.md",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "No additional gap asserted for this bounded statement.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "infinity/PROTOCOL.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "SPEC.md",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "No hidden causal fetch while rendering; compose/deduplicate declared requirements before presentation.",
+              "claim_status": "GIVEN"
+            },
+            "NEXT": {
+              "open_remainder": "No additional gap asserted for this bounded statement.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 98,
+          "inventory_binary_address": "01101010"
+        },
+        "parents": [
+          {
+            "id": "whole-envelope",
+            "group": "Finite Whole envelope and selected executable projections",
+            "term": "complete declared Whole envelope",
+            "parents": [
+              "local-whole",
+              "address",
+              "parent"
+            ],
+            "status": "GIVEN",
+            "support": "Centre/address, finite radius/Grain boundary, returned field, WAS/IS/available NEXT, inward/outward and six Face relations, frontier, ancestry, Difference/channel and receipt travel together.",
+            "sources": [
+              {
+                "path": "infinity/PROTOCOL.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "No additional gap asserted for this bounded statement.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "infinity/PROTOCOL.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "Centre/address, finite radius/Grain boundary, returned field, WAS/IS/available NEXT, inward/outward and six Face relations, frontier, ancestry, Difference/channel and receipt travel together.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "No additional gap asserted for this bounded statement.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 83,
+            "inventory_binary_address": "01011011"
+          },
+          {
+            "id": "presentation",
+            "group": "Finite Whole envelope and selected executable projections",
+            "term": "NOW, WAS, CAN BE, Fracture, Threads, Open grains, WHY, Closure, Difference, Observation gate",
+            "parents": [
+              "scene",
+              "landmark",
+              "can-be"
+            ],
+            "status": "GIVEN",
+            "support": "THEORY’s ten minimum GUI surfaces expose integrated state, provenance and genuine decision boundaries.",
+            "sources": [
+              {
+                "path": "THEORY.md",
+                "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+              }
+            ],
+            "gap": "Minimum requirements are not a claim each surface is fully implemented.",
+            "verification": "Source inspection; no new runtime implementation claimed.",
+            "state_frame": {
+              "WAS": {
+                "retained_sources": [
+                  {
+                    "path": "THEORY.md",
+                    "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                  }
+                ]
+              },
+              "IS": {
+                "established_statement": "THEORY’s ten minimum GUI surfaces expose integrated state, provenance and genuine decision boundaries.",
+                "claim_status": "GIVEN"
+              },
+              "NEXT": {
+                "open_remainder": "Minimum requirements are not a claim each surface is fully implemented.",
+                "new_act_claimed": false
+              }
+            },
+            "dependency_order": 97,
+            "inventory_binary_address": "01101001"
+          }
+        ],
+        "container": {
+          "id": "scene",
+          "group": "Finite Whole envelope and selected executable projections",
+          "term": "renderer-neutral scene / complete frame",
+          "parents": [
+            "whole-envelope",
+            "projection-36-19"
+          ],
+          "status": "GENERATED",
+          "support": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+          "sources": [
+            {
+              "path": "src/model/explorer.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "src/model/scene.ts",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            },
+            {
+              "path": "schema/explorer-frame.schema.json",
+              "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+            }
+          ],
+          "gap": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+          "verification": "Source inspection; no new runtime implementation claimed.",
+          "state_frame": {
+            "WAS": {
+              "retained_sources": [
+                {
+                  "path": "src/model/explorer.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "src/model/scene.ts",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                },
+                {
+                  "path": "schema/explorer-frame.schema.json",
+                  "revision": "5038c46d2b33ca75c5090d1c5654725532b1a063"
+                }
+              ]
+            },
+            "IS": {
+              "established_statement": "Explorer/schema/scene expose addressed relations and causal presentation edges to consumers.",
+              "claim_status": "GENERATED"
+            },
+            "NEXT": {
+              "open_remainder": "JSON keys are transport fields; the formal source relations retain semantic authority.",
+              "new_act_claimed": false
+            }
+          },
+          "dependency_order": 95,
+          "inventory_binary_address": "01100111"
+        },
+        "worldActChanged": false,
+        "scope": "Only the added display pattern advances"
+      },
+      "nextState": null,
+      "stateHash": "65a6e7b754584b38584defb6f34a739af3c645cf93383546bc3f4c047419902b",
+      "nextHash": null
+    }
+  ]
+}
