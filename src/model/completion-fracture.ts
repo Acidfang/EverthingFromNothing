@@ -55,12 +55,33 @@ export const COMPLETION_FRACTURES = Object.freeze([
 ] as const)
 
 export function canVerify(receipt:FractureReceipt):boolean{
-  return receipt.state==="VERIFIED" && receipt.evidence.length>0
+  switch(receipt.state){
+    case "VERIFIED":
+      return receipt.evidence.length>0
+    case "RETAINED":
+    case "QUEUED":
+    case "EXECUTED":
+    case "BLOCKED":
+    case "UNRESOLVED":
+      return false
+  }
 }
 
 export function normalizeCompletionState(state:CompletionState,evidence:readonly string[]):CompletionState{
-  if(state==="VERIFIED" && evidence.length===0)return "EXECUTED"
-  return state
+  switch(state){
+    case "VERIFIED":
+      return evidence.length>0 ? "VERIFIED" : "EXECUTED"
+    case "RETAINED":
+      return "RETAINED"
+    case "QUEUED":
+      return "QUEUED"
+    case "EXECUTED":
+      return "EXECUTED"
+    case "BLOCKED":
+      return "BLOCKED"
+    case "UNRESOLVED":
+      return "UNRESOLVED"
+  }
 }
 
 export const COMPLETION_BOUNDARIES = Object.freeze([
