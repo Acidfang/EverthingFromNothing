@@ -9,6 +9,7 @@ import { createAddressedDraw,mayAdvanceAfterDraw,type DrawReceipt } from "./mode
 import { FieldAddressOverlay } from "./FieldAddressOverlay"
 import { validSpatialAddress } from "./model/field-inventory"
 import { INITIAL_SYSTEM_STATE, transition } from "./model/transitionEngine"
+import {clampViewZoom,fitView,pickNodes,stateAddress,parseStateAddress,continuumAtAct,type NodeHit,type StateSelection} from "./model/view-navigation"
 import "./infinity.css"
 
 type PixelReference=Readonly<{x:number;y:number;addresses:readonly string[]}>
@@ -39,6 +40,9 @@ const drawEdges=(ctx:CanvasRenderingContext2D,edges:readonly FieldEdge[],points:
 }
 
 export function InfinityApp(){
+ const [viewAct,setViewAct]=useState<number|null>(null),[pan,setPan]=useState({x:0,y:0}),[fitMode,setFitMode]=useState<"field"|"selected"|null>("field"),[candidates,setCandidates]=useState<readonly string[]>([]),[addressError,setAddressError]=useState("")
+ const [history,setHistory]=useState<{items:StateSelection[];index:number}>({items:[{act:0,role:"IS",address:"0,0,0"}],index:0})
+ const toolsBar=useRef<HTMLDivElement>(null),nodeHits=useRef<readonly NodeHit[]>([]),hitContext=useRef({act:0,role:"IS" as "WAS"|"IS"|"NEXT"}),candidateContext=useRef({act:0,role:"IS" as "WAS"|"IS"|"NEXT"}),gesture=useRef<{x:number;y:number;moved:boolean}|null>(null)
  const [direction,setDirection]=useState(0),[fieldRole,setFieldRole]=useState<"WAS"|"IS"|"NEXT">("IS"),[traversalReceipt,setTraversalReceipt]=useState("IS · initial addressed field")
  const [inspecting,setInspecting]=useState(false),[paused,setPaused]=useState(true),[act,setAct]=useState(0),[roleState,setRoleState]=useState(INITIAL_SYSTEM_STATE)
  const [drawReceipt,setDrawReceipt]=useState<DrawReceipt|null>(null)
@@ -61,23 +65,32 @@ export function InfinityApp(){
  const naturalLive=()=>{if(live){stopListening();stopCapture();if("speechSynthesis" in window)window.speechSynthesis.cancel();drive("UI_CONTROL","LIVE_SESSION","END",()=>setLive(false));return}drive("UI_CONTROL","LIVE_SESSION","START",()=>setLive(true));startListening()}
  const [guidance,setGuidance]=useState("SOURCE"),[reply,setReply]=useState(""),[nextReply,setNextReply]=useState<string|null>(null),[sourceAddress,setSourceAddress]=useState("HUMAN/0"),[sourceMoment,setSourceMoment]=useState(0),[intentCenter,setIntentCenter]=useState("0,0,0"),[menu,setMenu]=useState<{x:number;y:number;address:string}|null>(null),[zoom,setZoom]=useState(16),[yaw,setYaw]=useState(-.65),[pitch,setPitch]=useState(.45),[selected,setSelected]=useState("0,0,0"),[visible,setVisible]=useState(1)
  const advance=()=>{continuum.current=advanceLedgerContinuum(continuum.current);setAct(continuum.current.state.act);setRoleState(state=>transition(state).after)}
- const requestAdvance=()=>{pendingActs.current+=1;setPaused(true)}
- const selectAddress=(address:string)=>{setSelected(address);setSourceAddress(address);setIntentCenter(address)}
+ const requestAdvance=()=>{pendingActs.current+=1;setPaused(true);setViewAct(null)}
+ const observed=useMemo(()=>continuumAtAct(continuum.current,viewAct??act),[act,viewAct])
+ const navigateState=(target:StateSelection,record=true)=>{setPaused(true);setViewAct(target.act);setFieldRole(target.role);setSelected(target.address);setInspecting(true);setCandidates([]);setAddressError("");if(record)setHistory(h=>{const current=h.items[h.index];return stateAddress(current)===stateAddress(target)?h:{items:[...h.items.slice(0,h.index+1),target],index:h.index+1}})}
+ const selectAddress=(address:string)=>navigateState({act:observed.state.act,role:fieldRole,address})
+ const openState=(value:string)=>{const target=parseStateAddress(value);if(!target){setAddressError("Use selected-kernel/act/NUMBER/WAS|IS|NEXT/x,y,z");return}if(target.act>act){setAddressError("That Act has not been retained in this session");return}navigateState(target)}
+ const visitHistory=(offset:number)=>{const index=history.index+offset,target=history.items[index];if(target){navigateState(target,false);setHistory(h=>({...h,index}))}}
+ const chooseAt=(x:number,y:number)=>{const hits=pickNodes(nodeHits.current,{x,y});if(hits.length===1)navigateState({...hitContext.current,address:hits[0]});else if(hits.length>1){candidateContext.current=hitContext.current;setCandidates(hits);setPaused(true)}else setCandidates([])}
  const closeInspector=()=>{setInspecting(false);inspectButton.current?.focus()}
- const calculated=useMemo(()=>resolveTick(continuum.current.state),[act])
+ const calculated=useMemo(()=>resolveTick(observed.state),[observed])
  const following=useMemo(()=>resolveTick(calculated.state),[calculated])
- const traverse=(role:"WAS"|"IS"|"NEXT")=>{setTraversalReceipt(`${fieldRole} → ${role} @ ${selected} · Act ${act} · ${role==="NEXT"?"calculated, not committed":"retained state"}`);setFieldRole(role)}
- const view=useRef({zoom,selected,sourceAddress,yaw,pitch,paused,roleState,direction,fieldRole,calculated,following})
- view.current={zoom,selected,sourceAddress,yaw,pitch,paused,roleState,direction,fieldRole,calculated,following}
+ const traverse=(role:"WAS"|"IS"|"NEXT")=>{setTraversalReceipt(`${fieldRole} → ${role} @ ${selected} · Act ${observed.state.act} · ${role==="NEXT"?"calculated, not committed":"retained state"}`);navigateState({act:observed.state.act,role,address:selected})}
+ const projectUnit=(p:Readonly<{x:number;y:number;z:number}>)=>{const ca=Math.cos(yaw),sa=Math.sin(yaw),cb=Math.cos(pitch),sb=Math.sin(pitch),rx=p.x*ca-p.z*sa,rz=p.x*sa+p.z*ca;return projectInDirection({x:rx,y:p.y*cb-rz*sb,z:p.y*sb+rz*cb},direction)}
+ const fitCamera=()=>{const box=canvas.current?.getBoundingClientRect();if(!box||!fitMode)return;const source=validSpatialAddress(sourceAddress)?sourceAddress:"0,0,0",field=fieldRole==="WAS"?observed.state.was:fieldRole==="NEXT"?calculated.state.is:observed.state.is,ledger=fieldRole==="WAS"?observed.receipts.at(-1):fieldRole==="IS"?calculated.ledger:following.ledger,addresses=fitMode==="selected"?new Set([selected]):field,points=[...addresses].map(a=>projectUnit(relativeTo(a,source)));if(ledger)for(const node of constrainedNodes(addresses,ledger)){const anchor=relativeTo(node.address,source);for(const n of node.next)for(const p of directedTetra(n.delta)??[])points.push(projectUnit({x:anchor.x+p.x,y:anchor.y+p.y,z:anchor.z+p.z}))}const left=inspecting&&box.width>800?490:0,top=(toolsBar.current?.getBoundingClientRect().bottom??80)-box.top+12,fit=fitView(points,box.width-left,box.height-top-70);if(fit){setZoom(fit.zoom);setPan({x:-fit.x,y:-fit.y})}}
+ useEffect(()=>{fitCamera();const observer=new ResizeObserver(fitCamera);if(canvas.current)observer.observe(canvas.current);if(toolsBar.current)observer.observe(toolsBar.current);return()=>observer.disconnect()},[fitMode,selected,sourceAddress,yaw,pitch,direction,fieldRole,observed,inspecting])
+ const manualZoom=(value:number)=>{setFitMode(null);setZoom(clampViewZoom(value))}
+ const view=useRef({zoom,selected,sourceAddress,yaw,pitch,paused,roleState,direction,fieldRole,calculated,following,observed,pan,inspecting})
+ view.current={zoom,selected,sourceAddress,yaw,pitch,paused,roleState,direction,fieldRole,calculated,following,observed,pan,inspecting}
  useEffect(()=>{const c=canvas.current;if(!c)return;const output=c.getContext("2d");if(!output)return
   const staging=document.createElement("canvas"),ctx=staging.getContext("2d",{willReadFrequently:true});if(!ctx)return
   let lastPresented="",lastFrameAt=0
   let disposed=false,timer:ReturnType<typeof setTimeout>|undefined,activeDraw:ReturnType<typeof createAddressedDraw>|undefined
   const draw=(now:number)=>{if(disposed)return
    // One coherent view snapshot finishes before the newest queued view is consumed.
-   const {zoom,selected,sourceAddress,yaw,pitch,roleState,direction,fieldRole,calculated,following}=view.current
+   const {zoom,selected,sourceAddress,yaw,pitch,roleState,direction,fieldRole,calculated,following,observed,pan,inspecting}=view.current
    const r=c.getBoundingClientRect(),dpr=devicePixelRatio||1,width=Math.max(1,Math.floor(r.width*dpr)),height=Math.max(1,Math.floor(r.height*dpr))
-   const frameIdentity=[width,height,zoom,selected,sourceAddress,yaw,pitch,direction,fieldRole,roleState.step].join("|")
+   const frameIdentity=[width,height,zoom,selected,sourceAddress,yaw,pitch,direction,fieldRole,observed.state.act,pan.x,pan.y,inspecting,roleState.step].join("|")
    if(pendingActs.current===0&&((view.current.paused&&frameIdentity===lastPresented)||(!view.current.paused&&now-lastFrameAt<1000/15))){raf.current=requestAnimationFrame(draw);return}
    lastFrameAt=now
    staging.width=width;staging.height=height;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle="#050708";ctx.fillRect(0,0,r.width,r.height)
@@ -90,30 +103,33 @@ export function InfinityApp(){
 
    // Differences already resolved by the continuum are state overlays within
    // the field; they do not define or bound the field itself.
-   const activeField=fieldRole==="WAS"?continuum.current.state.was:fieldRole==="NEXT"?calculated.state.is:continuum.current.state.is
+   const activeField=fieldRole==="WAS"?observed.state.was:fieldRole==="NEXT"?calculated.state.is:observed.state.is
    const stateAddresses=Object.freeze([...activeField])
-   const projectPoint=(p:Readonly<{x:number;y:number;z:number}>):ProjectedAddress=>{const ca=Math.cos(yaw),sa=Math.sin(yaw),cb=Math.cos(pitch),sb=Math.sin(pitch),rx=p.x*ca-p.z*sa,rz=p.x*sa+p.z*ca,q=projectInDirection({x:rx,y:p.y*cb-rz*sb,z:p.y*sb+rz*cb},direction);return{x:r.width/2+q.x/pixelStep,y:r.height/2-q.y/pixelStep}}
+   const viewLeft=inspecting&&r.width>800?490:0,viewTop=(toolsBar.current?.getBoundingClientRect().bottom??80)-r.top+12,viewCenter={x:viewLeft+(r.width-viewLeft)/2,y:viewTop+(r.height-viewTop-70)/2}
+   const projectPoint=(p:Readonly<{x:number;y:number;z:number}>):ProjectedAddress=>{const ca=Math.cos(yaw),sa=Math.sin(yaw),cb=Math.cos(pitch),sb=Math.sin(pitch),rx=p.x*ca-p.z*sa,rz=p.x*sa+p.z*ca,q=projectInDirection({x:rx,y:p.y*cb-rz*sb,z:p.y*sb+rz*cb},direction);return{x:viewCenter.x+(q.x+pan.x)/pixelStep,y:viewCenter.y-(q.y+pan.y)/pixelStep}}
    const projectState=(address:string)=>projectPoint(relativeTo(address,source))
    const stateByAddress=new Map(stateAddresses.map(address=>[address,projectState(address)] as const))
    const frameProjected=mergeByPixel(stateAddresses,projectState)
-   const ledger=fieldRole==="NEXT"?calculated.ledger:fieldRole==="WAS"?continuum.current.receipts.at(-2):continuum.current.receipts.at(-1)
+   const ledger=fieldRole==="NEXT"?calculated.ledger:fieldRole==="WAS"?observed.receipts.at(-2):observed.receipts.at(-1)
    const edges:readonly FieldEdge[]=ledger?.entries.flatMap(entry=>entry.arrivals.map(arrival=>({from:arrival.source,to:entry.address})))??[]
    const edgeByAddress=new Map([...new Set(edges.flatMap(edge=>[edge.from,edge.to]))].map(address=>[address,projectState(address)] as const))
    const detail=Math.max(.35,Math.min(1,zoom/8))
    if(detail>0){drawEdges(ctx,edges,edgeByAddress,.22*detail);for(const address of activeField){const q=stateByAddress.get(address);if(q&&q.x>=0&&q.x<r.width&&q.y>=0&&q.y<r.height)putPhysicalPixel(ctx,q.x,q.y,dpr,address===selected||address===source)}}
 
-   const successor=fieldRole==="WAS"?continuum.current.receipts.at(-1):fieldRole==="IS"?calculated.ledger:following.ledger
+   const successor=fieldRole==="WAS"?observed.receipts.at(-1):fieldRole==="IS"?calculated.ledger:following.ledger
    const constraints=successor?constrainedNodes(activeField,successor):[]
+   const frameHits:NodeHit[]=stateAddresses.map(address=>({...projectState(address),address,polygons:[]}))
    ctx.save();ctx.lineWidth=.7
    for(const node of constraints){const anchor=relativeTo(node.address,source),q=projectPoint(anchor)
     if(!node.next.length){ctx.strokeStyle="#929c9f";ctx.strokeRect(q.x-2,q.y-2,4,4);continue}
     ctx.strokeStyle=node.next.length===1?"#e5ad56":"rgba(229,173,86,.48)";ctx.setLineDash(node.next.length>1?[2,2]:[])
-    for(const candidate of node.next){const tetra=directedTetra(candidate.delta);if(!tetra)continue;const points=tetra.map(p=>projectPoint({x:anchor.x+p.x,y:anchor.y+p.y,z:anchor.z+p.z}));for(const [a,b] of [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]){ctx.beginPath();ctx.moveTo(points[a].x,points[a].y);ctx.lineTo(points[b].x,points[b].y);ctx.stroke()}}
+    for(const candidate of node.next){const tetra=directedTetra(candidate.delta);if(!tetra)continue;const points=tetra.map(p=>projectPoint({x:anchor.x+p.x,y:anchor.y+p.y,z:anchor.z+p.z}));const hit=frameHits.find(h=>h.address===node.address);if(hit)(hit.polygons as ProjectedAddress[][]).push(points);for(const [a,b] of [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]){ctx.beginPath();ctx.moveTo(points[a].x,points[a].y);ctx.lineTo(points[b].x,points[b].y);ctx.stroke()}}
    }
    ctx.restore()
+   const selectedPoint=stateByAddress.get(selected);if(selectedPoint){ctx.save();ctx.strokeStyle="#fff0b3";ctx.lineWidth=2;ctx.beginPath();ctx.arc(selectedPoint.x,selectedPoint.y,7,0,Math.PI*2);ctx.stroke();ctx.fillStyle="#fff0b3";ctx.font="12px monospace";ctx.fillText(selected,selectedPoint.x+10,selectedPoint.y-10);ctx.restore()}
    // Source points are modelling directions, not a solid to showcase.
    // The selected direction basis above projects every live address and edge.
-   const centre={x:r.width/2,y:r.height/2},vector=MODEL_DIRECTIONS[direction]
+   const centre=projectPoint({x:0,y:0,z:0}),vector=MODEL_DIRECTIONS[direction]
    ctx.save();ctx.fillStyle="#eeeade";ctx.fillRect(centre.x-1,centre.y-1,2,2)
    ctx.font="11px monospace";ctx.textAlign="center";ctx.fillText(`ZERO · ${fieldRole} · OBSERVER ${direction+1} (${vector.x},${vector.y},${vector.z})`,centre.x,centre.y+30)
    ctx.font="9px monospace";ctx.fillText("Per-node tips: admitted next · dashed: alternatives · glyph roll selected",centre.x,centre.y+46)
@@ -142,7 +158,7 @@ export function InfinityApp(){
     if(Math.max(1,Math.floor(current.width*(devicePixelRatio||1)))!==width||Math.max(1,Math.floor(current.height*(devicePixelRatio||1)))!==height){job.cancel();raf.current=requestAnimationFrame(draw);return}
     const receipt=job.assign(262144,(index)=>{const offset=index*4;presented.data[offset]=framed.data[offset];presented.data[offset+1]=framed.data[offset+1];presented.data[offset+2]=framed.data[offset+2];presented.data[offset+3]=framed.data[offset+3]})
     if(!receipt.complete){timer=setTimeout(batch,0);return}
-    c.width=width;c.height=height;output.putImageData(presented,0,0);projected.current=frameProjected;lastPresented=frameIdentity
+    c.width=width;c.height=height;output.putImageData(presented,0,0);projected.current=frameProjected;nodeHits.current=frameHits;hitContext.current={act:observed.state.act,role:fieldRole};lastPresented=frameIdentity
     const requested=pendingActs.current>0,playback=!view.current.paused&&now-last.current>=1000&&WHOLE_INVARIANT.recursive&&FULL_SELF_RESOLUTION.selfSimilar
     if(mayAdvanceAfterDraw(receipt,true)&&(requested||playback)){if(requested)pendingActs.current--;setDrawReceipt(receipt);advance();last.current=now}
     else setDrawReceipt(previous=>previous&&previous.width===width&&previous.height===height?previous:receipt)
@@ -150,16 +166,18 @@ export function InfinityApp(){
    };batch()
   };raf.current=requestAnimationFrame(draw);return()=>{disposed=true;activeDraw?.cancel();if(timer!==undefined)clearTimeout(timer);cancelAnimationFrame(raf.current)}},[])
  return <main className="infinity-map"><section className="infinity-field" aria-label="Ledger-driven fracture field">
-  <div className="field-tools"><label>Model relation <select aria-label="Model relation" value={fieldRole} onChange={e=>traverse(e.target.value as "WAS"|"IS"|"NEXT")}><option>WAS</option><option>IS</option><option>NEXT</option></select></label><label>Observer projection <select aria-label="Observer projection" value={direction} onChange={e=>{setDirection(Number(e.target.value));drive("UI_CONTROL","OBSERVER_DIRECTION",e.target.value,()=>{})}}>{MODEL_DIRECTIONS.map((v,i)=><option key={i} value={i}>{i+1}: {v.x},{v.y},{v.z}</option>)}</select></label><button ref={inspectButton} type="button" aria-expanded={inspecting} onClick={()=>setInspecting(value=>!value)}>Inspect addresses</button><button type="button" onClick={()=>setPaused(value=>!value)}>{paused?"Play shared Act":"Pause playback"}</button><button type="button" onClick={requestAdvance}>Advance one Act</button><button type="button" onClick={()=>{setYaw(-.65);setPitch(.45)}}>Reset view</button><button type="button" onClick={()=>setYaw(value=>value+.15)}>Turn view left</button><button type="button" onClick={()=>setZoom(z=>Math.min(64,z*2))}>Grain in</button><button type="button" onClick={()=>setZoom(z=>Math.max(.125,z/2))}>Grain out</button><button type="button" onClick={()=>setPitch(value=>Math.min(Math.PI/2,value+.15))}>Tilt view up</button></div>
-  {inspecting?<FieldAddressOverlay fieldRole={fieldRole} selected={selected} onSelect={selectAddress} onFollowNext={address=>{setTraversalReceipt(`${fieldRole} @ ${selected} → ${fieldRole==="WAS"?"IS":"proposed NEXT"} @ ${address} · Act ${act} · navigation only`);selectAddress(address);setFieldRole(fieldRole==="WAS"?"IS":"NEXT")}} continuum={continuum.current} paused={paused} onPause={()=>setPaused(value=>!value)} onStep={requestAdvance} onClose={closeInspector}/>:null}
+  <div ref={toolsBar} className="field-tools"><label>Model relation <select aria-label="Model relation" value={fieldRole} onChange={e=>traverse(e.target.value as "WAS"|"IS"|"NEXT")}><option>WAS</option><option>IS</option><option>NEXT</option></select></label><label>Observer projection <select aria-label="Observer projection" value={direction} onChange={e=>{setDirection(Number(e.target.value));drive("UI_CONTROL","OBSERVER_DIRECTION",e.target.value,()=>{})}}>{MODEL_DIRECTIONS.map((v,i)=><option key={i} value={i}>{i+1}: {v.x},{v.y},{v.z}</option>)}</select></label><button ref={inspectButton} type="button" aria-expanded={inspecting} onClick={()=>setInspecting(value=>!value)}>Inspect addresses</button><button type="button" onClick={()=>{if(paused)setViewAct(null);setPaused(value=>!value)}}>{paused?"Play shared Act":"Pause playback"}</button><button type="button" onClick={requestAdvance}>Advance one Act</button><button type="button" onClick={()=>{setYaw(-.65);setPitch(.45)}}>Reset view</button><button type="button" onClick={()=>setYaw(value=>value+.15)}>Turn view left</button><button type="button" onClick={()=>manualZoom(zoom*2)}>Grain in</button><button type="button" onClick={()=>manualZoom(zoom/2)}>Grain out</button><button type="button" onClick={()=>{setFitMode("selected");fitCamera()}}>Fit selected</button><button type="button" onClick={()=>{setFitMode("field");fitCamera()}}>Fit field</button><span className="zoom-readout">{zoom.toFixed(1)} px/unit</span><button type="button" onClick={()=>setPitch(value=>Math.min(Math.PI/2,value+.15))}>Tilt view up</button></div>
+  {candidates.length>0?<div className="node-choice" role="dialog" aria-label="Choose overlapping node"><strong>{candidates.length} nodes under this point</strong>{candidates.map(address=><button type="button" key={address} onClick={()=>navigateState({...candidateContext.current,address})}>{address}</button>)}<button type="button" onClick={()=>setCandidates([])}>Cancel selection</button></div>:null}
+  <div className="state-navigation"><strong>{stateAddress({act:observed.state.act,role:fieldRole,address:selected})}</strong><button type="button" disabled={history.index===0} onClick={()=>visitHistory(-1)}>Previous state address</button><button type="button" disabled={history.index===history.items.length-1} onClick={()=>visitHistory(1)}>Next state address</button><button type="button" onClick={()=>{setViewAct(null);setFieldRole("IS");setAddressError("")}}>Live Act {act}</button></div>
+  {inspecting?<FieldAddressOverlay stateAddressValue={stateAddress({act:observed.state.act,role:fieldRole,address:selected})} onOpenState={openState} stateAddressError={addressError} fieldRole={fieldRole} selected={selected} onSelect={selectAddress} onFollowNext={address=>{setTraversalReceipt(`${fieldRole} @ ${selected} → ${fieldRole==="WAS"?"IS":"proposed NEXT"} @ ${address} · Act ${act} · navigation only`);navigateState({act:observed.state.act,role:fieldRole==="WAS"?"IS":"NEXT",address})}} continuum={observed} paused={paused} onPause={()=>{if(paused)setViewAct(null);setPaused(value=>!value)}} onStep={requestAdvance} onClose={closeInspector}/>:null}
   <div className="field-view-status" aria-live="polite">Act {act} · {paused?"paused":"playback"} · slots {roleState.temporal.was} / {roleState.temporal.is} / {roleState.temporal.next} · view {yaw.toFixed(2)} / {pitch.toFixed(2)} · {traversalReceipt} · observer {direction+1} · SELECTED observer basis; six-face rule unchanged · Exact twist transform unresolved · {drawReceipt?`${drawReceipt.assigned}/${drawReceipt.width*drawReceipt.height} pixels completed before TIME`:"framing before TIME"}</div>
   <canvas ref={canvas} className="infinity-canvas"
-  onWheel={e=>{e.preventDefault();setZoom(z=>Math.max(.125,Math.min(64,z*Math.exp(-e.deltaY*.0015))))}}
-  onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPointer.current={x:e.clientX,y:e.clientY};const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(validSpatialAddress(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),hit=projected.current.reduce<PixelReference|null>((best,p)=>Math.hypot(p.x-x,p.y-y)<12&&(!best||Math.hypot(p.x-x,p.y-y)<Math.hypot(best.x-x,best.y-y))?p:best,null),address=hit?.addresses[0]??selected;setSelected(address)}}
-  onPointerMove={e=>{if(!pointers.current.has(e.pointerId))return;const prior=pointers.current.get(e.pointerId)!;pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===2){const pts=[...pointers.current.values()],before=pts.map(p=>({...p}));const movedIndex=[...pointers.current.keys()].indexOf(e.pointerId);before[movedIndex]=prior;const d=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),od=Math.hypot(before[0].x-before[1].x,before[0].y-before[1].y);if(od>0)setZoom(z=>Math.max(.125,Math.min(64,z*d/od)));return}if(!lastPointer.current)return;const dx=e.clientX-lastPointer.current.x,dy=e.clientY-lastPointer.current.y;lastPointer.current={x:e.clientX,y:e.clientY};setYaw(v=>v+dx*.008);setPitch(v=>Math.max(-Math.PI/2,Math.min(Math.PI/2,v+dy*.008)))}}
-  onPointerUp={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}} onPointerCancel={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}}
-  onContextMenu={e=>{e.preventDefault();const box=e.currentTarget.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,o=fromKey(validSpatialAddress(sourceAddress)?sourceAddress:"0,0,0"),step=1/Math.max(.125,zoom),hit=projected.current.reduce<PixelReference|null>((best,p)=>Math.hypot(p.x-x,p.y-y)<12&&(!best||Math.hypot(p.x-x,p.y-y)<Math.hypot(best.x-x,best.y-y))?p:best,null),address=hit?.addresses[0]??selected;setSelected(address);setIntentCenter(address);setSourceAddress(address);setGuidance("SOURCE");drive("UI_CONTROL","CENTER_OF_INTENT",address,()=>{});setMenu({x,y,address})}}
-  onDoubleClick={()=>{setZoom(1);setYaw(-.65);setPitch(.45)}} />
+  onWheel={e=>{e.preventDefault();manualZoom(zoom*Math.exp(-e.deltaY*.0015))}}
+  onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPointer.current={x:e.clientX,y:e.clientY};gesture.current={x:e.clientX,y:e.clientY,moved:pointers.current.size>1}}}
+  onPointerMove={e=>{if(!pointers.current.has(e.pointerId))return;if(gesture.current&&Math.hypot(e.clientX-gesture.current.x,e.clientY-gesture.current.y)>4)gesture.current.moved=true;const prior=pointers.current.get(e.pointerId)!;pointers.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.current.size===2){const pts=[...pointers.current.values()],before=pts.map(p=>({...p}));const movedIndex=[...pointers.current.keys()].indexOf(e.pointerId);before[movedIndex]=prior;const d=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),od=Math.hypot(before[0].x-before[1].x,before[0].y-before[1].y);if(gesture.current)gesture.current.moved=true;if(od>0)manualZoom(zoom*d/od);return}if(!lastPointer.current||!gesture.current?.moved)return;const dx=e.clientX-lastPointer.current.x,dy=e.clientY-lastPointer.current.y;lastPointer.current={x:e.clientX,y:e.clientY};setYaw(v=>v+dx*.008);setPitch(v=>Math.max(-Math.PI/2,Math.min(Math.PI/2,v+dy*.008)))}}
+  onPointerUp={e=>{if(gesture.current&&!gesture.current.moved&&pointers.current.size===1){const box=e.currentTarget.getBoundingClientRect();chooseAt(e.clientX-box.left,e.clientY-box.top)}pointers.current.delete(e.pointerId);lastPointer.current=null;gesture.current=null}} onPointerCancel={e=>{pointers.current.delete(e.pointerId);lastPointer.current=null}}
+  onContextMenu={e=>{e.preventDefault();const box=e.currentTarget.getBoundingClientRect();chooseAt(e.clientX-box.left,e.clientY-box.top)}}
+  onDoubleClick={()=>setFitMode("selected")} />
   {menu?<div className="map-context-menu" style={{position:"absolute",left:menu.x,top:menu.y,zIndex:5}} onPointerLeave={()=>setMenu(null)}>
    <button type="button" onClick={()=>{setSelected(menu.address);setMenu(null)}}>SET ZERO HERE</button>
    <button type="button" onClick={()=>{setSelected(menu.address);setZoom(z=>Math.min(64,z*2));setMenu(null)}}>ENTER / ZOOM</button>
@@ -179,3 +197,4 @@ export function InfinityApp(){
   <div className="sr-only" aria-live="polite">{visible} visible pixels · act {continuum.current.state.act} · center of intent {intentCenter} · {guidance} · {sourceChannel} → {destinationChannel}</div>
  </section></main>
 }
+

@@ -2,6 +2,7 @@ import {useEffect,useMemo,useRef,useState} from "react"
 import inventory from "../docs/FRACTURE-FIELD-INVENTORY.json"
 import {relationsAt,searchInventory,sourceHref,validSpatialAddress} from "./model/field-inventory"
 import {resolveTick,type LedgerContinuum} from "./model/kernel"
+import {stateAddress} from "./model/view-navigation"
 import {OPEN_DIFFERENCES} from "./model/canonicalSeed"
 
 import {FractureVideoProof} from "./FractureVideoProof"
@@ -11,16 +12,19 @@ const graph=inventory.binary_relation_order
 const nodes=new Map(graph.nodes.map(node=>[node.id,node]))
 const entries=new Map(inventory.entries.map(entry=>[entry.id,entry]))
 const refinementIds=["can-be","can-next","cant-next"]
-type Props=Readonly<{fieldRole:"WAS"|"IS"|"NEXT";selected:string;onSelect:(address:string)=>void;onFollowNext:(address:string)=>void;continuum:LedgerContinuum;paused:boolean;onPause:()=>void;onStep:()=>void;onClose:()=>void}>
+type Props=Readonly<{stateAddressValue:string;onOpenState:(value:string)=>void;stateAddressError:string;fieldRole:"WAS"|"IS"|"NEXT";selected:string;onSelect:(address:string)=>void;onFollowNext:(address:string)=>void;continuum:LedgerContinuum;paused:boolean;onPause:()=>void;onStep:()=>void;onClose:()=>void}>
 
-export function FieldAddressOverlay({fieldRole,selected,onSelect,onFollowNext,continuum,paused,onPause,onStep,onClose}:Props){
+export function FieldAddressOverlay({stateAddressValue,onOpenState,stateAddressError,fieldRole,selected,onSelect,onFollowNext,continuum,paused,onPause,onStep,onClose}:Props){
  const [query,setQuery]=useState(""),[route,setRoute]=useState({ids:["nothing"],index:0}),[role,setRole]=useState<"WAS"|"IS"|"NEXT">("IS"),[coordinate,setCoordinate]=useState(selected),[error,setError]=useState("")
+ const [stateInput,setStateInput]=useState(stateAddressValue)
+ useEffect(()=>setStateInput(stateAddressValue),[stateAddressValue])
  const sourceDetail=useRef<HTMLElement>(null)
  const search=useRef<HTMLInputElement>(null)
  const id=route.ids[route.index],node=nodes.get(id)!,entry=entries.get(id)
  const matched=searchInventory(graph.nodes,query),relations=relationsAt(graph.relations,id)
  const preview=useMemo(()=>resolveTick(continuum.state),[continuum])
- const receipt=continuum.receipts.at(-1)?.entries.find(item=>item.address===selected)
+ const incoming=fieldRole==="NEXT"?preview.ledger:fieldRole==="WAS"?continuum.receipts.at(-2):continuum.receipts.at(-1)
+ const receipt=incoming?.entries.find(item=>item.address===selected)
  const following=useMemo(()=>resolveTick(preview.state),[preview])
  const successor=fieldRole==="WAS"?continuum.receipts.at(-1):fieldRole==="IS"?preview.ledger:following.ledger
  const allowedNext=(successor?.entries??[]).filter(item=>item.remainsDifferent&&item.arrivals.some(arrival=>arrival.source===selected))
@@ -31,6 +35,7 @@ export function FieldAddressOverlay({fieldRole,selected,onSelect,onFollowNext,co
  return <aside className="field-address-overlay" aria-label="Address and relation inspector" onKeyDown={event=>{if(event.key==="Escape"){event.stopPropagation();onClose()}}}>
   <header><div><small>ONE FIELD · ADDRESSED RELATIONS</small><h1>Address inspector</h1></div><button type="button" onClick={onClose} aria-label="Close address inspector">Close</button></header>
   <section aria-label="Selected runtime address">
+   <form onSubmit={event=>{event.preventDefault();onOpenState(stateInput)}}><label>State address<input aria-label="State address" value={stateInput} onChange={event=>setStateInput(event.target.value)}/></label><button type="submit">Open retained state</button></form><p>Session address: base Act + WAS/IS/NEXT + spatial node. NEXT remains a calculated proposal; opening it does not advance the model.</p>{stateAddressError?<p role="alert">{stateAddressError}</p>:null}
    <h2>Selected spatial address · {selected}</h2>
    <form onSubmit={event=>{event.preventDefault();const value=coordinate.trim();if(!validSpatialAddress(value)){setError("Use three safe integers: x,y,z");return}onSelect(value.split(",").map(Number).join(","));setError("")}}><label>Spatial address <input value={coordinate} onChange={event=>setCoordinate(event.target.value)} aria-label="Spatial address"/></label><button type="submit">Select address</button></form>
    {error?<p role="alert">{error}</p>:null}
@@ -39,10 +44,10 @@ export function FieldAddressOverlay({fieldRole,selected,onSelect,onFollowNext,co
    <p>SELECTED six-face parity model · NEXT is a preview until the shared Act advances. Address navigation does not advance time.</p>
    <details><summary>Allowed NEXT directions</summary><p>From displayed {fieldRole}. {allowedNext.length} surviving successor addresses in the selected kernel. Multiple candidates remain alternatives; inspecting one does not commit it or exclude the others.</p>{allowedNext.map(item=><button type="button" key={item.address} disabled={fieldRole==="NEXT"} onClick={()=>onFollowNext(item.address)}>{fieldRole==="WAS"?"Inspect IS":"Inspect proposed"} {item.address}</button>)}{fieldRole==="NEXT"?<p>These are calculated beyond the displayed NEXT frame; they are not committed or traversed as current state.</p>:null}{allowedNext.length===0?<p>No admissible successor returned for this source at this Act.</p>:null}</details>
    <details><summary>Returned evidence and source arrivals</summary>
-    <p>{receipt?`Receipt ${continuum.state.act-1} → ${continuum.state.act}: ${receipt.arrivalCount} arrivals · ${receipt.result}`:"No returned receipt at this address in the latest Act. SAME is absence of a represented Difference in this selected model."}</p>
-    {receipt?.arrivals.map(arrival=><button type="button" key={arrival.source+arrival.face} onClick={()=>onSelect(arrival.source)}>SOURCE {arrival.source} · face {arrival.face}</button>)}
+    <p>{receipt?`Receipt ${incoming?.fromAct} → ${incoming?.toAct}: ${receipt.arrivalCount} arrivals · ${receipt.result}`:"No returned receipt at this address in the latest Act. SAME is absence of a represented Difference in this selected model."}</p>
+    {receipt?.arrivals.map(arrival=><button type="button" key={arrival.source+arrival.face} onClick={()=>onOpenState(stateAddress({act:fieldRole==="WAS"?Math.max(0,continuum.state.act-1):continuum.state.act,role:fieldRole==="NEXT"?"IS":"WAS",address:arrival.source}))}>SOURCE {arrival.source} · face {arrival.face}</button>)}
     <p>Calculated NEXT arrivals: {nextReceipt?.arrivalCount??0}</p>
-    {nextReceipt?.arrivals.map(arrival=><button type="button" key={arrival.source+arrival.face} onClick={()=>onSelect(arrival.source)}>NEXT source {arrival.source} · face {arrival.face}</button>)}
+    {nextReceipt?.arrivals.map(arrival=><button type="button" key={arrival.source+arrival.face} onClick={()=>onOpenState(stateAddress({act:continuum.state.act,role:"IS",address:arrival.source}))}>NEXT source {arrival.source} · face {arrival.face}</button>)}
     <a href={sourceHref({path:"src/model/kernel.ts",revision:inventory.source_revision})} target="_blank" rel="noreferrer">Inspect retained kernel source</a>
    </details>
   </section>
@@ -71,3 +76,4 @@ export function FieldAddressOverlay({fieldRole,selected,onSelect,onFollowNext,co
   <footer>Selection and search stay in this page’s memory. No private address data is loaded or sent. Source-stated and derived claims remain scoped; runtime identity is unverified.</footer>
  </aside>
 }
+
