@@ -27,3 +27,15 @@ export function continuumAtAct(live:LedgerContinuum,act:number):LedgerContinuum{
  const prior=act===1?createLedgerContinuum().state.is:new Set(live.receipts.find(r=>r.toAct===act-1)!.entries.filter(e=>e.remainsDifferent).map(e=>e.address))
  return{state:{act,was:prior,is:new Set(receipt.entries.filter(e=>e.remainsDifferent).map(e=>e.address))},receipts:live.receipts.filter(r=>r.toAct<=act),activeAddress:live.activeAddress}
 }
+
+export function usableFieldView(width:number,height:number,toolbarBottom:number,inspecting:boolean){
+ const left=inspecting&&width>800?490:0,top=Math.max(340,toolbarBottom+12,Math.max(110,Math.min(220,height*.28))+28)
+ return{left,top,width:Math.max(32,width-left),height:Math.max(32,height-top-70)}
+}
+
+export function isCurrentActFrame(framedAct:number,liveAct:number){return Number.isSafeInteger(framedAct)&&framedAct>=0&&framedAct===liveAct}
+/** Pending view actions only; cancellation never changes a committed kernel state. */
+export function createViewAdvanceQueue(){
+ let pending=0
+ return{get pending(){return pending},request(){pending++;return pending},cancel(){const cancelled=pending;pending=0;return cancelled},consumeCurrentFrame(framedAct:number,liveAct:number){if(pending===0||!isCurrentActFrame(framedAct,liveAct))return false;pending--;return true}}
+}
