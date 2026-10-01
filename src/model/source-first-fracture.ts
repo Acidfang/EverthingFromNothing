@@ -8,10 +8,12 @@ export const FRACTURE_AUTHORITY = Object.freeze({
   anotherGrain: 'docs/SOURCE-MECHANISM.md#grains',
   temporal: 'src/model/canonicalSeed.ts:transition',
 });
+export type SourceRelation = Readonly<{id:string;relation:string;address:string;sourceRef:string;revision:number}>;
 export type SourceRecord = Readonly<{
   id:string; address:string; sourceRef:string; value:string;
   previousId?:string; parentAddress?:string; parentAddresses?:readonly string[];
   moment?:Readonly<{index:string; sourceRef:string}>;
+  relations?:readonly SourceRelation[];
 }>;
 export type FractureInput = Readonly<{
   sourceAddress:string; records:readonly SourceRecord[];
@@ -24,7 +26,8 @@ export type FractureNode = Readonly<{
 }>;
 export type FractureEdge = Readonly<{
   id:string; from:string; to:string;
-  kind:'RETAINED_AT'|'DIFFERENCE_AT'|'RETURN'|'CONTAINED_BY';
+  kind:'RETAINED_AT'|'DIFFERENCE_AT'|'RETURN'|'CONTAINED_BY'|'DECLARED_RELATION';
+  relation?:string; sourceRecordId?:string; sourceRevision?:number; toKnown?:boolean;
   sourceRefs:readonly string[];
 }>;
 export type FractureGate = Readonly<{
@@ -61,10 +64,13 @@ export function produceSourceFractures(input:FractureInput) {
     if(r.parentAddresses!==undefined&&(!Array.isArray(r.parentAddresses)||r.parentAddresses.some((p:unknown)=>!nonempty(p))))throw new Error('invalid parentAddresses');
     if(records.has(r.id)) throw new Error('duplicate record identity');
     if(r.moment!==undefined && (!r.moment || typeof r.moment!=='object' || !nonempty(r.moment.index) || !nonempty(r.moment.sourceRef))) throw new Error('moment requires explicit source binding');
+    if(r.relations!==undefined&&(!Array.isArray(r.relations)||r.relations.some((link:SourceRelation)=>!link||!nonempty(link.id)||!nonempty(link.relation)||!nonempty(link.address)||!nonempty(link.sourceRef)||!Number.isSafeInteger(link.revision)||link.revision<0)))throw new Error('invalid addressed relation');
+    if(r.relations&&new Set(r.relations.map((link:SourceRelation)=>link.id)).size!==r.relations.length)throw new Error('duplicate addressed relation identity');
     const copy:SourceRecord={id:r.id,address:r.address,sourceRef:r.sourceRef,value:r.value,
       ...(r.previousId!==undefined?{previousId:r.previousId}:{}),
       ...(r.parentAddress!==undefined?{parentAddress:r.parentAddress}:{}),
       ...(r.parentAddresses!==undefined?{parentAddresses:[...r.parentAddresses]}:{}),
+      ...(r.relations?{relations:r.relations.map((link:SourceRelation)=>({id:link.id,relation:link.relation,address:link.address,sourceRef:link.sourceRef,revision:link.revision}))}:{}),
       ...(r.moment?{moment:{index:r.moment.index,sourceRef:r.moment.sourceRef}}:{})};
     records.set(r.id,freeze(copy));
   }
@@ -88,6 +94,12 @@ export function produceSourceFractures(input:FractureInput) {
     }
     if(address!==input.sourceAddress && parents.length===0) unresolved.push({address,reason:'CONTAINMENT_UNBOUND'});
   }
+  for(const r of sourceRecords)for(const link of r.relations??[]){
+    const toKnown=addresses.has(link.address);
+    edges.push({id:id('DECLARED_RELATION',r.id,link.id),from:id('ADDRESS',r.address),to:id('ADDRESS',link.address),kind:'DECLARED_RELATION',relation:link.relation,sourceRecordId:r.id,sourceRevision:link.revision,sourceRefs:[link.sourceRef],toKnown});
+    if(!toKnown)unresolved.push({address:link.address,reason:`RELATION_ENDPOINT_NOT_RETAINED:${link.id}`});
+  }
+  // Named relations remain witnessed links, not inferred containment or spatial rays.
   for(const r of sourceRecords) {
     if(!r.previousId) { unresolved.push({address:r.address,reason:`BASELINE_ONLY:${r.id}`}); continue; }
     const was=records.get(r.previousId);

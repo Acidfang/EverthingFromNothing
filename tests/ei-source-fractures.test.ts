@@ -59,3 +59,70 @@ test('an explicit correction of a retained conversation message produces its own
  assert.equal(out.bindings.find(binding=>binding.recordId===gate.isRecordId)?.phase,'PROPOSED')
  assert.equal(captured.ledger.records.find(record=>record.address===turn.user.address)?.is.value,'read "definition"')
 })
+
+test('named threads survive field handoff with creation provenance across revisions and replay',()=>{
+ const ledger=createEILedger({records:[
+  {address:'root',value:'root',source:source('root')},
+  {address:'definition',value:'before',parents:['root'],source:source('origin'),relations:[
+   {relation:'supports',address:'root'},{relation:'returns-to',address:'root'},
+   {relation:'self',address:'definition'},{relation:'unresolved-target',address:'absent'},
+  ]},
+ ]})
+ const execution=proposed(ledger,'after'),projection=prepareEIUnifiedTransition(ledger,execution)
+ const links=projection.sourceFractures.field.edges.filter(edge=>edge.kind==='DECLARED_RELATION')
+ assert.equal(links.length,4)
+ assert.deepEqual(links.map(edge=>edge.relation),['supports','returns-to','self','unresolved-target'])
+ assert.equal(new Set(links.map(edge=>edge.id)).size,4)
+ for(const link of links){
+  assert.equal(link.from,JSON.stringify(['ADDRESS','definition']))
+  assert.equal(link.sourceRevision,0)
+  assert.equal(link.sourceRecordId,JSON.stringify(['EI_STATE','definition',0]))
+  assert.deepEqual(link.sourceRefs,[JSON.stringify(['EI_SOURCE','definition',0,'source:origin'])])
+ }
+ assert.equal(links[3].to,JSON.stringify(['ADDRESS','absent']));assert.equal(links[3].toKnown,false)
+ assert.ok(!projection.sourceFractures.field.nodes.some(node=>node.address==='absent'))
+ assert.ok(projection.sourceFractures.field.unresolved.some(item=>item.address==='absent'&&item.reason.startsWith('RELATION_ENDPOINT_NOT_RETAINED:')))
+ const text=serializeEIUnifiedTransition(projection),tampered=JSON.parse(text)
+ tampered.sourceFractures.field.edges=tampered.sourceFractures.field.edges.filter((edge:{kind:string})=>edge.kind!=='DECLARED_RELATION')
+ assert.throws(()=>verifyEIUnifiedTransition(ledger,execution,projection,{values:execution.expected,projectionText:JSON.stringify(tampered,null,2)}),/sourceFractures/)
+ const committed=commitEIUnifiedTransition(ledger,verifyEIUnifiedTransition(ledger,execution,projection,{values:execution.expected,projectionText:text}))
+ assert.equal(committed.status,'committed')
+ const restored=importEILedger(exportEILedger(committed.ledger))
+ assert.equal(serializeEIUnifiedTransition(reconstructEIUnifiedTransition(restored,committed.receipt.id)),text)
+ const next=deriveEISourceFractures(restored,proposed(restored,'later','later'))
+ assert.deepEqual(next.field.edges.filter(edge=>edge.kind==='DECLARED_RELATION'),links)
+ assert.ok(next.field.nodes.every(node=>node.position===null))
+ assert.equal(ledger.revision,0)
+})
+
+test('named relation never silently becomes a parent, geometric direction or root return',()=>{
+ const ledger=createEILedger({records:[{address:'root',value:'root',source:source('root')},{address:'definition',value:'before',source:source('before'),relations:[{relation:'points-to',address:'root'}]}]})
+ const out=deriveEISourceFractures(ledger,proposed(ledger,'after'))
+ const node=out.field.nodes.find(node=>node.kind==='ADDRESS'&&node.address==='definition')!
+ assert.equal(out.field.threads.find(thread=>thread.nodeId===node.id)?.reachable,false)
+ assert.equal(out.field.edges.filter(edge=>edge.kind==='CONTAINED_BY').length,0)
+ assert.equal(out.field.gates[0].mappingResolved,false)
+})
+
+test('all public source relation occurrences reach the produced field unchanged',async()=>{
+ const {createEIPublicFieldRecords}=await import('../src/model/ei-public-field.ts')
+ const ledger=createEILedger({records:[{address:'root',value:'root',source:source('root'),relations:[{relation:'included-public-source',address:'model/inventory-root'}]},...createEIPublicFieldRecords(),{address:'definition',value:'before',parents:['root'],source:source('before')}]})
+ const field=deriveEISourceFractures(ledger,proposed(ledger,'after')).field
+ const expected=ledger.records.flatMap(record=>record.relations.map(link=>({from:JSON.stringify(['ADDRESS',record.address]),to:JSON.stringify(['ADDRESS',link.address]),relation:link.relation})))
+ const actual=field.edges.filter(edge=>edge.kind==='DECLARED_RELATION').map(({from,to,relation})=>({from,to,relation}))
+ assert.equal(expected.length,368)
+ assert.deepEqual(actual,expected)
+})
+
+test('relation source records are immutable and malformed or duplicate incidence identities reject',async()=>{
+ const {produceSourceFractures}=await import('../src/model/source-first-fracture.ts')
+ const extra={mutable:true}
+ const link={id:'edge:1',relation:'supplied',address:'root',sourceRef:'source:link',revision:0,extra}
+ const record={id:'state:0',address:'root',sourceRef:'source:root',value:'value',relations:[link]}
+ const result=produceSourceFractures({sourceAddress:'root',records:[record]}),before=JSON.stringify(result)
+ assert.equal(Object.isFrozen(extra),false);assert.equal('extra' in result.sourceRecords[0].relations![0],false)
+ link.address='changed';record.relations.push({...link,id:'edge:2'})
+ assert.equal(JSON.stringify(result),before);assert.ok(Object.isFrozen(result.sourceRecords[0].relations![0]))
+ for(const invalid of [{...link,revision:-1},{...link,revision:Infinity},{...link,sourceRef:''},{...link,address:''}])assert.throws(()=>produceSourceFractures({sourceAddress:'root',records:[{...record,relations:[invalid]}]}),/invalid addressed relation/)
+ assert.throws(()=>produceSourceFractures({sourceAddress:'root',records:[{...record,relations:[link,link]}]}),/duplicate addressed relation/)
+})

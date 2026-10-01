@@ -15,7 +15,9 @@ export function deriveEISourceFractures(previous:EILedger,execution:EIExecution)
   for(const state of [...record.was,record.is]){
    const id=JSON.stringify(['EI_STATE',record.address,state.revision])
    const proposed=state.revision>previous.revision
-   records.push({id,address:record.address,value:state.value,sourceRef:JSON.stringify(['EI_SOURCE',record.address,state.revision,state.source.id]),...(previousId?{previousId}:{}),parentAddresses:record.parents})
+   const origin=record.was[0]??record.is
+   const relations=state===origin?record.relations.map((link,index)=>({id:JSON.stringify(['EI_RELATION',record.address,index]),relation:link.relation,address:link.address,sourceRef:JSON.stringify(['EI_SOURCE',record.address,origin.revision,origin.source.id]),revision:origin.revision})):undefined
+   records.push({id,...(relations?{relations}:{}),address:record.address,value:state.value,sourceRef:JSON.stringify(['EI_SOURCE',record.address,state.revision,state.source.id]),...(previousId?{previousId}:{}),parentAddresses:record.parents})
    bindings.push({recordId:id,address:record.address,revision:state.revision,sourceId:state.source.id,sourceRealm:state.source.realm??null,phase:proposed?'PROPOSED':'RETAINED',receiptId:proposed?null:previous.receipts.find(receipt=>receipt.resultRevision===state.revision&&receipt.patches.some(patch=>patch.address===record.address))?.id??null})
    previousId=id
   }
