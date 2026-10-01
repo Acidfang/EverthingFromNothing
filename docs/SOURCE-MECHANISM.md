@@ -67,3 +67,28 @@ authority, truth or NEXT. Fixed English triggers and authored fallback replies
 are not substitutes for the interpretation and reply-composition mechanism.
 Those reductions remain unbound in this implementation; new input is retained
 without manufacturing an assistant answer.
+
+## Witnessed symbolic comparison
+
+The retained authored relation is:
+
+```text
+∀a,b:a≡b?a⋈b:Δab→L
+```
+
+The public inventory retains `U≡R` and `T₀≠T∞`. Substituting those actual
+premises yields `U⋈R` and the symbolic Difference-to-`L` consequence. A later
+source uses `U₀≡R`; that spelling is not silently substituted for the older `U`.
+The authored source also supplies `Ω≡Ω(Ω)`, `⟦Ω⟧≡Ω`, and `S≡ℜ(H)`.
+
+This is an application of a witnessed source relation, not a comparison of the
+English or Unicode spellings. Equal spellings alone do not establish the identity
+premise; different spellings alone do not establish nonidentity. Missing witnesses
+remain open. Conflicting direct witnesses remain retained without a chosen branch.
+`L` remains the source term, without an invented database or external action.
+
+The current syntax adapter supports standalone direct identity/nonidentity clauses
+and exact symbolic terms with unary application or interpretation brackets. It does
+not infer transitivity, symmetry, arbitrary-language meaning, or identities embedded
+inside other conditional clauses. Source locators and parser bounds are implementation
+choices, not a canonical binary encoding or a complete semantic compiler.

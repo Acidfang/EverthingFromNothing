@@ -103,3 +103,40 @@ addresses and invokes the existing explicit exact-value evaluator. Equal address
 sets give the same query, matches, unknowns and proof in every grain. Historical,
 proposed, fabricated or stale handles cannot select a current operation target.
 The operator and predicate are explicit; an unknown predicate remains unbound.
+
+## Addressed operations
+
+The selected entity in the existing inspector can resolve its retained incoming
+and outgoing relations, follow a supplied relation label, trace parent/source
+paths, and compare its current value with another selected address. These controls
+invoke the typed evaluator through the same issued grain handle. They do not parse
+the conversation to guess the intended operation. Returned addresses are selectable;
+current values, source references, missing edges and checks remain visible.
+
+Each explicit continuation can now carry its own supplied address/value conditions.
+The adapter preserves those conditions rather than replacing them with the already
+known current value. Conditions that differ exclude a candidate; missing condition
+addresses remain unresolved. Empty conditions remain empty. User-owned candidates
+still require selection, and the existing complete local readback gates admission.
+
+Query answer v3 adds the original relation/parent creation-source premise to edge
+and context evidence. Updating a record's value does not replace that relation's
+origin. A created relation also retains its original creation receipt. Saved v2
+answers remain readable and can be checked under their original structure; a v2
+edge/context proof cannot pass the stronger origin-evidence requirement merely
+because its old computation is reproducible. It remains unresolved at that boundary.
+
+## Applying an authored source relation
+
+A selected source containing the retained comparison clause can resolve its directly
+witnessed operands. For the included public inventory, follow `included-public-source`
+from the conversation root, select `model/inventory-root`, and use its source-operand
+selector. The result includes the exact rule, premise, source revision, JSON pointer
+or text span, substitution and symbolic consequence. Every mechanism-grain handle
+uses the same retained source and result. A source edit invalidates earlier handles.
+
+This path now derives relations between different source terms, rather than treating
+exact-text equality as symbolic identity. Its returned proof is reconstructed from the
+originating operands and checked against the retained source. It is a read-only local
+symbolic result; it does not generate a conversational answer, choose what a new sentence
+means, append a ledger command for the symbol `L`, or complete spatial field animation.

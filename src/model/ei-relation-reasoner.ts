@@ -19,14 +19,16 @@ export type EIQuery = Readonly<
   | { kind: 'context'; address: string }
 >
 export type EIQueryParseResult = Readonly<{ status: 'parsed'; query: EIQuery } | { status: 'unresolved'; reason: string; grammar: readonly string[] }>
-export type EIQueryEdge = Readonly<{ from: string; relation: string; to: string; relationIndex: number }>
+/** Relations and parents are immutable metadata declared when their source
+ * record was created. Their origin is distinct from an endpoint's current IS. */
+export type EIQueryEdge = Readonly<{ from: string; relation: string; to: string; relationIndex: number; originPremise?: string }>
 export type EIQueryPath = Readonly<{ start: string; edges: readonly EIQueryEdge[] }>
 export type EIQueryGap = Readonly<{ kind: 'no-captured-edge'; address: string; relation: string; path: EIQueryPath }>
 export type EIQueryContextEdge = Readonly<{ from: number; relation: string; to: number; relationIndex: number }>
 export type EIQueryContext = Readonly<{
   address: string; kind: 'retained-incident-relations';
-  incident: readonly Readonly<{ role: 'incoming' | 'outgoing' | 'self'; edge: EIQueryContextEdge; sourcePremise: string | null; targetPremise: string | null }>[];
-  parentLinks: readonly Readonly<{ role: 'parent' | 'child'; child: number; parent: number; childPremise: string | null; parentPremise: string | null }>[];
+  incident: readonly Readonly<{ role: 'incoming' | 'outgoing' | 'self'; edge: EIQueryContextEdge; sourcePremise: string | null; targetPremise: string | null; originPremise?: string }>[];
+  parentLinks: readonly Readonly<{ role: 'parent' | 'child'; child: number; parent: number; childPremise: string | null; parentPremise: string | null; originPremise?: string }>[];
 }>
 export type EIQueryUnknown = Readonly<{ kind: 'missing-address' | 'missing-relation' | 'missing-history' | 'missing-receipt' | 'broken-receipt-return' | 'limit'; address: string; reason: string; path?: EIQueryPath }>
 /** Resolves to the complete source on the named premise/receipt in origin's ledger.
@@ -63,7 +65,7 @@ export type EIQueryMatch = Readonly<{ address: string; value: string; revision: 
 export type EIQueryComparison = Readonly<{ left: string; right: string; leftValue: string | null; rightValue: string | null; result: 'equal' | 'different' | 'unknown' }>
 export type EIQueryOrigin = Readonly<{ ledgerRevision: number; sourceStateFingerprint: string; queryFingerprint: string }>
 export type EIQueryAnswer = Readonly<{
-  format: 'ei-query-answer/v2'; query: EIQuery; origin: EIQueryOrigin; scope: 'captured-local-records';
+  format: 'ei-query-answer/v2' | 'ei-query-answer/v3'; query: EIQuery; origin: EIQueryOrigin; scope: 'captured-local-records';
   status: 'resolved' | 'open' | 'unresolved' | 'empty'; matches: readonly EIQueryMatch[];
   comparison: EIQueryComparison | null; context: EIQueryContext | null; premises: readonly EIQueryPremise[];
   parentGraph: EIQueryParentGraph; receipts: readonly EIQueryReceiptPath[];
@@ -165,6 +167,11 @@ function equal(a: unknown, b: unknown): boolean { try { return JSON.stringify(a)
 
 /** Read-only interpretation. Relations are followed only in the supplied order and direction. */
 export async function evaluateEIQuery(ledger: EILedger, input: EIQuery): Promise<EIQueryAnswer> {
+  return evaluateRetainedQuery(ledger, input, true)
+}
+
+/** v2 is retained only for inspecting previously stored proofs; new operations use v3. */
+async function evaluateRetainedQuery(ledger: EILedger, input: EIQuery, relationOrigins: boolean): Promise<EIQueryAnswer> {
   const snapshot = exportEILedger(ledger), query = validateQuery(input)
   const byAddress = new Map(ledger.records.map(record => [record.address, record]))
   const proof: EIQueryProofStep[] = [], unknowns: EIQueryUnknown[] = [], matches: EIQueryMatch[] = [], gaps: EIQueryGap[] = []
@@ -220,6 +227,10 @@ export async function evaluateEIQuery(ledger: EILedger, input: EIQuery): Promise
     step({ op: 'READ_SOURCE', premise: item.id })
     return item
   }
+  function creationPremise(record: EIRecord): RawPremise {
+    const value = record.was[0] ?? record.is
+    return premise(record, value, value === record.is ? 'is' : 'was')
+  }
   function match(record: EIRecord, path: EIQueryPath, value = record.is, state: 'is' | 'was' = 'is', equals?: string): void {
     if (matches.length >= EI_REASONER_LIMITS.paths) { if (!matchesLimited) unknown('limit', record.address, 'Result bound reached; remaining matching values stay open'); matchesLimited = true; return }
     const p = premise(record, value, state)
@@ -246,14 +257,14 @@ export async function evaluateEIQuery(ledger: EILedger, input: EIQuery): Promise
       const role = edge.from === query.address && edge.to === query.address ? 'self' : edge.from === query.address ? 'outgoing' : 'incoming'
       if (!step({ op: 'CONTEXT_RELATION', incident: incident.length })) break relations
       const from = endpoint(edge.from), to = endpoint(edge.to)
-      incident.push({ role, edge: { ...edge, from: parentNode(edge.from), to: parentNode(edge.to) }, sourcePremise: from?.id ?? null, targetPremise: to?.id ?? null })
+      incident.push({ role, edge: { ...edge, from: parentNode(edge.from), to: parentNode(edge.to) }, sourcePremise: from?.id ?? null, targetPremise: to?.id ?? null, ...(relationOrigins ? {originPremise: creationPremise(source).id} : {}) })
     }
     parents: for (const child of ledger.records) for (const parent of child.parents) {
       if (child.address !== query.address && parent !== query.address) continue
       if (parentLinks.length >= EI_REASONER_LIMITS.incidentRelations) { unknown('limit', query.address, 'Explicit parent-link bound reached; the remaining context stays open'); break parents }
       if (!step({ op: 'CONTEXT_PARENT', parentLink: parentLinks.length })) break parents
       const c = endpoint(child.address), p = endpoint(parent)
-      parentLinks.push({ role: child.address === query.address ? 'parent' : 'child', child: parentNode(child.address), parent: parentNode(parent), childPremise: c?.id ?? null, parentPremise: p?.id ?? null })
+      parentLinks.push({ role: child.address === query.address ? 'parent' : 'child', child: parentNode(child.address), parent: parentNode(parent), childPremise: c?.id ?? null, parentPremise: p?.id ?? null, ...(relationOrigins ? {originPremise: creationPremise(child).id} : {}) })
     }
     context = { address: query.address, kind: 'retained-incident-relations', incident, parentLinks }
   } else if (query.kind === 'read' || query.kind === 'trace') {
@@ -279,8 +290,9 @@ export async function evaluateEIQuery(ledger: EILedger, input: EIQuery): Promise
       branches: for (const current of frontier) {
         const edges = current.record.relations.flatMap((item, relationIndex) => item.relation === relation ? [{ from: current.record.address, relation, to: item.address, relationIndex }] : [])
         if (!edges.length) gaps.push({ kind: 'no-captured-edge', address: current.record.address, relation, path: current.path })
-        for (const edge of edges) {
+        for (const retainedEdge of edges) {
           if (next.length >= EI_REASONER_LIMITS.paths) { unknown('limit', current.record.address, 'Relation-path bound reached; remaining choices are open', current.path); break branches }
+          const edge = { ...retainedEdge, ...(relationOrigins ? {originPremise: creationPremise(current.record).id} : {}) }
           if (!step({ op: 'FOLLOW_RELATION', edge })) break branches
           const path = { start: current.path.start, edges: [...current.path.edges, edge] }, target = find(edge.to, path)
           if (target) { premise(target, target.is, 'is'); next.push({ record: target, path }) }
@@ -317,13 +329,14 @@ export async function evaluateEIQuery(ledger: EILedger, input: EIQuery): Promise
   const status = unknowns.length ? (matches.length ? 'open' : 'unresolved') : (query.kind === 'follow' || query.kind === 'filter') && matches.length > 1 ? 'open' : matches.length || comparison ? 'resolved' : 'empty'
   const parentGraph = { addresses: parentAddresses, parents: parentEdges, roots: parentEdges.flatMap((parents, index) => parents?.length === 0 ? [index] : []) }
   const retainedProof: EIQueryProofStep[] = query.kind === 'context' ? [{ op: 'RECONSTRUCT_CONTEXT' }] : proof
-  return freeze({ format: 'ei-query-answer/v2', query, origin, scope: 'captured-local-records', status, matches, comparison, context, premises: sourcedPremises, parentGraph, receipts, proof: retainedProof, gaps, unknowns, sourceRefs: [...new Set(premises.map(p => p.address))] })
+  return freeze({ format: relationOrigins ? 'ei-query-answer/v3' : 'ei-query-answer/v2', query, origin, scope: 'captured-local-records', status, matches, comparison, context, premises: sourcedPremises, parentGraph, receipts, proof: retainedProof, gaps, unknowns, sourceRefs: [...new Set(premises.map(p => p.address))] })
 }
 
 /** Recompute once from retained inputs. A passed check proves internal consistency only. */
 export async function verifyEIQueryAnswer(ledger: EILedger, query: EIQuery, answer: unknown): Promise<EIQueryVerification> {
-  const expected = await evaluateEIQuery(ledger, query)
   const actual = answer && typeof answer === 'object' && !Array.isArray(answer) ? answer as Record<string, unknown> : {}
+  const legacy = actual.format === 'ei-query-answer/v2'
+  const expected = await evaluateRetainedQuery(ledger, query, !legacy)
   const checks: EIQueryCheck[] = []
   const check = (kind: string, subject: string, wanted: unknown, got: unknown): void => { checks.push({ kind, subject, matches: equal(wanted, got), expected: wanted ?? null, actual: got ?? null }) }
   const origin = actual.origin && typeof actual.origin === 'object' ? actual.origin as Record<string, unknown> : {}
@@ -347,7 +360,8 @@ export async function verifyEIQueryAnswer(ledger: EILedger, query: EIQuery, answ
   check('incident-context', 'all captured incident relations and explicit parent links', expected.context, actual.context)
   check('result', 'expected and returned derivation', { status: expected.status, matches: expected.matches, comparison: expected.comparison, gaps: expected.gaps, unknowns: expected.unknowns }, { status: actual.status, matches: actual.matches, comparison: actual.comparison, gaps: actual.gaps, unknowns: actual.unknowns })
   check('answer-shape', 'complete bounded answer', expected, actual)
-  const status = checks.some(c => !c.matches) ? 'failed' : expected.unknowns.length ? 'unresolved' : 'passed'
+  const status = checks.some(c => !c.matches) ? 'failed' : expected.unknowns.length || (legacy && (query.kind === 'follow' || query.kind === 'context')) ? 'unresolved' : 'passed'
+  if (legacy && (query.kind === 'follow' || query.kind === 'context')) checks.push({kind:'legacy-relation-origin-evidence',subject:'v2 predates explicit edge-origin premises',matches:false})
   // Keep mismatch evidence reviewable without repeatedly embedding full source
   // text or earlier conversation proofs in a later conversation receipt.
   async function compact(value: unknown): Promise<unknown> {

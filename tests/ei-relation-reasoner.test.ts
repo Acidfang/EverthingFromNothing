@@ -311,7 +311,7 @@ test('twelve capture-only inputs retain complete directly queried contexts witho
     const answer = await evaluateEIQuery(ledger, typedQuery)
     const verification = await verifyEIQueryAnswer(ledger, typedQuery, answer)
     assert.equal(verification.status, 'passed')
-    assert.equal(answer.format, 'ei-query-answer/v2')
+    assert.equal(answer.format, 'ei-query-answer/v3')
     assert.equal(exportEILedger(ledger), beforeQuery)
     if (n > 1) {
       assert.deepEqual(answer.proof, [{ op: 'RECONSTRUCT_CONTEXT' }])
@@ -343,4 +343,48 @@ test('twelve capture-only inputs retain complete directly queried contexts witho
   assert.equal(pending.reply, null)
   assert.equal(pending.mode, 'capture-only')
   assert.equal(ledger.revision, 12)
+})
+
+test('follow and context retain original edge/parent sources after current values change', async () => {
+  let ledger=graph()
+  const s=source('unrelated current A')
+  ledger=advanceEI(ledger,proposeEI(ledger,{id:'update-a',producer:'Ω',input:s,candidates:[{id:'a',label:'edit',owner:'engine',source:s,conditions:[],patches:[{address:'A',value:s.text,source:s}]}]})).ledger
+  for(const q of [{kind:'follow',address:'A',relations:['R']},{kind:'context',address:'A'}] as const){
+    const answer=await evaluateEIQuery(ledger,q)
+    const origin=answer.premises.find(p=>p.source.id==='captured:question')
+    assert.ok(origin);assert.equal(origin.state,'was');assert.equal(origin.sourceBinding,'captured-seed')
+    assert.ok(answer.premises.some(p=>p.source.id===s.id))
+    if(q.kind==='follow')assert.equal(answer.matches[0].path.edges[0].originPremise,origin.id)
+    else {assert.equal(answer.context!.incident.find(i=>i.edge.relation==='R')!.originPremise,origin.id);assert.equal(answer.context!.parentLinks[0].originPremise,origin.id)}
+    const checked=await verifyEIQueryAnswer(ledger,q,answer)
+    assert.equal(checked.status,q.kind==='context'?'unresolved':'passed')
+    assert.ok(checked.checks.every(check=>check.matches))
+    const forged=structuredClone(answer);forged.premises=forged.premises.filter(p=>p.id!==origin.id)
+    assert.equal((await verifyEIQueryAnswer(ledger,q,forged)).status,'failed')
+  }
+})
+
+test('created relation origin retains its creation receipt across later value updates',async()=>{
+  let ledger=graph()
+  const s=source('edge creation')
+  ledger=advanceEI(ledger,proposeEI(ledger,{id:'create-edge',producer:'Ω',input:s,candidates:[{id:'create',label:'create',owner:'engine',source:s,conditions:[],patches:[{kind:'create',address:'new',value:s.text,source:s,parents:['Ω'],relations:[{relation:'R',address:'B'}]}]}]})).ledger
+  const changed=source('later value')
+  ledger=advanceEI(ledger,proposeEI(ledger,{id:'edit-edge',producer:'Ω',input:changed,candidates:[{id:'edit',label:'edit',owner:'engine',source:changed,conditions:[],patches:[{address:'new',value:changed.text,source:changed}]}]})).ledger
+  const q={kind:'follow',address:'new',relations:['R']} as const,answer=await evaluateEIQuery(ledger,q)
+  const origin=answer.premises.find(p=>p.id===answer.matches[0].path.edges[0].originPremise)!
+  assert.equal(origin.source.id,s.id);assert.equal(origin.revision,1);assert.equal(origin.sourceBinding,'committed-local-receipt')
+  assert.deepEqual(origin.valueReceiptIds,['ei-receipt:create-edge'])
+  assert.ok(answer.receipts.some(r=>r.receiptId==='ei-receipt:create-edge'&&r.returnedToProducer))
+})
+
+test('old v2 edge proofs remain readable but new origin-evidence strength stays unresolved',async()=>{
+  const ledger=graph(),q={kind:'context',address:'A'} as const,newAnswer=await evaluateEIQuery(ledger,q)
+  const old=JSON.parse(JSON.stringify(newAnswer,(key,value)=>key==='originPremise'?undefined:value))
+  old.format='ei-query-answer/v2'
+  const check=await verifyEIQueryAnswer(ledger,q,old)
+  assert.equal(check.status,'unresolved')
+  assert.ok(check.checks.some(item=>item.kind==='legacy-relation-origin-evidence'))
+  assert.equal(check.checks.filter(item=>!item.matches).length,1)
+  old.origin.ledgerRevision=999
+  assert.equal((await verifyEIQueryAnswer(ledger,q,old)).status,'failed')
 })
