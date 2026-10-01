@@ -1,10 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { advanceEI, createEILedger, executeEI, exportEILedger, proposeEI, type EIInput, type EILedger, type EISource } from '../src/model/ei-engine.ts'
+import { advanceEI, createEILedger, executeEI, exportEILedger, proposeEI, verifyLocalEI, type EIInput, type EILedger, type EISource } from '../src/model/ei-engine.ts'
+import { commitEIConversationTurn, executeEIConversationTurn, prepareEIConversationTurn } from '../src/model/ei-conversation.ts'
 import {
   EI_REASONER_LIMITS, evaluateEIQuery, formatEIQueryAnswer, formatEIQueryVerification,
-  parseEIQuery, verifyEIQueryAnswer, type EIQuery,
+  parseEIQuery, verifyEIQueryAnswer, type EIQuery, type EIQueryAnswer,
 } from '../src/model/ei-relation-reasoner.ts'
 
 const source = (text: string): EISource => ({ id: `captured:${text}`, text, realm: 'synthetic-test' })
@@ -28,6 +29,16 @@ function query(raw: string): EIQuery {
 function update(ledger: EILedger, value = 'changed'): EIInput {
   return { id: `update:${ledger.revision}`, producer: 'Ω', input: source('explicit edit'), candidates: [{ id: 'edit', label: 'captured edit', owner: 'engine', source: source('explicit edit'), conditions: [], patches: [{ address: 'D', value, source: source(value) }] }] }
 }
+function retainedRootPaths(answer: EIQueryAnswer, address: string): string[][] {
+  const graph = answer.parentGraph, node = graph.addresses.indexOf(address)
+  function walk(at: number): string[][] {
+    const parents = graph.parents[at]
+    if (parents === null) return []
+    if (!parents.length) return [[graph.addresses[at]]]
+    return parents.flatMap(parent => walk(parent).map(path => [...path, graph.addresses[at]]))
+  }
+  return walk(node)
+}
 
 test('declared grammar composes quoted paths and filters, including escaped identifiers and exact Unicode', () => {
   assert.deepEqual(query('from "A" follow "R" then "S" where value is "yes"'), { kind: 'follow', address: 'A', relations: ['R', 'S'], where: { equals: 'yes' } })
@@ -42,7 +53,7 @@ test('multi-hop derivation filters actual branch values and retains addressed pr
   assert.equal(answer.status, 'resolved')
   assert.deepEqual(answer.matches.map(m => m.address), ['D'])
   assert.deepEqual(answer.matches[0].path.edges.map(e => [e.from, e.relation, e.to]), [['A', 'R', 'B'], ['B', 'S', 'D']])
-  assert.deepEqual(answer.premises.find(p => p.address === 'D')!.rootPaths, [['Ω', 'grain:one', 'B', 'D'], ['Ω', 'grain:two', 'D']])
+  assert.deepEqual(retainedRootPaths(answer, 'D'), [['Ω', 'grain:one', 'B', 'D'], ['Ω', 'grain:two', 'D']])
   assert.equal(answer.proof.filter(p => p.op === 'FILTER').length, 2)
   assert.ok(answer.proof.some(p => p.op === 'FILTER' && !p.matches && p.actual === 'no'))
   assert.deepEqual(answer.sourceRefs, ['A', 'B', 'C', 'D', 'E'])
@@ -123,9 +134,10 @@ test('history and trace reconstruct value-source-receipt return and root paths w
   const current = await evaluateEIQuery(changed, query('trace "D"'))
   const p = current.premises[0]
   assert.equal(p.sourceBinding, 'committed-local-receipt')
-  assert.equal(p.valueReceiptPaths[0].producer, 'Ω')
-  assert.equal(p.valueReceiptPaths[0].returnedToProducer, true)
-  assert.equal(p.valueReceiptPaths[0].patchSource.text, 'changed')
+  const receipt = current.receipts.find(r => r.receiptId === p.valueReceiptIds[0])!
+  assert.equal(receipt.producer, 'Ω')
+  assert.equal(receipt.returnedToProducer, true)
+  assert.equal(p.source.sourceFingerprint, `sha256:${createHash('sha256').update(JSON.stringify(source('changed'))).digest('hex')}`)
   assert.match(formatEIQueryAnswer(current), /Receipt:/)
   const was = await evaluateEIQuery(changed, query('read "D" was'))
   assert.equal(was.matches[0].value, 'yes')
@@ -161,7 +173,7 @@ test('self-check rejects changed context, forged edge/result/source/refs, and ve
     (a: any) => { delete a.premises[0].source },
     (a: any) => { a.sourceRefs.push('missing') },
     (a: any) => { a.format = 'ei-query-answer/v999' },
-    (a: any) => { a.premises[0].rootPaths = [['invented', 'A']] },
+    (a: any) => { a.parentGraph.parents[0] = [] },
   ]) {
     const forged = structuredClone(answer); tamper(forged)
     const failed = await verifyEIQueryAnswer(ledger, q, forged)
@@ -205,11 +217,12 @@ test('branch explosion is bounded and incomplete search stays explicitly unresol
 test('context reconstructs all incoming/outgoing incident labels, roles, realms and separate parent links', async () => {
   const ledger = graph(), q = query('context "B"'), answer = await evaluateEIQuery(ledger, q)
   assert.equal(answer.context!.kind, 'retained-incident-relations')
-  assert.deepEqual(answer.context!.incident.map(i => [i.role, i.edge.from, i.edge.relation, i.edge.to]), [
+  const addresses = answer.parentGraph.addresses
+  assert.deepEqual(answer.context!.incident.map(i => [i.role, addresses[i.edge.from], i.edge.relation, addresses[i.edge.to]]), [
     ['incoming', 'A', 'R', 'B'], ['outgoing', 'B', 'S', 'D'], ['outgoing', 'B', 'back', 'A'],
   ])
-  assert.ok(answer.context!.incident.every(i => i.sourceRealm === 'synthetic-test' && i.targetRealm === 'synthetic-test'))
-  assert.deepEqual(answer.context!.parentLinks.map(p => [p.role, p.child, p.parent]), [['parent', 'B', 'grain:one'], ['child', 'D', 'B']])
+  assert.ok(answer.context!.incident.every(i => answer.premises.find(p => p.id === i.sourcePremise)?.source.realm === 'synthetic-test' && answer.premises.find(p => p.id === i.targetPremise)?.source.realm === 'synthetic-test'))
+  assert.deepEqual(answer.context!.parentLinks.map(p => [p.role, addresses[p.child], addresses[p.parent]]), [['parent', 'B', 'grain:one'], ['child', 'D', 'B']])
   assert.match(formatEIQueryAnswer(answer), /free-language meaning remains open/)
   assert.equal((await verifyEIQueryAnswer(ledger, q, answer)).status, 'passed')
   const omitted = structuredClone(answer) as any
@@ -222,22 +235,29 @@ test('context reconstructs all incoming/outgoing incident labels, roles, realms 
 test('context preserves unresolved incident endpoints and can reconstruct a missing address reference without inventing it', async () => {
   const ledger = graph(), answer = await evaluateEIQuery(ledger, query('context "A"'))
   assert.equal(answer.status, 'open')
-  assert.equal(answer.context!.incident.find(i => i.edge.to === 'missing')!.targetPremise, null)
+  assert.equal(answer.context!.incident.find(i => answer.parentGraph.addresses[i.edge.to] === 'missing')!.targetPremise, null)
   assert.ok(!answer.sourceRefs.includes('missing'))
   const missing = await evaluateEIQuery(ledger, query('context "missing"'))
   assert.equal(missing.status, 'unresolved')
   assert.equal(missing.context!.incident[0].role, 'incoming')
-  assert.equal(missing.context!.incident[0].edge.from, 'A')
+  assert.equal(missing.parentGraph.addresses[missing.context!.incident[0].edge.from], 'A')
+  assert.equal(missing.parentGraph.parents[missing.parentGraph.addresses.indexOf('missing')], null)
+  assert.ok(!missing.parentGraph.roots.includes(missing.parentGraph.addresses.indexOf('missing')))
   assert.deepEqual(missing.sourceRefs, ['A'])
 })
 
-test('large explicit parent DAG retains bounded partial ancestry and does not claim exhaustive root paths', async () => {
+test('large explicit parent DAG retains every path alternative once without exponential route enumeration', async () => {
   const records = [{ address: '0', value: '0', source: source('0'), parents: [] as string[] }]
   for (let i = 1; i < 38; i++) records.push({ address: String(i), value: String(i), source: source(String(i)), parents: records.map(r => r.address) })
   const answer = await evaluateEIQuery(createEILedger({ records }), query('trace "37"'))
-  assert.equal(answer.status, 'open')
-  assert.ok(answer.unknowns.some(u => u.kind === 'limit'))
-  assert.ok(answer.premises[0].rootPaths.length <= EI_REASONER_LIMITS.rootPaths)
+  assert.equal(answer.status, 'resolved')
+  assert.equal(answer.unknowns.length, 0)
+  assert.equal(answer.parentGraph.addresses.length, records.length)
+  assert.equal(answer.parentGraph.parents.reduce((count, parents) => count + (parents?.length ?? 0), 0), 38 * 37 / 2)
+  for (const record of records) {
+    const node = answer.parentGraph.addresses.indexOf(record.address)
+    assert.deepEqual(answer.parentGraph.parents[node]!.map(parent => answer.parentGraph.addresses[parent]), record.parents)
+  }
 })
 
 test('oversized full prose is rejected rather than presenting an incomplete resolved answer', async () => {
@@ -246,4 +266,81 @@ test('oversized full prose is rejected rather than presenting an incomplete reso
   const answer = await evaluateEIQuery(ledger, query('read "a"'))
   assert.equal(answer.matches[0].value.length, 9000)
   assert.throws(() => formatEIQueryAnswer(answer), /complete answer exceeds/)
+})
+
+test('full source bytes remain in the ledger while references hash text and locator exactly', async () => {
+  const captured = { id: 'proof-bearing', text: 'FULL_SOURCE_TEXT_ONLY_IN_LEDGER', realm: 'ei-conversation-reply', locator: JSON.stringify({ earlierProof: 'proof'.repeat(5000) }) }
+  const ledger = createEILedger({ records: [
+    { address: 'root', value: 'root', source: source('root') },
+    { address: 'reply', value: 'UNREQUESTED_REPLY_TEXT', source: captured, parents: ['root'], relations: [{ relation: 'source-reference', address: 'root' }] },
+  ] })
+  const q = query('context "root"'), answer = await evaluateEIQuery(ledger, q)
+  const p = answer.premises.find(p => answer.parentGraph.addresses[p.parentNode] === 'reply')!
+  assert.equal(p.source.sourceFingerprint, `sha256:${createHash('sha256').update(JSON.stringify(captured)).digest('hex')}`)
+  assert.equal(p.source.realm, captured.realm)
+  assert.ok(!Object.hasOwn(p.source, 'locator'))
+  assert.ok(!Object.hasOwn(p.source, 'text'))
+  assert.ok(!JSON.stringify(answer).includes('FULL_SOURCE_TEXT_ONLY_IN_LEDGER'))
+  assert.ok(!JSON.stringify(answer).includes('UNREQUESTED_REPLY_TEXT'))
+  assert.equal(ledger.records[1].is.source.locator, captured.locator)
+  assert.equal((await evaluateEIQuery(ledger, query('read "reply"'))).matches[0].value, 'UNREQUESTED_REPLY_TEXT')
+  const corrected = createEILedger({ records: ledger.records.map(record => ({ address: record.address, value: record.is.value, source: record.address === 'reply' ? { ...captured, locator: `${captured.locator} ` } : record.is.source, parents: record.parents, relations: record.relations })) })
+  const failed = await verifyEIQueryAnswer(corrected, q, answer)
+  assert.equal(failed.status, 'failed')
+  assert.ok(failed.checks.some(check => check.kind === 'source-revision' && !check.matches))
+})
+
+test('twelve capture-only inputs retain complete directly queried contexts without generating replies or embedded proofs', async () => {
+  const root = 'EI/QA-2026-10-01'
+  let ledger = createEILedger({ records: [
+    { address: root, value: 'root', source: { id: 'root-source', text: 'root' } },
+    { address: `${root}/child`, value: 'child', source: { id: 'child-source', text: 'child' }, parents: [root] },
+  ] })
+  for (let n = 1; n <= 12; n++) {
+    const input = n === 1 ? `compare "${root}" with "${root}/child"` : `context "${root}"`
+    const turn = await prepareEIConversationTurn({ ledger, root, input, id: `turn:${n}` })
+    assert.equal(turn.status, 'proposed')
+    if (turn.status !== 'proposed') assert.fail('turn was not proposed')
+    assert.equal(turn.mode, 'capture-only')
+    assert.equal(turn.reply, null)
+    assert.equal(turn.user.text, input)
+    assert.equal(turn.user.source.text, input)
+    assert.equal(turn.user.evidence, undefined)
+    const typedQuery: EIQuery = n === 1 ? { kind: 'compare', left: root, right: `${root}/child` } : { kind: 'context', address: root }
+    const beforeQuery = exportEILedger(ledger)
+    const answer = await evaluateEIQuery(ledger, typedQuery)
+    const verification = await verifyEIQueryAnswer(ledger, typedQuery, answer)
+    assert.equal(verification.status, 'passed')
+    assert.equal(answer.format, 'ei-query-answer/v2')
+    assert.equal(exportEILedger(ledger), beforeQuery)
+    if (n > 1) {
+      assert.deepEqual(answer.proof, [{ op: 'RECONSTRUCT_CONTEXT' }])
+      assert.equal(answer.context!.incident.length, n - 1)
+      assert.equal(answer.context!.parentLinks.length, n)
+      const expectedEdges = ledger.records.reduce((count, record) => count + record.parents.length, 0)
+      assert.equal(answer.parentGraph.parents.reduce((count, parents) => count + (parents?.length ?? 0), 0), expectedEdges)
+      for (const premise of answer.premises) {
+        const address = answer.parentGraph.addresses[premise.parentNode], record = ledger.records.find(r => r.address === address)!
+        assert.equal(premise.source.sourceFingerprint, `sha256:${createHash('sha256').update(JSON.stringify(record.is.source)).digest('hex')}`)
+      }
+    }
+    const execution = executeEIConversationTurn(ledger, turn)
+    assert.equal(execution.status, 'staged')
+    if (execution.status !== 'staged') assert.fail('turn was not staged')
+    assert.deepEqual(execution.expected, [{ address: turn.user.address, value: input }])
+    const committed = commitEIConversationTurn(ledger, turn, verifyLocalEI(execution))
+    assert.equal(committed.status, 'committed')
+    if (committed.status !== 'committed') assert.fail('turn was not committed')
+    ledger = committed.ledger
+  }
+  assert.equal(ledger.revision, 12)
+  assert.equal(ledger.records.length, 14)
+  assert.ok(ledger.receipts.every(receipt => receipt.patches.length === 1))
+  assert.equal(ledger.records.some(record => record.is.source.realm === 'ei-conversation-reply'), false)
+  const pending = await prepareEIConversationTurn({ ledger, root, input: `context "${root}"`, id: 'turn:13' })
+  assert.equal(pending.status, 'proposed')
+  if (pending.status !== 'proposed') assert.fail('pending capture was not proposed')
+  assert.equal(pending.reply, null)
+  assert.equal(pending.mode, 'capture-only')
+  assert.equal(ledger.revision, 12)
 })

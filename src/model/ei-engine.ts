@@ -6,7 +6,9 @@
  * No storage, network, natural-language solver, geometry, or implicit recursion.
  */
 export const EI_FORMAT = 'ei-local-ledger/v1' as const
-export const EI_LIMITS = Object.freeze({ jsonBytes: 1_048_576, inputBytes: 131_072, records: 256, candidates: 32, conditions: 256, patches: 256, receipts: 512, history: 512, textLength: 32_768, idLength: 256 })
+// Expanded immutable state may exceed its normalized storage envelope. Session
+// storage retains its separate 1 MiB cap; transaction inputs remain 128 KiB.
+export const EI_LIMITS = Object.freeze({ jsonBytes: 4_194_304, inputBytes: 131_072, records: 256, candidates: 32, conditions: 256, patches: 256, receipts: 512, history: 512, textLength: 32_768, idLength: 256 })
 export const EI_PIPELINE = Object.freeze(['READ_SOURCE', 'FIND_ADDRESS', 'SEE_DIFFERENCE', 'FILTER_TO_ALLOWED_CONTINUATIONS', 'IF_ONE_CONTINUE', 'IF_NONE_REST_OR_UNRESOLVED', 'IF_MINE_STOP_FOR_USER_SELECTION', 'RECORD_SELECTION', 'CONTINUE'] as const)
 export type EISource = Readonly<{ id: string; text: string; realm?: string; locator?: string }>
 export type EIRelation = Readonly<{ relation: string; address: string }>

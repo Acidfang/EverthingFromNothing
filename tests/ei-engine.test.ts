@@ -290,3 +290,55 @@ test('prototype-shaped literal addresses stay exact data and never alter record 
   assert.equal(findEIAddress(result.ledger, '__proto__')!.is.value, 'next')
   assert.equal(({} as { polluted?: unknown }).polluted, undefined)
 })
+
+test('expanded ledger accepts exactly 4 MiB and rejects one extra byte without changing transaction limits', () => {
+  assert.equal(EI_LIMITS.jsonBytes, 4 * 1_024 * 1_024)
+  assert.equal(EI_LIMITS.inputBytes, 128 * 1_024)
+  assert.equal(EI_LIMITS.records, 256)
+  assert.equal(EI_LIMITS.candidates, 32)
+  const seed = { records: Array.from({ length: 64 }, (_, index) => ({ address: `row/${index}`, value: '', source: { id: `source/${index}`, text: '' } })) }
+  const empty = createEILedger(seed)
+  let remaining = EI_LIMITS.jsonBytes - new TextEncoder().encode(exportEILedger(empty)).length
+  // ASCII source/value data contributes exactly one serialized byte per code
+  // unit. Structural overhead comes from an actual valid engine export.
+  for (const record of seed.records) {
+    const valueLength = Math.min(remaining, EI_LIMITS.textLength)
+    record.value = 'x'.repeat(valueLength); remaining -= valueLength
+    const sourceLength = Math.min(remaining, EI_LIMITS.textLength)
+    record.source.text = 'x'.repeat(sourceLength); remaining -= sourceLength
+  }
+  assert.equal(remaining, 0)
+  const boundary = createEILedger(seed), raw = exportEILedger(boundary)
+  assert.equal(new TextEncoder().encode(raw).length, 4_194_304)
+  assert.equal(exportEILedger(importEILedger(raw)), raw)
+  assert.throws(() => importEILedger(`${raw}\n`), /too large/)
+  const multibyte = raw.replace('"value":"x', '"value":"€')
+  assert.equal(multibyte.length, raw.length)
+  assert.equal(new TextEncoder().encode(multibyte).length, EI_LIMITS.jsonBytes + 2)
+  assert.throws(() => importEILedger(multibyte), /too large/)
+
+  const over = structuredClone(seed), available = over.records.find(record => record.source.text.length < EI_LIMITS.textLength)!
+  available.source.text += 'x'
+  assert.throws(() => createEILedger(over), /JSON exceeds 4194304 bytes/)
+  assert.throws(() => parseEIInput(' '.repeat(EI_LIMITS.inputBytes + 1)), /too large/)
+
+  const proposal = proposeEI(boundary, { ...input([candidate({ conditions: [], patches: [patch('row/0', 'small new value')] })], 'boundary-update'), producer: 'row/0' })
+  const rejected = advanceEI(boundary, proposal)
+  assert.equal(rejected.status, 'blocked')
+  assert.equal(rejected.ledger, boundary)
+  assert.match(rejected.receipt.reasons[0], /Atomic staging failed/)
+  assert.equal(exportEILedger(boundary), raw)
+})
+
+test('larger expanded byte allowance does not remove import structure and record-count guards', () => {
+  const broad = JSON.stringify({ oversizedStructure: Array(100_000).fill(0) })
+  assert.ok(new TextEncoder().encode(broad).length < EI_LIMITS.jsonBytes)
+  assert.throws(() => importEILedger(broad), /bounded depth or item count/)
+  const deep = `${'{"nested":'.repeat(25)}0${'}'.repeat(25)}`
+  assert.throws(() => importEILedger(deep), /bounded depth or item count/)
+  assert.throws(() => createEILedger({ records: Array.from({ length: 257 }, (_, index) => ({ address: String(index), value: '0', source: source('0') })) }), /at most 256/)
+  const normal = committed(), roundTrip = importEILedger(exportEILedger(normal))
+  assert.deepEqual(roundTrip, normal)
+  assert.equal(roundTrip.records[1].was[0].value, 'WAS A')
+  assert.equal(roundTrip.receipts[0].checks[0].matches, true)
+})

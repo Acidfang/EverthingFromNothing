@@ -1,392 +1,222 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {
-  advanceEI, createEILedger, exportEILedger, importEILedger, proposeEI, verifyEI, verifyLocalEI,
-  type EIExecution, type EILedger,
-} from '../src/model/ei-engine.ts'
-import {
-  EI_CONVERSATION_LIMITS, commitEIConversationTurn, executeEIConversationTurn,
-  isEIConversationTurnCurrent, prepareEIConversationTurn, readEIConversation, verifyEIConversationProjection,
-  type EIPreparedConversationTurn, type EIInferenceAdapter, type EIInferenceContext, type EIInferenceResult,
-} from '../src/model/ei-conversation.ts'
+import { advanceEI, createEILedger, exportEILedger, importEILedger, proposeEI, type EILedger, type EIPatch } from '../src/model/ei-engine.ts'
+import { prepareEIConversationTurn, readEIConversation, readEIPhraseBindings, verifyEIConversationProjection, type EIConversationEvidence, type EIInferenceProvenance } from '../src/model/ei-conversation.ts'
+import { evaluateEIQuery, verifyEIQueryAnswer, type EIQuery } from '../src/model/ei-relation-reasoner.ts'
 
-function initial(text = 'My first supplied input'): EILedger {
+function initial(): EILedger {
   return createEILedger({ records: [
-    { address: 'chat', value: text, source: { id: 'original-input', text, realm: 'user-captured-input' } },
-    { address: 'left', value: '0', source: { id: 'left-capture', text: '0' }, parents: ['chat'], relations: [{ relation: 'leads-to', address: 'right' }] },
-    { address: 'right', value: '1', source: { id: 'right-capture', text: '1' }, parents: ['chat', 'left'] },
+    { address: 'chat', value: 'original input', source: { id: 'original-input', text: 'original input', realm: 'user-captured-input' } },
+    { address: 'other', value: 'another root', source: { id: 'other-root', text: 'another root' } },
+    { address: 'left', value: '0', source: { id: 'left-source', text: '0' }, parents: ['chat'], relations: [{ relation: 'R', address: 'right' }] },
+    { address: 'right', value: '1', source: { id: 'right-source', text: '1' }, parents: ['chat', 'left'] },
   ] })
 }
-async function prepare(ledger: EILedger, input: string, id: string, extra: Partial<Parameters<typeof prepareEIConversationTurn>[0]> = {}): Promise<EIPreparedConversationTurn> {
-  const result = await prepareEIConversationTurn({ ledger, root: 'chat', input, id, ...extra })
-  assert.equal(result.status, 'proposed')
-  return result as EIPreparedConversationTurn
-}
-function stage(ledger: EILedger, turn: EIPreparedConversationTurn): EIExecution {
-  const result = executeEIConversationTurn(ledger, turn)
-  assert.equal(result.status, 'staged')
-  return result as EIExecution
-}
-function commit(ledger: EILedger, turn: EIPreparedConversationTurn): EILedger {
-  const execution = stage(ledger, turn), result = commitEIConversationTurn(ledger, turn, verifyLocalEI(execution))
-  assert.equal(result.status, 'committed')
-  return (result as { ledger: EILedger }).ledger
-}
-function update(ledger: EILedger, address: string, value: string, id = 'explicit-correction'): EILedger {
-  const source = { id, text: value, realm: 'explicit-test-correction' }
-  const result = advanceEI(ledger, proposeEI(ledger, { id, producer: 'chat', input: source, candidates: [{ id: 'correct', label: 'Explicit captured correction', owner: 'engine', source, conditions: [], patches: [{ address, value, source }] }] }))
+function transact(ledger: EILedger, patches: EIPatch[], id: string, producer = 'chat'): EILedger {
+  const source = { id, text: 'synthetic historical test fixture', realm: 'synthetic-fixture' }
+  const result = advanceEI(ledger, proposeEI(ledger, { id, producer, input: source, candidates: [{ id: 'fixture', label: 'fixture', owner: 'engine', source, conditions: [], patches }] }))
   assert.equal(result.status, 'committed')
   return result.ledger
 }
-function deferred<T>() {
-  let resolve!: (value: T) => void, reject!: (reason: unknown) => void
-  const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no })
-  return { promise, resolve, reject }
+/** Historical fixture data only. This helper never calls the conversation reply routing. */
+function legacyPair(ledger: EILedger, options: {
+  turn?: number; input?: string; text?: string; status?: 'command-return' | 'inference-unavailable' | 'generated-unverified';
+  provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence; root?: string; sourceRefs?: string[];
+  userMeta?: Record<string, unknown>; replyMeta?: Record<string, unknown>; omitReply?: boolean; omitPrevious?: boolean;
+} = {}): EILedger {
+  const root = options.root ?? 'chat', prior = readEIConversation(ledger, root).turns.at(-1), turn = options.turn ?? (prior?.turn ?? 0) + 1
+  const userAddress = `${root}/turn/${turn}/user`, replyAddress = `${root}/turn/${turn}/assistant`
+  const input = options.input ?? 'historical input', text = options.text ?? 'retained historical response'
+  const userRefs = prior && !options.omitPrevious ? [root, prior.address] : [root]
+  const userMeta = { format: 'ei-conversation-message/v1', root, turn, role: 'user', sourceRefs: userRefs, status: 'captured', ...options.userMeta }
+  const replyMeta = { format: 'ei-conversation-message/v1', root, turn, role: 'assistant', sourceRefs: options.sourceRefs ?? [userAddress], status: options.status ?? 'command-return', ...(options.provenance ? { provenance: options.provenance } : {}), ...(options.evidence ? { evidence: options.evidence } : {}), ...options.replyMeta }
+  const patches: EIPatch[] = [{ kind: 'create', address: userAddress, value: input, source: { id: `legacy/${root}/${turn}/user`, text: input, realm: 'ei-conversation-user', locator: JSON.stringify(userMeta) }, parents: userRefs, relations: userRefs.map(address => ({ relation: 'conversation-context', address })) }]
+  if (!options.omitReply) patches.push({ kind: 'create', address: replyAddress, value: text, source: { id: `legacy/${root}/${turn}/reply`, text, realm: 'ei-conversation-reply', locator: JSON.stringify(replyMeta) }, parents: [userAddress], relations: (replyMeta.sourceRefs as string[]).map(address => ({ relation: address === userAddress ? 'reply-to' : 'source-reference', address })) })
+  return transact(ledger, patches, `legacy:${root}:${turn}`, root)
 }
-const inferred = (text: string): EIInferenceResult => ({ text, provenance: { adapterId: 'explicit-test-adapter', sourceId: 'returned-output', model: 'test-only', requestId: 'request-1' } })
-
-test('unresolved input and honest returned output remain separate exact addressed records behind the atomic barrier', async () => {
-  const ledger = initial(), raw = '  Meaning stays open\n𝟘\u0000e\u0301  ', turn = await prepare(ledger, raw, 'local-proposal/1')
-  assert.equal(turn.user.text, raw)
-  assert.equal(turn.user.source.text, raw)
-  assert.equal(turn.user.source.realm, 'ei-conversation-user')
-  assert.equal(turn.reply.source.realm, 'ei-conversation-reply')
-  assert.equal(turn.reply.status, 'inference-unavailable')
-  assert.match(turn.reply.text, /No implemented source-bound derivation/)
-  assert.ok(!turn.reply.text.includes(raw))
-  assert.equal(turn.proposal.input.id, 'local-proposal/1')
-  assert.equal(turn.proposal.candidates[0].candidate.owner, 'engine')
-  assert.equal(turn.proposal.candidates[0].candidate.patches.length, 2)
-  assert.equal(readEIConversation(ledger, 'chat').turns.length, 0)
-  const execution = stage(ledger, turn), failed = verifyEI(execution, { kind: 'rendered-address-values', values: [{ address: turn.user.address, value: raw }] })
-  const rejected = commitEIConversationTurn(ledger, turn, failed)
-  assert.equal(rejected.status, 'rejected')
-  assert.equal((rejected as { ledger: EILedger }).ledger, ledger)
-  const next = commit(ledger, turn), conversation = readEIConversation(next, 'chat')
-  assert.deepEqual(conversation.turns.map(message => [message.role, message.text]), [['user', raw], ['assistant', turn.reply.text]])
-  assert.deepEqual(next.records.find(record => record.address === turn.reply.address)!.parents, [turn.user.address])
-  assert.ok(turn.reply.sourceRefs.includes(turn.user.address))
-  assert.deepEqual(readEIConversation(importEILedger(exportEILedger(next)), 'chat'), conversation)
-})
-
-test('second contextual turn derives a prior utterance from actual committed history and retains all source links', async () => {
-  const root = initial('I prefer blue'), first = await prepare(root, 'I prefer blue', 'first'), ledger = commit(root, first)
-  const second = await prepare(ledger, 'What did I say before?', 'second')
-  assert.equal(second.reply.status, 'command-return')
-  assert.match(second.reply.text, /I prefer blue/)
-  assert.ok(second.reply.sourceRefs.includes(first.user.address))
-  assert.equal(second.context.conversation.turns.length, 2)
-  assert.equal(second.context.ledger, ledger)
-  assert.equal(second.context.ledger.receipts.length, 1)
-  assert.deepEqual(second.context.ledger.records.find(record => record.address === 'right')!.parents, ['chat', 'left'])
-  const next = commit(ledger, second), messages = readEIConversation(next, 'chat').turns
-  assert.deepEqual(messages.map(message => [message.turn, message.role]), [[1, 'user'], [1, 'assistant'], [2, 'user'], [2, 'assistant']])
-  assert.ok(next.records.find(record => record.address === second.user.address)!.parents.includes(first.reply.address))
-  assert.equal(messages[0].text, 'I prefer blue')
-  assert.deepEqual(readEIConversation(importEILedger(exportEILedger(next)), 'chat'), readEIConversation(next, 'chat'))
-})
-
-test('third contextual response compares retained inputs lexically and keeps earlier contradictory source intact', async () => {
-  const root = initial('I prefer blue'), first = await prepare(root, 'I prefer blue', 'first'), one = commit(root, first)
-  const second = await prepare(one, 'I prefer green', 'second'), two = commit(one, second)
-  const third = await prepare(two, 'what changed?', 'third')
-  assert.equal(third.reply.status, 'command-return')
-  assert.match(third.reply.text, /Exact retained-input text Difference: different/)
-  assert.match(third.reply.text, /I prefer blue/); assert.match(third.reply.text, /I prefer green/)
-  assert.ok(third.reply.sourceRefs.includes(first.user.address)); assert.ok(third.reply.sourceRefs.includes(second.user.address))
-  const three = commit(two, third)
-  assert.equal(readEIConversation(three, 'chat').turns[0].text, 'I prefer blue')
-  assert.equal(three.records.find(record => record.address === 'chat')!.is.value, 'I prefer blue')
-  const listing = await prepare(two, 'WHAT HAVE I SAID?', 'listing')
-  assert.equal(listing.reply.text.match(/I prefer blue/g)?.length, 1)
-  assert.equal(listing.reply.text.match(/I prefer green/g)?.length, 1)
-  assert.ok(!listing.reply.sourceRefs.includes('chat'), 'duplicate root capture should not duplicate first input in contextual answer')
-})
-
-test('original root is available before turns; unsupported paraphrases and underspecified change remain unresolved', async () => {
-  const ledger = initial('Original root statement')
-  const previous = await prepare(ledger, 'what did I say before?', 'previous')
-  assert.ok(previous.reply.sourceRefs.includes('chat')); assert.match(previous.reply.text, /Original root statement/)
-  assert.equal((await prepare(ledger, 'what changed?', 'change')).reply.status, 'inference-unavailable')
-  assert.equal((await prepare(ledger, 'Tell me what I said previously', 'paraphrase')).reply.status, 'inference-unavailable')
-  const corrected = update(ledger, 'chat', 'Later root correction')
-  assert.match((await prepare(corrected, 'what did I say before?', 'root-query')).reply.text, /Original root statement/)
-  assert.match((await prepare(corrected, '/look chat', 'root-look')).reply.text, /Later root correction/)
-})
-
-test('look, compare and trace read actual addressed state with exact comparison and bounded parent provenance', async () => {
-  const ledger = initial()
-  const look = await prepare(ledger, '/look left', 'look')
-  assert.equal(look.reply.status, 'command-return'); assert.match(look.reply.text, /Captured IS:\n0/); assert.match(look.reply.text, /left-capture/)
-  assert.ok(look.reply.sourceRefs.includes('left'))
-  const difference = await prepare(ledger, '/compare left right', 'difference')
-  assert.match(difference.reply.text, /Exact text comparison: different/)
-  const equal = await prepare(ledger, '/compare left left', 'equal')
-  assert.match(equal.reply.text, /Exact text comparison: equal/)
-  const trace = await prepare(ledger, '/trace right', 'trace')
-  assert.equal(trace.reply.status, 'command-return')
-  assert.deepEqual(trace.reply.sourceRefs, [trace.user.address, 'right', 'chat', 'left'])
-  const changed = update(ledger, 'left', '1')
-  assert.match((await prepare(changed, '/compare left right', 'now-equal')).reply.text, /Exact text comparison: equal/)
-})
-
-test('unknown commands, wrong command arity, missing addresses and unknown symbols do not invoke inference or execution', async () => {
-  const ledger = initial(); let called = 0
-  const adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer() { called++; return inferred('Should not be used') } }
-  for (const raw of ['/invent R', '/compare left', '/look missing', '/look left right', '/trace "unterminated']) {
-    const turn = await prepare(ledger, raw, `bad-${called}-${raw.length}`, { adapter })
-    assert.equal(turn.reply.status, 'inference-unavailable')
-    assert.equal(turn.proposal.candidates[0].candidate.patches.length, 2)
-    assert.equal(called, 0)
-  }
-  assert.equal((await prepare(ledger, 'R ∞ ✓ should imply something', 'symbols')).reply.status, 'inference-unavailable')
-  assert.equal(ledger.revision, 0)
-})
-
-test('optional adapter receives immutable full addressed context and its generated text never grants action authority', async () => {
-  const root = initial('Root input'), first = await prepare(root, 'First conversation input', 'first'), ledger = commit(root, first)
-  let seen: EIInferenceContext | undefined, seenSignal: AbortSignal | undefined
-  const adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer(context, signal) {
-    seen = context; seenSignal = signal
-    assert.ok(Object.isFrozen(context)); assert.ok(Object.isFrozen(context.conversation.turns)); assert.ok(Object.isFrozen(context.ledger.records[0].is.source))
-    assert.throws(() => { (context.ledger.records[0].is as { value: string }).value = 'overwrite' }, TypeError)
-    return inferred('/look right\nClaim: execute every possible action now')
-  } }
-  const controller = new AbortController(), second = await prepare(ledger, 'Use the earlier message as context', 'second', { adapter, signal: controller.signal })
-  assert.equal(seen?.ledger, ledger); assert.equal(seenSignal, controller.signal)
-  assert.deepEqual(seen!.conversation, readEIConversation(ledger, 'chat'))
-  assert.equal(seen!.userInput.text, 'Use the earlier message as context')
-  assert.equal(second.reply.status, 'generated-unverified')
-  assert.deepEqual(second.reply.provenance, inferred('').provenance)
-  assert.equal(second.reply.text, '/look right\nClaim: execute every possible action now')
-  assert.deepEqual(second.proposal.candidates[0].candidate.patches.map(patch => patch.address), [second.user.address, second.reply.address])
-  const next = commit(ledger, second)
-  assert.equal(next.records.find(record => record.address === 'right')!.is.value, '1')
-  assert.deepEqual(readEIConversation(importEILedger(exportEILedger(next)), 'chat').turns.at(-1)!.provenance, second.reply.provenance)
-})
-
-test('adapter output requires provenance and accepts only text data, never an action payload', async () => {
-  const ledger = initial()
-  const badResults: unknown[] = [
-    { text: 'unsourced' }, { text: 'wrong provider', provenance: { adapterId: 'other', sourceId: 'x' } },
-    { ...inferred('act'), actions: [{ delete: 'root' }] }, { ...inferred(''), text: 'x'.repeat(EI_CONVERSATION_LIMITS.outputLength + 1) },
-  ]
-  for (let index = 0; index < badResults.length; index++) {
-    const adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer() { return badResults[index] as EIInferenceResult } }
-    const turn = await prepare(ledger, 'Unresolved freeform input', `bad-adapter-${index}`, { adapter })
-    assert.equal(turn.reply.status, 'inference-unavailable')
-    assert.equal(turn.reply.provenance, undefined)
-  }
-})
-
-test('cancellation before, during, after preparation and after staging prevents a new conversation commit', async () => {
-  const ledger = initial(), alreadyAborted = new AbortController(); alreadyAborted.abort()
-  assert.equal((await prepareEIConversationTurn({ ledger, root: 'chat', input: 'cancelled', id: 'before', signal: alreadyAborted.signal })).status, 'cancelled')
-  const waiting = deferred<EIInferenceResult>(), started = deferred<void>(), during = new AbortController()
-  const adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer() { started.resolve(); return waiting.promise } }
-  const pending = prepareEIConversationTurn({ ledger, root: 'chat', input: 'pending input', id: 'during', adapter, signal: during.signal })
-  await started.promise; during.abort(); assert.equal((await pending).status, 'cancelled')
-  waiting.resolve(inferred('late output cannot commit'))
-  const after = new AbortController(), turn = await prepare(ledger, 'prepared input', 'after', { signal: after.signal })
-  const execution = stage(ledger, turn)
-  after.abort()
-  assert.equal(isEIConversationTurnCurrent(turn, ledger), false)
-  assert.equal(executeEIConversationTurn(ledger, turn).status, 'cancelled')
-  assert.equal(commitEIConversationTurn(ledger, turn, verifyLocalEI(execution)).status, 'cancelled')
-  assert.equal(readEIConversation(ledger, 'chat').turns.length, 0)
-})
-
-test('a later abort does not invalidate or undo a previously committed turn', async () => {
-  const ledger = initial(), controller = new AbortController(), turn = await prepare(ledger, '/look left', 'turn', { signal: controller.signal })
-  const execution = stage(ledger, turn), verification = verifyLocalEI(execution), result = commitEIConversationTurn(ledger, turn, verification)
+function update(ledger: EILedger, address: string, value: string, realm = 'explicit-correction'): EILedger {
+  return transact(ledger, [{ address, value, source: { id: `correction:${ledger.revision}`, text: value, realm } }], `correct:${ledger.revision}`)
+}
+async function capture(ledger: EILedger, input: string, id = `capture:${ledger.revision}`): Promise<EILedger> {
+  const turn = await prepareEIConversationTurn({ ledger, root: 'chat', input, id })
+  assert.equal(turn.status, 'proposed')
+  if (turn.status !== 'proposed') assert.fail()
+  assert.equal(turn.reply, null)
+  const result = advanceEI(ledger, turn.proposal)
   assert.equal(result.status, 'committed')
-  const next = (result as { ledger: EILedger }).ledger
-  controller.abort()
-  assert.equal(isEIConversationTurnCurrent(turn, next), true)
-  assert.equal(executeEIConversationTurn(next, turn).status, 'replayed')
-  assert.equal(commitEIConversationTurn(next, turn, verification).status, 'replayed')
-  assert.equal(readEIConversation(next, 'chat').turns.length, 2)
+  return result.ledger
+}
+async function bindingFixture(ledger: EILedger, phrase = 'current bit'): Promise<EILedger> {
+  const query: EIQuery = { kind: 'read', address: 'left', state: 'is' }, answer = await evaluateEIQuery(ledger, query), verification = await verifyEIQueryAnswer(ledger, query, answer)
+  const turn = (readEIConversation(ledger, 'chat').turns.at(-1)?.turn ?? 0) + 1
+  return legacyPair(ledger, { input: `bind ${JSON.stringify(phrase)} to read "left"`, evidence: { kind: 'phrase-binding', binding: { format: 'ei-phrase-binding/v1', root: 'chat', realm: ledger.records.find(r => r.address === 'chat')!.is.source.realm ?? null, phrase, query, definitionAddress: `chat/turn/${turn}/user`, definitionSourceId: `legacy/chat/${turn}/user` }, answer, verification } })
+}
+function tamperHistoricalSources(ledger: EILedger, change: (metadata: any) => void): EILedger {
+  const parsed = JSON.parse(exportEILedger(ledger))
+  function visit(value: any): void {
+    if (!value || typeof value !== 'object') return
+    if ((value.realm === 'ei-conversation-reply' || value.realm === 'ei-conversation-user') && typeof value.locator === 'string') {
+      const metadata = JSON.parse(value.locator); change(metadata); value.locator = JSON.stringify(metadata)
+    }
+    for (const child of Object.values(value)) visit(child)
+  }
+  visit(parsed)
+  // All matching retained sources are changed together: this fixture is internally
+  // replay-consistent, which must not make a changed derivation authentic.
+  return importEILedger(JSON.stringify(parsed))
+}
+
+test('all historical reply statuses and exact provenance remain readable after import', () => {
+  let ledger = initial()
+  for (const status of ['command-return', 'inference-unavailable', 'generated-unverified'] as const) ledger = legacyPair(ledger, { status, ...(status === 'generated-unverified' ? { provenance: { adapterId: 'old-adapter', sourceId: 'old-return', model: 'fixture-model', requestId: 'fixture-request' } } : {}) })
+  const conversation = readEIConversation(ledger, 'chat'), restored = readEIConversation(importEILedger(exportEILedger(ledger)), 'chat')
+  assert.deepEqual(restored, conversation)
+  assert.deepEqual(conversation.turns.filter(m => m.role === 'assistant').map(m => m.status), ['command-return', 'inference-unavailable', 'generated-unverified'])
+  assert.equal(conversation.turns[5].provenance!.adapterId, 'old-adapter')
 })
 
-test('stale adapter and staged responses cannot join a different current conversation snapshot', async () => {
-  const ledger = initial(), waiting = deferred<EIInferenceResult>(), started = deferred<void>(); let live = ledger
-  const adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer() { started.resolve(); return waiting.promise } }
-  const pending = prepareEIConversationTurn({ ledger, root: 'chat', input: 'pending context', id: 'pending', adapter, currentLedger: () => live })
-  await started.promise; live = update(ledger, 'left', '1'); waiting.resolve(inferred('old context response'))
-  assert.equal((await pending).status, 'stale')
-  const prepared = await prepare(ledger, '/look left', 'prepared'), execution = stage(ledger, prepared)
-  assert.equal(isEIConversationTurnCurrent(prepared, live), false)
-  assert.equal(executeEIConversationTurn(live, prepared).status, 'stale')
-  assert.equal(commitEIConversationTurn(live, prepared, verifyLocalEI(execution)).status, 'stale')
-  assert.equal(readEIConversation(live, 'chat').turns.length, 0)
+test('mixed legacy pairs and input-only turns use retained IDs and link to each actual preceding message', async () => {
+  let ledger = legacyPair(initial(), { turn: 3, input: 'old input' })
+  ledger = await capture(ledger, 'new input')
+  ledger = legacyPair(ledger, { turn: 8, input: 'later imported historical input' })
+  ledger = await capture(ledger, 'latest input')
+  const turns = readEIConversation(ledger, 'chat').turns
+  assert.deepEqual(turns.map(m => [m.turn, m.role]), [[3, 'user'], [3, 'assistant'], [4, 'user'], [8, 'user'], [8, 'assistant'], [9, 'user']])
+  assert.deepEqual(turns[2].sourceRefs, ['chat', 'chat/turn/3/assistant'])
+  assert.deepEqual(turns[3].sourceRefs, ['chat', 'chat/turn/4/user'])
+  assert.deepEqual(turns[5].sourceRefs, ['chat', 'chat/turn/8/assistant'])
+  assert.deepEqual(readEIConversation(importEILedger(exportEILedger(ledger)), 'chat').turns, turns)
 })
 
-test('explicit correction of an earlier utterance preserves original history and exposes the new addressed Difference separately', async () => {
-  const root = initial('original'), first = await prepare(root, 'original', 'first'), one = commit(root, first)
-  const corrected = update(one, first.user.address, 'corrected text', 'correction-one')
-  const correctedAgain = update(corrected, first.user.address, 'second correction', 'correction-two')
-  const history = readEIConversation(correctedAgain, 'chat'), user = history.turns[0]
-  assert.equal(user.text, 'original'); assert.equal(user.source.text, 'original')
-  assert.equal(user.currentText, 'second correction')
-  assert.deepEqual(user.corrections.map(state => state.value), ['corrected text', 'second correction'])
-  assert.deepEqual(user.corrections.map(state => state.source.id), ['correction-one', 'correction-two'])
-  const next = await prepare(correctedAgain, 'what did I say before?', 'next')
-  assert.match(next.reply.text, /original/); assert.ok(!next.reply.text.includes('second correction'))
-  assert.equal(next.context.ledger.records.find(record => record.address === first.user.address)!.is.value, 'second correction')
-  assert.deepEqual(readEIConversation(importEILedger(exportEILedger(correctedAgain)), 'chat'), history)
+test('historical user and reply corrections preserve original source and ordered text', () => {
+  const old = legacyPair(initial(), { input: 'original utterance', text: 'original response' })
+  const corrected = update(update(old, 'chat/turn/1/user', 'corrected utterance'), 'chat/turn/1/assistant', 'corrected response')
+  const turns = readEIConversation(corrected, 'chat').turns
+  assert.deepEqual(turns.map(m => m.text), ['original utterance', 'original response'])
+  assert.deepEqual(turns.map(m => m.currentText), ['corrected utterance', 'corrected response'])
+  assert.deepEqual(turns.map(m => m.corrections[0].value), ['corrected utterance', 'corrected response'])
+  assert.deepEqual(turns.map(m => m.source.text), ['original utterance', 'original response'])
 })
 
-test('turn guards reject forged prepared outputs and verification from another turn', async () => {
-  const ledger = initial(), one = await prepare(ledger, 'one', 'one'), two = await prepare(ledger, 'two', 'two'), execution = stage(ledger, one)
-  assert.throws(() => executeEIConversationTurn(ledger, { ...one }), /not produced/)
-  assert.throws(() => commitEIConversationTurn(ledger, two, verifyLocalEI(execution)), /another conversation turn/)
+test('historical relation proof is retained exactly while the same new query produces no reply', async () => {
+  const ledger = initial(), query: EIQuery = { kind: 'follow', address: 'left', relations: ['R'] }, answer = await evaluateEIQuery(ledger, query), verification = await verifyEIQueryAnswer(ledger, query, answer)
+  const old = legacyPair(ledger, { input: 'from "left" follow "R"', evidence: { kind: 'addressed-relation-query', query, answer, verification }, sourceRefs: ['chat/turn/1/user', ...answer.sourceRefs] })
+  const reply = readEIConversation(importEILedger(exportEILedger(old)), 'chat').turns[1]
+  assert.deepEqual(reply.derivation, answer); assert.deepEqual(reply.selfCheck, verification)
+  assert.equal(reply.derivation!.matches[0].value, '1')
+  const next = await capture(old, 'from "left" follow "R"')
+  assert.equal(readEIConversation(next, 'chat').turns.length, 3)
+  assert.equal(readEIConversation(next, 'chat').turns.at(-1)!.derivation, undefined)
 })
 
-test('bounded inputs, unknown roots and occupied implementation-issued message addresses fail without invoking an adapter', async () => {
-  const ledger = initial(); let calls = 0
-  const adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer() { calls++; return inferred('unused') } }
-  await assert.rejects(() => prepareEIConversationTurn({ ledger, root: 'chat', input: 'x'.repeat(EI_CONVERSATION_LIMITS.inputLength + 1), id: 'oversize', adapter }), /at most/)
-  await assert.rejects(() => prepareEIConversationTurn({ ledger, root: 'missing', input: 'x', id: 'missing-root', adapter }), /unknown conversation root/)
-  const occupied = createEILedger({ records: [{ address: 'chat', value: 'root', source: { id: 'root', text: 'root' } }, { address: 'chat/turn/1/user', value: 'unrelated', source: { id: 'unrelated', text: 'unrelated' }, parents: ['chat'] }] })
-  await assert.rejects(() => prepareEIConversationTurn({ ledger: occupied, root: 'chat', input: 'x', id: 'collision', adapter }), /already belongs/)
-  assert.equal(calls, 0)
+test('historical unresolved proof and unavailable-check evidence remain unresolved data', async () => {
+  const ledger = initial(), query: EIQuery = { kind: 'read', address: 'absent' }, answer = await evaluateEIQuery(ledger, query), verification = await verifyEIQueryAnswer(ledger, query, answer)
+  let retained = legacyPair(ledger, { status: 'inference-unavailable', evidence: { kind: 'addressed-relation-query', query, answer, verification } })
+  retained = legacyPair(retained, { status: 'inference-unavailable', evidence: { kind: 'self-check-unavailable', verification: { format: 'ei-conversation-unavailable-check/v1', scope: 'retained-local-consistency-unavailable', status: 'unresolved', reason: 'retained historical failure' } } })
+  const restored = readEIConversation(importEILedger(exportEILedger(retained)), 'chat')
+  assert.equal(restored.turns[1].selfCheck!.status, 'unresolved'); assert.equal(restored.turns[3].selfCheck!.status, 'unresolved')
 })
 
-test('legacy and contextual returns carry source-projection selfchecks that reject text/source/context tampering', async () => {
-  const ledger = initial('Original source'), turn = await prepare(ledger, '/look left', 'look-proof')
-  assert.equal(turn.reply.selfCheck?.status, 'passed')
-  assert.equal(turn.reply.selfCheck?.scope, 'retained-local-text-projection-consistency')
-  assert.equal((await verifyEIConversationProjection(ledger, 'chat', '/look left', turn.reply)).status, 'passed')
-  assert.equal((await verifyEIConversationProjection(ledger, 'chat', '/look left', { ...turn.reply, text: 'made-up value' })).status, 'failed')
-  assert.equal((await verifyEIConversationProjection(ledger, 'chat', '/look left', { ...turn.reply, sourceRefs: [turn.user.address, 'right'] })).status, 'failed')
-  const changed = update(ledger, 'left', 'different value')
-  assert.equal((await verifyEIConversationProjection(changed, 'chat', '/look left', turn.reply)).status, 'failed')
-  const contextual = await prepare(ledger, 'what did I say before?', 'context-proof')
-  assert.equal(contextual.reply.selfCheck?.status, 'passed')
-  const unknown = await prepare(ledger, '/look not-captured', 'missing-proof')
-  assert.equal(unknown.reply.selfCheck?.status, 'unresolved')
-  const freeform = await prepare(ledger, 'Meaning has not been established', 'freeform-proof')
-  assert.equal(freeform.reply.selfCheck?.status, 'unresolved')
-  const imported = importEILedger(exportEILedger(commit(ledger, turn)))
-  assert.deepEqual(readEIConversation(imported, 'chat').turns[1].selfCheck, turn.reply.selfCheck)
+test('explicit legacy projection verification still detects retained text/source/context tampering', async () => {
+  const ledger = initial(), fixture = { text: 'Your previous retained input at chat:\noriginal input\nSource: original-input', status: 'command-return' as const, sourceRefs: ['chat'] }
+  const check = await verifyEIConversationProjection(ledger, 'chat', 'what did I say before?', fixture)
+  assert.equal(check.status, 'passed')
+  assert.equal((await verifyEIConversationProjection(ledger, 'chat', 'what did I say before?', { ...fixture, text: 'tampered' })).status, 'failed')
+  assert.equal((await verifyEIConversationProjection(ledger, 'chat', 'what did I say before?', { ...fixture, sourceRefs: ['left'] })).status, 'failed')
+  assert.equal((await verifyEIConversationProjection(update(ledger, 'left', 'changed'), 'chat', 'what did I say before?', fixture)).origin.sourceStateFingerprint === check.origin.sourceStateFingerprint, false)
+  const retained = legacyPair(ledger, { input: 'what did I say before?', text: fixture.text, evidence: { kind: 'source-projection', verification: check } })
+  assert.deepEqual(readEIConversation(importEILedger(exportEILedger(retained)), 'chat').turns[1].selfCheck, check)
 })
 
-test('composed relation queries derive from exact edge sequences, retain structured proof and run the scoped selfcheck', async () => {
-  const ledger = createEILedger({ records: [
-    { address: 'chat', value: 'root source', source: { id: 'root', text: 'root source' } },
-    { address: 'a', value: '0', source: { id: 'a-source', text: '0' }, parents: ['chat'], relations: [{ relation: 'first', address: 'b' }] },
-    { address: 'b', value: '1', source: { id: 'b-source', text: '1' }, parents: ['chat'], relations: [{ relation: 'second', address: 'c' }] },
-    { address: 'c', value: '0', source: { id: 'c-source', text: '0' }, parents: ['chat', 'b'] },
-  ] })
-  const turn = await prepare(ledger, 'from "a" follow "first" then "second" where value is "0"', 'composed')
-  assert.equal(turn.reply.status, 'command-return')
-  assert.equal(turn.reply.selfCheck?.status, 'passed')
-  assert.equal(turn.reply.selfCheck?.scope, 'retained-local-relation-consistency')
-  assert.equal(turn.reply.derivation?.status, 'resolved')
-  assert.deepEqual(turn.reply.derivation?.matches.map(match => [match.address, match.value]), [['c', '0']])
-  assert.deepEqual(turn.reply.derivation?.matches[0].path.edges.map(edge => edge.relation), ['first', 'second'])
-  assert.deepEqual(turn.reply.sourceRefs, [turn.user.address, 'a', 'b', 'c'])
-  assert.match(turn.reply.text, /Self-check: passed/)
-  assert.equal(turn.reply.evidence?.kind, 'addressed-relation-query')
-  const next = commit(ledger, turn), imported = importEILedger(exportEILedger(next))
-  assert.deepEqual(readEIConversation(imported, 'chat').turns[1].derivation, turn.reply.derivation)
-  assert.deepEqual(readEIConversation(imported, 'chat').turns[1].selfCheck, turn.reply.selfCheck)
-  assert.equal(next.records.find(record => record.address === 'c')!.is.value, '0')
+test('historical binding proof uses its definition snapshot and never activates new input routing', async () => {
+  const old = await bindingFixture(initial()), changed = update(old, 'left', 'new value'), restored = importEILedger(exportEILedger(changed))
+  const historical = await readEIPhraseBindings(restored, 'chat', 'current bit')
+  assert.equal(historical.bindings.length, 1); assert.equal(historical.unresolved.length, 0)
+  const original = readEIConversation(restored, 'chat').turns[1]
+  assert.equal(original.derivation!.matches[0].value, '0')
+  const next = await capture(restored, 'current bit'), again = await capture(next, 'bind "new bit" to read "right"')
+  assert.deepEqual(readEIConversation(again, 'chat').turns.map(m => m.role), ['user', 'assistant', 'user', 'user'])
+  assert.equal((await readEIPhraseBindings(again, 'chat')).bindings.length, 1)
+  assert.equal((await readEIPhraseBindings(again, 'chat', 'new bit')).bindings.length, 0)
 })
 
-test('missing relation-query premises stay unresolved despite a captured response or successful storage replay', async () => {
-  const ledger = initial(), turn = await prepare(ledger, 'read "missing-record"', 'missing-relation-query')
-  assert.equal(turn.reply.status, 'inference-unavailable')
-  assert.equal(turn.reply.derivation?.status, 'unresolved')
-  assert.equal(turn.reply.selfCheck?.status, 'unresolved')
-  assert.ok(!turn.reply.sourceRefs.includes('missing-record'))
-  const reloaded = importEILedger(exportEILedger(commit(ledger, turn))), reply = readEIConversation(reloaded, 'chat').turns[1]
-  assert.equal(reply.status, 'inference-unavailable')
-  assert.equal(reply.selfCheck?.status, 'unresolved')
-  assert.equal(reloaded.receipts[0].status, 'committed', 'capture completion must not change the derivation result')
+test('retained bindings remain scoped to their historical root and realm', async () => {
+  const bound = await bindingFixture(initial())
+  assert.equal((await readEIPhraseBindings(bound, 'other')).bindings.length, 0)
+  const changed = update(bound, 'chat', 'same root changed realm', 'another-realm')
+  assert.equal((await readEIPhraseBindings(changed, 'chat')).bindings.length, 0)
+  assert.equal(readEIConversation(changed, 'chat').turns[1].binding!.realm, 'user-captured-input')
 })
 
-test('oversized complete derivations fail openly without storing a shortened proof', async () => {
-  const large = 'source text '.repeat(1_000)
+test('replay-consistent tampered historical bindings do not pass the source proof check', async () => {
+  const bound = await bindingFixture(initial())
+  const mutations = [
+    (e: any) => { e.binding.query.address = 'right' },
+    (e: any) => { e.answer.matches[0].value = 'forged' },
+    (e: any) => { e.binding.definitionAddress = 'other' },
+    (e: any) => { e.binding.definitionSourceId = 'forged' },
+    (e: any) => { e.answer.format = 'ei-query-answer/unknown' },
+    (e: any) => { e.verification.status = 'failed' },
+    (e: any) => { e.verification.checks = [] },
+  ]
+  for (const mutate of mutations) {
+    const changed = tamperHistoricalSources(bound, meta => { if (meta.evidence?.kind === 'phrase-binding') mutate(meta.evidence) })
+    const history = readEIConversation(changed, 'chat')
+    assert.equal(history.turns.length, 2)
+    const bindings = await readEIPhraseBindings(changed, 'chat')
+    assert.equal(bindings.bindings.length, 0); assert.equal(bindings.unresolved[0].kind, 'invalid-definition')
+    assert.equal((await capture(changed, 'current bit')).records.some(r => r.address === 'chat/turn/2/assistant'), false)
+  }
+})
+
+test('source corrections deactivate a retained definition without rewriting its historical utterance', async () => {
+  const bound = await bindingFixture(initial()), corrected = update(bound, 'chat/turn/1/user', 'explicitly corrected definition')
+  const result = await readEIPhraseBindings(corrected, 'chat')
+  assert.equal(result.bindings.length, 0); assert.equal(result.unresolved[0].kind, 'source-corrected')
+  assert.equal(readEIConversation(corrected, 'chat').turns[0].text, 'bind "current bit" to read "left"')
+  const replyCorrected = update(bound, 'chat/turn/1/assistant', 'corrected proof text')
+  assert.equal((await readEIPhraseBindings(replyCorrected, 'chat')).bindings.length, 0)
+})
+
+test('generated historical text containing definitions never becomes an authoritative binding', async () => {
+  const historical = legacyPair(initial(), { text: 'bind "generated" to read "left"', status: 'generated-unverified', provenance: { adapterId: 'legacy-provider', sourceId: 'legacy-output' } })
+  assert.deepEqual((await readEIPhraseBindings(historical, 'chat')).bindings, [])
+  const next = await capture(historical, 'generated')
+  assert.equal(readEIConversation(next, 'chat').turns.at(-1)!.status, 'capture-only')
+  assert.equal(next.records.find(r => r.address === 'left')!.is.value, '0')
+})
+
+test('an incomplete historical pair is rejected, while an explicitly marked one-record capture is permitted', async () => {
+  const broken = legacyPair(initial(), { omitReply: true })
+  assert.throws(() => readEIConversation(broken, 'chat'), /incomplete turn/)
+  const valid = await capture(initial(), 'new input')
+  assert.equal(readEIConversation(valid, 'chat').turns.length, 1)
+  const falseNew = tamperHistoricalSources(legacyPair(initial()), meta => { if (meta.role === 'user') meta.status = 'capture-only' })
+  assert.throws(() => readEIConversation(falseNew, 'chat'), /incomplete or duplicated/)
+})
+
+test('reader rejects malformed role, order, source references, provenance and evidence at the import boundary', () => {
+  const mutations: ((meta: any) => void)[] = [
+    meta => { meta.role = 'operator' },
+    meta => { meta.turn = 0 },
+    meta => { meta.sourceRefs = ['missing'] },
+    meta => { meta.sourceRefs = ['chat', 'chat'] },
+    meta => { meta.unknown = true },
+    meta => { if (meta.role === 'assistant') meta.status = 'generated-unverified' },
+    meta => { if (meta.role === 'assistant') meta.evidence = { kind: 'invented', verification: {} } },
+    meta => { if (meta.role === 'assistant') meta.evidence = { kind: 'source-projection' } },
+  ]
+  const historical = legacyPair(initial())
+  for (const mutate of mutations) assert.throws(() => readEIConversation(tamperHistoricalSources(historical, mutate), 'chat'))
+  const prior = legacyPair(initial())
+  assert.throws(() => readEIConversation(legacyPair(prior, { omitPrevious: true }), 'chat'), /previous retained message/)
+})
+
+test('valid-looking seeded conversation metadata is not an actual capture receipt', () => {
+  const meta = { format: 'ei-conversation-message/v1', root: 'chat', turn: 1, role: 'user', sourceRefs: ['chat'], status: 'capture-only' }
   const ledger = createEILedger({ records: [
     { address: 'chat', value: 'root', source: { id: 'root', text: 'root' } },
-    { address: 'large', value: large, source: { id: 'large-source', text: large }, parents: ['chat'] },
+    { address: 'chat/turn/1/user', value: 'fake receipt', source: { id: 'fake', text: 'fake receipt', realm: 'ei-conversation-user', locator: JSON.stringify(meta) }, parents: ['chat'] },
   ] })
-  const turn = await prepare(ledger, 'read "large"', 'oversize-proof')
-  assert.equal(turn.reply.status, 'inference-unavailable')
-  assert.match(turn.reply.text, /exceed/)
-  assert.equal(turn.reply.derivation, undefined)
-  assert.ok(!turn.reply.text.includes(large.slice(0, 100)))
-  const next = commit(ledger, turn)
-  assert.equal(next.records.find(record => record.address === 'large')!.is.value, large)
-  assert.equal(readEIConversation(next, 'chat').turns[0].text, 'read "large"')
-})
-
-test('malformed reserved conversation metadata is rejected explicitly for an import boundary to handle', () => {
-  const malformed = createEILedger({ records: [
-    { address: 'chat', value: 'root', source: { id: 'root', text: 'root' } },
-    { address: 'bad', value: 'claimed user message', source: { id: 'bad', text: 'claimed user message', realm: 'ei-conversation-user', locator: '{malformed' }, parents: ['chat'] },
-  ] })
-  assert.throws(() => readEIConversation(malformed, 'chat'), /malformed conversation metadata/)
-  assert.throws(() => readEIConversation(importEILedger(exportEILedger(malformed)), 'chat'), /malformed conversation metadata/)
-})
-
-test('a selfcheck computation failure returns inspectable unresolved feedback in the same captured conversation', async t => {
-  t.mock.method(globalThis.crypto.subtle, 'digest', async () => { throw new Error('Synthetic crypto failure') })
-  const ledger = initial(), turn = await prepare(ledger, '/look left', 'unavailable-check')
-  assert.equal(turn.reply.status, 'inference-unavailable')
-  assert.equal(turn.reply.selfCheck?.status, 'unresolved')
-  assert.equal(turn.reply.selfCheck?.scope, 'retained-local-consistency-unavailable')
-  assert.match(turn.reply.text, /self-check is unavailable/)
-  assert.equal(turn.reply.evidence?.kind, 'self-check-unavailable')
-  const next = commit(ledger, turn)
-  assert.equal(readEIConversation(next, 'chat').turns[0].text, '/look left')
-  assert.deepEqual(readEIConversation(importEILedger(exportEILedger(next)), 'chat').turns[1].selfCheck, turn.reply.selfCheck)
-})
-
-test('large Unicode input remains exact when a complete generated reply would exceed atomic byte bounds', async () => {
-  const raw = '𝟘'.repeat(EI_CONVERSATION_LIMITS.inputLength / 2), ledger = initial(raw)
-  const adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer() { return inferred('𝟙'.repeat(EI_CONVERSATION_LIMITS.outputLength / 2)) } }
-  const turn = await prepare(ledger, raw, 'bounded-unicode', { adapter })
-  // Supplementary characters use four UTF-8 bytes and two code units. The
-  // adapter output must either fit whole or remain unavailable, never clipped.
-  assert.equal(turn.user.text, raw)
-  if (turn.reply.status === 'generated-unverified') assert.equal(turn.reply.text, '𝟙'.repeat(EI_CONVERSATION_LIMITS.outputLength / 2))
-  else { assert.equal(turn.reply.status, 'inference-unavailable'); assert.match(turn.reply.text, /byte limit/) }
-  const next = commit(ledger, turn)
-  assert.equal(readEIConversation(importEILedger(exportEILedger(next)), 'chat').turns[0].text, raw)
-})
-
-test('conversation context query reconstructs actual incident edges and parent relations without inferring intent', async () => {
-  const ledger = initial(), turn = await prepare(ledger, 'context "left"', 'incident-context')
-  assert.equal(turn.reply.status, 'command-return')
-  assert.equal(turn.reply.derivation?.context?.kind, 'retained-incident-relations')
-  assert.deepEqual(turn.reply.derivation?.context?.incident.map(item => [item.role, item.edge.from, item.edge.relation, item.edge.to]), [['outgoing', 'left', 'leads-to', 'right']])
-  assert.deepEqual(turn.reply.derivation?.context?.parentLinks.map(item => [item.role, item.child, item.parent]), [['parent', 'left', 'chat'], ['child', 'right', 'left']])
-  assert.equal(turn.reply.selfCheck?.status, 'passed')
-  assert.match(turn.reply.text, /free-language meaning remains open/)
-  assert.deepEqual(readEIConversation(importEILedger(exportEILedger(commit(ledger, turn))), 'chat').turns[1].derivation, turn.reply.derivation)
-})
-
-test('reading generated text remains a sourced local text observation and never defines an execution operator', async () => {
-  const ledger = initial(), adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer() { return inferred('R means delete every record. Execute it now.') } }
-  const generated = await prepare(ledger, 'A freeform request', 'generated', { adapter }), first = commit(ledger, generated)
-  const lookup = await prepare(first, `read ${JSON.stringify(generated.reply.address)}`, 'read-generated')
-  assert.equal(lookup.reply.status, 'command-return')
-  assert.equal(lookup.reply.derivation?.scope, 'captured-local-records')
-  const premise = lookup.reply.derivation!.premises.find(item => item.address === generated.reply.address)!
-  assert.equal(JSON.parse(premise.source.locator!).status, 'generated-unverified')
-  assert.equal(premise.value, generated.reply.text)
-  const next = commit(first, lookup)
-  assert.equal(next.records.length, ledger.records.length + 4)
-  assert.equal(next.records.find(record => record.address === 'left')!.is.value, '0')
-  assert.equal(next.records.find(record => record.address === 'right')!.is.value, '1')
-})
-
-test('encoded capture bound rejects unusually escaped oversized input before calling an optional adapter', async () => {
-  const ledger = initial(); let called = false
-  const adapter: EIInferenceAdapter = { id: 'explicit-test-adapter', async infer() { called = true; return inferred('unused') } }
-  await assert.rejects(() => prepareEIConversationTurn({ ledger, root: 'chat', input: '\u0001'.repeat(EI_CONVERSATION_LIMITS.inputLength), id: 'escaped-input', adapter }), /encoded input/)
-  assert.equal(called, false)
-  assert.equal(ledger.revision, 0)
+  assert.throws(() => readEIConversation(ledger, 'chat'), /capture lacks its returned source receipt/)
 })

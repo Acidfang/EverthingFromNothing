@@ -1,16 +1,16 @@
-/** Local addressed conversation: capture and command returns, with optional explicitly supplied inference. */
+/** Local addressed input capture. Retained historical replies remain readable; new input does not imply intent or a response. */
 import {
-  EI_LIMITS, commitEI, executeEI, exportEILedger, proposeEI,
+  commitEI, executeEI, exportEILedger, importEILedger, proposeEI,
   type EIExecution, type EIInput, type EILedger, type EIProposal, type EIRecord,
   type EIResult, type EISource, type EIValueState, type EIVerification,
 } from './ei-engine.ts'
-import { parseEIQuery, evaluateEIQuery, verifyEIQueryAnswer, formatEIQueryAnswer, formatEIQueryVerification, type EIQuery, type EIQueryAnswer, type EIQueryVerification } from './ei-relation-reasoner.ts'
+import { parseEIQuery, verifyEIQueryAnswer, type EIQuery, type EIQueryAnswer, type EIQueryVerification } from './ei-relation-reasoner.ts'
 
-export const EI_CONVERSATION_LIMITS = Object.freeze({ inputLength: 8_192, encodedInputBytes: 32_768, outputLength: 8_192, commandReferences: 64 })
+export const EI_CONVERSATION_LIMITS = Object.freeze({ inputLength: 8_192, encodedInputBytes: 32_768, outputLength: 8_192, commandReferences: 64, phraseLength: 512 })
 const FORMAT = 'ei-conversation-message/v1'
 const USER_REALM = 'ei-conversation-user'
 const REPLY_REALM = 'ei-conversation-reply'
-export type EIConversationStatus = 'captured' | 'command-return' | 'inference-unavailable' | 'generated-unverified'
+export type EIConversationStatus = 'capture-only' | 'captured' | 'command-return' | 'inference-unavailable' | 'generated-unverified'
 export type EIInferenceProvenance = Readonly<{ adapterId: string; sourceId: string; model?: string; requestId?: string }>
 export type EIProjectionVerification = Readonly<{
   format: 'ei-conversation-projection-check/v1'; scope: 'retained-local-text-projection-consistency';
@@ -19,10 +19,18 @@ export type EIProjectionVerification = Readonly<{
   expectedFingerprint: string | null; actualFingerprint: string; note: string;
 }>
 export type EIUnavailableVerification = Readonly<{ format: 'ei-conversation-unavailable-check/v1'; scope: 'retained-local-consistency-unavailable'; status: 'unresolved'; reason: string }>
-export type EIConversationEvidence = Readonly<{ kind: 'self-check-unavailable'; verification: EIUnavailableVerification }> | Readonly<{ kind: 'source-projection'; verification: EIProjectionVerification }> | Readonly<{ kind: 'addressed-relation-query'; query: EIQuery; answer: EIQueryAnswer; verification: EIQueryVerification }>
+/** Interface-selected syntax, not a recovered historical symbol spelling. */
+export const EI_PHRASE_BINDING_GRAMMAR = 'bind "exact phrase" to <declared relation query>'
+export type EIPhraseBinding = Readonly<{
+  format: 'ei-phrase-binding/v1'; root: string; realm: string | null; phrase: string;
+  query: EIQuery; definitionAddress: string; definitionSourceId: string;
+}>
+export type EISourcedPhraseBinding = EIPhraseBinding & Readonly<{ replyAddress: string }>
+export type EIPhraseBindings = Readonly<{ bindings: readonly EISourcedPhraseBinding[]; unresolved: readonly Readonly<{ address: string; reason: string; kind: 'source-corrected' | 'invalid-definition' }>[] }>
+export type EIConversationEvidence = Readonly<{ kind: 'phrase-binding'; binding: EIPhraseBinding; answer: EIQueryAnswer; verification: EIQueryVerification }> | Readonly<{ kind: 'bound-query'; bindings: readonly EISourcedPhraseBinding[]; query: EIQuery; answer: EIQueryAnswer; verification: EIQueryVerification }> | Readonly<{ kind: 'self-check-unavailable'; verification: EIUnavailableVerification }> | Readonly<{ kind: 'source-projection'; verification: EIProjectionVerification }> | Readonly<{ kind: 'addressed-relation-query'; query: EIQuery; answer: EIQueryAnswer; verification: EIQueryVerification }>
 export type EIConversationMessage = Readonly<{
   address: string; role: 'user' | 'assistant'; text: string; sourceRefs: readonly string[];
-  status: EIConversationStatus; turn: number; source: EISource; corrections: readonly EIValueState[]; currentText: string; provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence; selfCheck?: EIProjectionVerification | EIQueryVerification | EIUnavailableVerification; derivation?: EIQueryAnswer;
+  status: EIConversationStatus; turn: number; source: EISource; corrections: readonly EIValueState[]; currentText: string; provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence; selfCheck?: EIProjectionVerification | EIQueryVerification | EIUnavailableVerification; derivation?: EIQueryAnswer; binding?: EIPhraseBinding; bindingSources?: readonly EISourcedPhraseBinding[];
 }>
 export type EIConversation = Readonly<{ root: string; turns: readonly EIConversationMessage[] }>
 export type EIInferenceContext = Readonly<{
@@ -35,16 +43,16 @@ export interface EIInferenceAdapter {
   infer(context: EIInferenceContext, signal: AbortSignal): Promise<EIInferenceResult>
 }
 export type EIPreparedConversationTurn = Readonly<{
-  status: 'proposed'; proposal: EIProposal; user: EIConversationMessage;
-  reply: EIConversationMessage; context: EIInferenceContext;
+  status: 'proposed'; mode: 'capture-only'; proposal: EIProposal; user: EIConversationMessage;
+  reply: null; context: EIInferenceContext;
 }>
 export type EIConversationStopped = Readonly<{ status: 'cancelled' | 'stale'; reason: string }>
 export type EIConversationPreparation = EIPreparedConversationTurn | EIConversationStopped
 export type EIConversationExecution = EIExecution | EIResult | EIConversationStopped
 export type EIConversationCommit = EIResult | EIConversationStopped
 export type EIConversationOptions = Readonly<{
-  ledger: EILedger; root: string; input: string; id: string; signal?: AbortSignal; adapter?: EIInferenceAdapter;
-  /** Optional live state accessor allows stale detection immediately after inference. */
+  ledger: EILedger; root: string; input: string; id: string; signal?: AbortSignal;
+  /** Optional live state accessor rejects capture prepared from an obsolete snapshot. */
   currentLedger?: () => EILedger;
 }>
 type Metadata = Readonly<{
@@ -93,8 +101,8 @@ function readMetadata(record: EIRecord, root: string): Metadata | null {
   if (!Array.isArray(meta.sourceRefs) || meta.sourceRefs.length > EI_CONVERSATION_LIMITS.commandReferences + 2) fail('invalid message source references')
   const sourceRefs = meta.sourceRefs.map(item => checkedText(item, 'source reference', 256, true))
   if (new Set(sourceRefs).size !== sourceRefs.length) fail('duplicate message source references')
-  const statuses = ['captured', 'command-return', 'inference-unavailable', 'generated-unverified']
-  if (!statuses.includes(meta.status as string) || (meta.role === 'user') !== (meta.status === 'captured')) fail('invalid captured message status')
+  const statuses = ['capture-only', 'captured', 'command-return', 'inference-unavailable', 'generated-unverified']
+  if (!statuses.includes(meta.status as string) || (meta.role === 'user') !== (meta.status === 'captured' || meta.status === 'capture-only')) fail('invalid captured message status')
   if ((meta.status === 'generated-unverified') !== (meta.provenance !== undefined)) fail('generated content must retain adapter provenance without becoming verified authority')
   return freeze({ format: FORMAT, root, turn: meta.turn as number, role: meta.role, sourceRefs, status: meta.status as EIConversationStatus, ...(meta.provenance === undefined ? {} : { provenance: provenance(meta.provenance) }), ...(meta.evidence === undefined ? {} : { evidence: readEvidence(meta.evidence) }) })
 }
@@ -108,22 +116,40 @@ export function readEIConversation(ledger: EILedger, root: string): EIConversati
     const captured = record.was[0] ?? record.is
     return meta ? [{ address: record.address, role: meta.role, text: captured.value, sourceRefs: meta.sourceRefs, status: meta.status, turn: meta.turn, source: captured.source, corrections: record.was.length ? [...record.was.slice(1), record.is] : [], currentText: record.is.value, ...(meta.provenance ? { provenance: meta.provenance } : {}), ...(meta.evidence ? { evidence: meta.evidence, ...evidenceFields(meta.evidence) } : {}) }] : []
   }).sort((a, b) => a.turn - b.turn || (a.role === b.role ? 0 : a.role === 'user' ? -1 : 1))
-  if (turns.length % 2 !== 0) fail('conversation history contains an incomplete turn')
   const byAddress = new Map(ledger.records.map(record => [record.address, record]))
-  for (let i = 0; i < turns.length; i += 2) {
-    const user = turns[i], reply = turns[i + 1], index = i / 2 + 1
-    if (user.turn !== index || reply.turn !== index || user.role !== 'user' || reply.role !== 'assistant') fail('conversation order is incomplete or duplicated')
-    const userRecord = byAddress.get(user.address)!, replyRecord = byAddress.get(reply.address)!
-    if (!userRecord.parents.includes(root) || !replyRecord.parents.includes(user.address) || !reply.sourceRefs.includes(user.address)) fail('conversation parent/source links are broken')
-    if (i > 0 && !userRecord.parents.includes(turns[i - 1].address)) fail('conversation does not link to its previous reply')
-    for (const message of [user, reply]) for (const ref of message.sourceRefs) if (!byAddress.has(ref)) fail(`conversation source reference is unbound: ${ref}`)
-    const userCapture = userRecord.was[0] ?? userRecord.is, replyCapture = replyRecord.was[0] ?? replyRecord.is
-    if (userCapture.revision !== replyCapture.revision || !ledger.receipts.some(receipt => receipt.resultRevision === userCapture.revision && receipt.patches.some(patch => patch.address === user.address) && receipt.patches.some(patch => patch.address === reply.address))) fail('input and response lack one atomic conversation receipt')
+  let previous: EIConversationMessage | undefined, previousRevision = -1
+  for (let i = 0; i < turns.length;) {
+    const user = turns[i++]
+    if (user.role !== 'user' || (previous && user.turn <= previous.turn)) fail('conversation order is incomplete or duplicated')
+    const next = turns[i], reply = next?.turn === user.turn ? next : undefined
+    if (reply) {
+      if (reply.role !== 'assistant' || user.status !== 'captured') fail('conversation order is incomplete or duplicated')
+      i++
+    } else if (user.status !== 'capture-only') fail('conversation history contains an incomplete turn')
+    if (turns[i]?.turn === user.turn) fail('conversation order is incomplete or duplicated')
+    const userRecord = byAddress.get(user.address)!, userCapture = userRecord.was[0] ?? userRecord.is
+    if (!userRecord.parents.includes(root) || !user.sourceRefs.includes(root)) fail('conversation parent/source links are broken')
+    if (previous && (!userRecord.parents.includes(previous.address) || !user.sourceRefs.includes(previous.address))) fail('conversation does not link to its previous retained message')
+    if (userCapture.revision <= previousRevision) fail('conversation turn order does not match capture receipts')
+    const messages = reply ? [user, reply] : [user]
+    for (const message of messages) for (const ref of message.sourceRefs) if (!byAddress.has(ref)) fail(`conversation source reference is unbound: ${ref}`)
+    if (reply) {
+      const replyRecord = byAddress.get(reply.address)!, replyCapture = replyRecord.was[0] ?? replyRecord.is
+      if (!replyRecord.parents.includes(user.address) || !reply.sourceRefs.includes(user.address)) fail('conversation parent/source links are broken')
+      if (userCapture.revision !== replyCapture.revision) fail('input and response lack one atomic conversation receipt')
+    }
+    const receipt = ledger.receipts.find(receipt => receipt.status === 'committed' && receipt.producer === root && receipt.resultRevision === userCapture.revision && messages.every(message => receipt.patches.some(patch => patch.kind === 'create' && patch.address === message.address && patch.value === message.text && JSON.stringify(patch.source) === JSON.stringify(message.source))))
+    if (!receipt || !byAddress.get(root)!.receiptIds.includes(receipt.id)) fail('conversation capture lacks its returned source receipt')
+    if (!reply && receipt.patches.length !== 1) fail('capture-only turn must retain one addressed input patch')
+    previous = reply ?? user
+    previousRevision = userCapture.revision
   }
   return freeze({ root, turns })
 }
 
-type ReturnContent = Readonly<{ text: string; status: Exclude<EIConversationStatus, 'captured'>; sourceRefs: readonly string[]; provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence }>
+// Historical projection helpers below are used only by the explicit legacy verifier.
+// prepareEIConversationTurn never dispatches input to them.
+type ReturnContent = Readonly<{ text: string; status: Exclude<EIConversationStatus, 'captured' | 'capture-only'>; sourceRefs: readonly string[]; provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence }>
 function unavailable(text: string, sourceRefs: readonly string[] = []): ReturnContent { return { text, status: 'inference-unavailable', sourceRefs } }
 function parseCommand(raw: string): { name: string; args: string[] } | null {
   const trimmed = raw.trim()
@@ -197,26 +223,13 @@ function contextualReturn(ledger: EILedger, conversation: EIConversation, input:
   return { text, status: 'command-return', sourceRefs: refs }
 }
 
-function evidenceFields(evidence: EIConversationEvidence): { selfCheck: EIProjectionVerification | EIQueryVerification | EIUnavailableVerification; derivation?: EIQueryAnswer } {
-  return { selfCheck: evidence.verification, ...(evidence.kind === 'addressed-relation-query' ? { derivation: evidence.answer } : {}) }
+function evidenceFields(evidence: EIConversationEvidence): { selfCheck: EIProjectionVerification | EIQueryVerification | EIUnavailableVerification; derivation?: EIQueryAnswer; binding?: EIPhraseBinding; bindingSources?: readonly EISourcedPhraseBinding[] } {
+  return { selfCheck: evidence.verification, ...('answer' in evidence ? { derivation: evidence.answer } : {}), ...(evidence.kind === 'phrase-binding' ? { binding: evidence.binding } : {}), ...(evidence.kind === 'bound-query' ? { bindingSources: evidence.bindings } : {}) }
 }
-async function relationReturn(ledger: EILedger, input: string): Promise<ReturnContent | null> {
-  const parsed = parseEIQuery(input)
-  if (parsed.status !== 'parsed') return null
-  const answer = await evaluateEIQuery(ledger, parsed.query)
-  if (JSON.stringify(answer).length > 24_000 || answer.sourceRefs.length > EI_CONVERSATION_LIMITS.commandReferences) return unavailable('The complete addressed derivation exceeds the local evidence limit. Narrow the supplied query. No partial proof has been presented as a complete answer.')
-  const verification = await verifyEIQueryAnswer(ledger, parsed.query, answer)
-  const evidence: EIConversationEvidence = { kind: 'addressed-relation-query', query: parsed.query, answer, verification }
-  const formatted = formatEIQueryAnswer(answer), text = `${formatted}\n${formatEIQueryVerification(verification)}`
-  if (JSON.stringify(evidence).length > 24_000 || text.length > EI_CONVERSATION_LIMITS.outputLength || formatted.includes('complete answer exceeds')) return unavailable('The complete addressed answer and self-check exceed the local evidence limit. Narrow the supplied query. No answer or proof was silently shortened.')
-  if (verification.status === 'failed') return { text: 'The addressed answer failed its source consistency self-check. No resolved answer or action was admitted.', status: 'inference-unavailable', sourceRefs: answer.sourceRefs, evidence }
-  return { text, status: verification.status === 'passed' ? 'command-return' : 'inference-unavailable', sourceRefs: answer.sourceRefs, evidence }
-}
-
 function readEvidence(value: unknown): EIConversationEvidence {
   const evidence = plain(value, 'conversation evidence')
-  if (evidence.kind !== 'source-projection' && evidence.kind !== 'addressed-relation-query' && evidence.kind !== 'self-check-unavailable') fail('unknown conversation evidence kind')
-  const allowed = evidence.kind === 'addressed-relation-query' ? ['kind', 'query', 'answer', 'verification'] : ['kind', 'verification']
+  if (evidence.kind !== 'source-projection' && evidence.kind !== 'addressed-relation-query' && evidence.kind !== 'self-check-unavailable' && evidence.kind !== 'phrase-binding' && evidence.kind !== 'bound-query') fail('unknown conversation evidence kind')
+  const allowed = evidence.kind === 'phrase-binding' ? ['kind', 'binding', 'answer', 'verification'] : evidence.kind === 'bound-query' ? ['kind', 'bindings', 'query', 'answer', 'verification'] : evidence.kind === 'addressed-relation-query' ? ['kind', 'query', 'answer', 'verification'] : ['kind', 'verification']
   for (const key of Object.keys(evidence)) if (!allowed.includes(key)) fail(`unexpected evidence field: ${key}`)
   for (const key of allowed) if (!Object.hasOwn(evidence, key)) fail(`missing evidence field: ${key}`)
   const pending = [{ value, depth: 0 }]; let count = 0
@@ -235,7 +248,7 @@ async function fingerprint(value: unknown): Promise<string> {
 /** Fresh consistency check against actual source state, not the message-capture receipt. */
 export async function verifyEIConversationProjection(ledger: EILedger, root: string, input: string, answer: Pick<EIConversationMessage, 'text' | 'status' | 'sourceRefs'>): Promise<EIProjectionVerification> {
   const conversation = readEIConversation(ledger, root), expected = contextualReturn(ledger, conversation, input) ?? commandReturn(ledger, input)
-  const pendingUser = `${root}/turn/${conversation.turns.length / 2 + 1}/user`
+  const pendingUser = `${root}/turn/${nextTurn(conversation)}/user`
   const actual = { text: answer.text, status: answer.status, sourceRefs: answer.sourceRefs.filter(ref => ref !== pendingUser) }
   const expectedFields = expected ? { text: expected.text, status: expected.status, sourceRefs: expected.sourceRefs } : null
   const checks = [
@@ -257,96 +270,46 @@ function makeMessage(address: string, text: string, metadata: Metadata, id: stri
 function stopped(status: EIConversationStopped['status']): EIConversationStopped {
   return freeze({ status, reason: status === 'cancelled' ? 'This conversation turn was cancelled; no message or response was committed.' : 'The addressed conversation changed while the response was being prepared; prepare again from the current ledger.' })
 }
-function isAbort(error: unknown, signal: AbortSignal): boolean { return signal.aborted || (error instanceof Error && error.name === 'AbortError') }
-function abortable<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const cancel = () => { const error = new Error('Conversation inference cancelled'); error.name = 'AbortError'; reject(error) }
-    if (signal.aborted) { cancel(); return }
-    signal.addEventListener('abort', cancel, { once: true })
-    promise.then(value => { signal.removeEventListener('abort', cancel); resolve(value) }, error => { signal.removeEventListener('abort', cancel); reject(error) })
-  })
+function nextTurn(conversation: EIConversation): number {
+  const turn = Math.max(0, ...conversation.turns.map(message => message.turn)) + 1
+  if (!Number.isSafeInteger(turn)) fail('conversation turn ID exceeds the safe integer bound')
+  return turn
 }
 
-/** Prepare an atomic user+reply capture; this function alone commits nothing. */
+/** Prepare one raw input capture. No source-defined intent/reply reducer is bound. */
 export async function prepareEIConversationTurn(options: EIConversationOptions): Promise<EIConversationPreparation> {
-  const { ledger, root, adapter } = options
+  const { ledger, root } = options
   const input = checkedText(options.input, 'input', EI_CONVERSATION_LIMITS.inputLength, true), id = checkedText(options.id, 'transaction ID', 200, true)
   if (new TextEncoder().encode(JSON.stringify(input)).length > EI_CONVERSATION_LIMITS.encodedInputBytes) fail('encoded input exceeds the atomic capture byte limit')
   const signal = options.signal ?? new AbortController().signal
   if (signal.aborted) return stopped('cancelled')
-  const conversation = readEIConversation(ledger, root), snapshot = exportEILedger(ledger), turn = conversation.turns.length / 2 + 1
-  const userAddress = checkedText(`${root}/turn/${turn}/user`, 'user address', 256, true), replyAddress = checkedText(`${root}/turn/${turn}/assistant`, 'reply address', 256, true)
-  if (ledger.records.some(record => record.address === userAddress || record.address === replyAddress)) fail('next conversation address already belongs to another captured record')
+  const conversation = readEIConversation(ledger, root), snapshot = exportEILedger(ledger), turn = nextTurn(conversation)
+  const userAddress = checkedText(`${root}/turn/${turn}/user`, 'user address', 256, true)
+  if (ledger.records.some(record => record.address === userAddress)) fail('next conversation address already belongs to another captured record')
   const previous = conversation.turns.at(-1), userRefs = previous ? [root, previous.address] : [root]
-  const user = makeMessage(userAddress, input, { format: FORMAT, root, turn, role: 'user', sourceRefs: userRefs, status: 'captured' }, `${id}/user`)
+  const user = makeMessage(userAddress, input, { format: FORMAT, root, turn, role: 'user', sourceRefs: userRefs, status: 'capture-only' }, `${id}/user`)
   const context: EIInferenceContext = freeze({ ledger, conversation, userInput: { address: userAddress, text: input, source: user.source } })
-  let output = contextualReturn(ledger, conversation, input) ?? commandReturn(ledger, input)
-  if (!output) {
-    try { output = await relationReturn(ledger, input) }
-    catch (error) { output = unavailable(error instanceof Error && /exceed|bound|limit/i.test(error.message) ? 'The complete addressed answer exceeds the local output limit. The input remains context; no answer or proof was silently shortened.' : 'The local source derivation could not complete its self-check. The input remains context; no resolved answer or action was admitted.') }
-  }
-  if (!output && !adapter) output = unavailable('Your input is retained as context when this turn is committed. No implemented source-bound derivation resolves this message, so its meaning and intent remain open. I have not established an answer or selected an action.')
-  if (!output && adapter) {
-    try {
-      const adapterId = checkedText(adapter.id, 'adapter ID', 256, true)
-      const returned = plain(await abortable(Promise.resolve().then(() => adapter.infer(context, signal)), signal), 'adapter result')
-      for (const key of Object.keys(returned)) if (!['text', 'provenance'].includes(key)) fail(`unexpected adapter result field: ${key}; generated text cannot authorize actions`)
-      output = { text: checkedText(returned.text, 'adapter response', EI_CONVERSATION_LIMITS.outputLength, true), status: 'generated-unverified', sourceRefs: [...new Set([root, ...conversation.turns.map(message => message.address)])], provenance: provenance(returned.provenance, adapterId) }
-      // Complete context is always supplied to inference. A source pointer to the
-      // conversation root names the whole context when individual links are large.
-      if (output.sourceRefs.length > EI_CONVERSATION_LIMITS.commandReferences) output = { ...output, sourceRefs: [root] }
-    } catch (error) {
-      if (isAbort(error, signal)) return stopped('cancelled')
-      output = unavailable(`Inference unavailable: the selected adapter did not return a valid sourced response. ${error instanceof Error ? error.message : 'Adapter failure'}`)
-      if (output.text.length > EI_CONVERSATION_LIMITS.outputLength) output = unavailable('Inference unavailable: the selected adapter failed. No generated answer or action was accepted.')
-    }
-  }
-  if (!output!.evidence && output!.status !== 'generated-unverified') {
-    try { output = { ...output!, evidence: { kind: 'source-projection', verification: await verifyEIConversationProjection(ledger, root, input, output!) } } }
-    catch {
-      const verification: EIUnavailableVerification = { format: 'ei-conversation-unavailable-check/v1', scope: 'retained-local-consistency-unavailable', status: 'unresolved', reason: 'The local consistency checker could not run. No fingerprint, passed check, or verified answer was produced.' }
-      output = { ...unavailable('The local self-check is unavailable. Your input remains captured context with this feedback; no resolved answer or action was admitted.'), evidence: { kind: 'self-check-unavailable', verification } }
-    }
-  }
   if (signal.aborted) return stopped('cancelled')
   if (options.currentLedger && exportEILedger(options.currentLedger()) !== snapshot) return stopped('stale')
-  if (output!.text.length > EI_CONVERSATION_LIMITS.outputLength) output = unavailable('The complete local response exceeds the output limit. No shortened answer or proof was substituted; the input remains available as context.')
-  function replyFor(returned: ReturnContent): EIConversationMessage {
-    const sourceRefs = [...new Set([user.address, ...returned.sourceRefs])]
-    return makeMessage(replyAddress, returned.text, { format: FORMAT, root, turn, role: 'assistant', sourceRefs, status: returned.status, ...(returned.provenance ? { provenance: returned.provenance } : {}), ...(returned.evidence ? { evidence: returned.evidence } : {}) }, `${id}/reply`)
+  const definition: EISource = { id: 'ei-conversation-input-capture/v1', text: JSON.stringify({ operation: 'capture-input', intent: 'unbound', reply: 'absent' }), realm: 'local-implementation-definition' }
+  const inputProposal: EIInput = {
+    id, producer: root, input: { id: `${id}/input`, text: input, realm: USER_REALM },
+    // The issued proposal binds the entire ledger snapshot, including history,
+    // relations and receipts. The patch records raw input without interpreting it.
+    candidates: [{ id: 'capture-conversation-input', label: 'capture-only', owner: 'engine', source: definition, conditions: [], patches: [
+      { kind: 'create', address: user.address, value: user.text, source: user.source, parents: userRefs, relations: userRefs.map(address => ({ relation: 'conversation-context', address })) },
+    ] }],
   }
-  let reply = replyFor(output!)
-  if ((reply.source.locator?.length ?? 0) > EI_LIMITS.textLength) {
-    output = unavailable('The complete response metadata exceeds the local evidence limit. The input is retained; no partial answer or proof was admitted.')
-    reply = replyFor(output)
-  }
-  const definition: EISource = { id: 'ei-conversation-capture/v1', text: 'Capture the exact user input and returned response as two separate source-linked records. Generated content is unverified data and grants no execution authority.', realm: 'local-implementation-definition' }
-  function proposalFor(returned: EIConversationMessage): EIInput {
-    return {
-      id, producer: root, input: { id: `${id}/input`, text: input, realm: USER_REALM },
-      // The engine binds the entire immutable ledger snapshot, including root
-      // state. Duplicating a large root value as a condition is unnecessary.
-      candidates: [{ id: 'capture-conversation-turn', label: 'Capture input and returned response', owner: 'engine', source: definition, conditions: [], patches: [
-        { kind: 'create', address: user.address, value: user.text, source: user.source, parents: userRefs, relations: userRefs.map(address => ({ relation: 'conversation-context', address })) },
-        { kind: 'create', address: returned.address, value: returned.text, source: returned.source, parents: [user.address], relations: returned.sourceRefs.map(address => ({ relation: address === user.address ? 'reply-to' : 'source-reference', address })) },
-      ] }],
-    }
-  }
-  let inputProposal = proposalFor(reply)
-  if (new TextEncoder().encode(JSON.stringify(inputProposal)).length > EI_LIMITS.inputBytes) {
-    output = unavailable('The complete response exceeds this atomic turn’s byte limit. The exact input is retained; no shortened generated response or proof was accepted.')
-    reply = replyFor(output)
-    inputProposal = proposalFor(reply)
-  }
-  const prepared: EIPreparedConversationTurn = freeze({ status: 'proposed', proposal: proposeEI(ledger, inputProposal), user, reply, context })
+  const prepared: EIPreparedConversationTurn = freeze({ status: 'proposed', mode: 'capture-only', proposal: proposeEI(ledger, inputProposal), user, reply: null, context })
   preparedGuards.set(prepared, { snapshot, signal })
   return prepared
 }
 
 function guardFor(prepared: EIPreparedConversationTurn): Guard { const guard = preparedGuards.get(prepared); if (!guard) fail('turn was not produced by prepareEIConversationTurn'); return guard }
 function recorded(ledger: EILedger, prepared: EIPreparedConversationTurn): boolean {
-  const receipt = ledger.receipts.find(receipt => receipt.transactionId === prepared.proposal.input.id)
-  return !!receipt && receipt.patches.some(patch => patch.address === prepared.user.address && patch.value === prepared.user.text) && receipt.patches.some(patch => patch.address === prepared.reply.address && patch.value === prepared.reply.text)
+  exportEILedger(ledger)
+  const receipt = ledger.receipts.find(receipt => receipt.status === 'committed' && receipt.transactionId === prepared.proposal.input.id)
+  return !!receipt && receipt.producer === prepared.proposal.input.producer && JSON.stringify(receipt.source) === JSON.stringify(prepared.proposal.input.input) && JSON.stringify(receipt.patches) === JSON.stringify(prepared.proposal.input.candidates[0].patches)
 }
 /** A later cancellation never retracts a turn already committed to this ledger. */
 export function isEIConversationTurnCurrent(prepared: EIPreparedConversationTurn, ledger: EILedger): boolean {
@@ -374,3 +337,59 @@ export function commitEIConversationTurn(ledger: EILedger, prepared: EIPreparedC
   const result = commitEI(ledger, verification)
   return result
 }
+
+function parseBindingDefinition(input: string): { phrase: string; query: EIQuery } | null {
+  const match = /^bind\s+("(?:[^"\\\u0000-\u001f]|\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4}))*")\s+to\s+([\s\S]+)$/.exec(input.trim())
+  if (!match) return null
+  const phrase = checkedText(JSON.parse(match[1]), 'bound phrase', EI_CONVERSATION_LIMITS.phraseLength, true)
+  const parsed = parseEIQuery(match[2])
+  return parsed.status === 'parsed' ? { phrase, query: parsed.query } : null
+}
+function reservedPhrase(phrase: string): boolean {
+  const trimmed = phrase.trim()
+  return /^what is [\s\S]+\?$/i.test(trimmed) || trimmed.startsWith('/') || /^bind(?:\s|$)/.test(trimmed) || EI_CONTEXT_QUERY_FORMS.some(form => form.toLowerCase() === trimmed.toLowerCase()) || parseEIQuery(phrase).status === 'parsed'
+}
+function bindingRealm(ledger: EILedger, root: string): string | null { return ledger.records.find(record => record.address === root)!.is.source.realm ?? null }
+
+/** Reconstruct a retained historical snapshot; this does not apply an inverse edit. */
+function ledgerAt(ledger: EILedger, revision: number): EILedger {
+  if (!Number.isSafeInteger(revision) || revision < 0 || revision > ledger.revision) fail('invalid binding definition revision')
+  const receipts = ledger.receipts.filter(receipt => receipt.resultRevision <= revision), receiptIds = new Set(receipts.map(receipt => receipt.id))
+  const records = ledger.records.flatMap(record => {
+    const states = [...record.was, record.is].filter(state => state.revision <= revision)
+    if (!states.length) return []
+    return [{ ...record, was: states.slice(0, -1), is: states.at(-1)!, receiptIds: record.receiptIds.filter(id => receiptIds.has(id)) }]
+  })
+  return importEILedger(JSON.stringify({ ...ledger, revision, receipts, records }))
+}
+
+/** Inspect historical definitions only. New conversation input never activates or invokes these bindings. */
+export async function readEIPhraseBindings(ledger: EILedger, root: string, phrase?: string): Promise<EIPhraseBindings> {
+  const conversation = readEIConversation(ledger, root), realm = bindingRealm(ledger, root)
+  const bindings: EISourcedPhraseBinding[] = [], unresolved: { address: string; reason: string; kind: 'source-corrected' | 'invalid-definition' }[] = []
+  for (const message of conversation.turns) {
+    if (message.role !== 'assistant' || message.evidence?.kind !== 'phrase-binding') continue
+    const evidence = message.evidence, definition = conversation.turns.find(turn => turn.turn === message.turn && turn.role === 'user')!
+    try {
+      const parsed = parseBindingDefinition(definition.text)
+      if (phrase !== undefined && parsed?.phrase !== phrase) continue
+      if (!parsed || reservedPhrase(parsed.phrase)) fail('definition is not a permitted explicit phrase binding')
+      if (definition.currentText !== definition.text || message.currentText !== message.text) { unresolved.push({ address: definition.address, kind: 'source-corrected', reason: 'The addressed definition or returned proof was explicitly corrected. Its original binding is inactive; retain the correction and define a new sourced binding if wanted.' }); continue }
+      const binding = plain(evidence.binding, 'phrase binding')
+      for (const key of Object.keys(binding)) if (!['format', 'root', 'realm', 'phrase', 'query', 'definitionAddress', 'definitionSourceId'].includes(key)) fail(`unexpected binding field: ${key}`)
+      if (binding.format !== 'ei-phrase-binding/v1' || binding.root !== root || binding.phrase !== parsed.phrase || binding.definitionAddress !== definition.address || binding.definitionSourceId !== definition.source.id || JSON.stringify(binding.query) !== JSON.stringify(parsed.query)) fail('binding does not match its addressed user definition')
+      if (binding.realm !== null && typeof binding.realm !== 'string') fail('invalid binding source realm')
+      if (message.status !== 'command-return' || message.provenance !== undefined || evidence.answer.status !== 'resolved' || evidence.verification.status !== 'passed') fail('binding has no successful source-derived definition')
+      const record = ledger.records.find(record => record.address === definition.address)!, captured = record.was[0] ?? record.is
+      const original = ledgerAt(ledger, captured.revision - 1)
+      if (bindingRealm(original, root) !== binding.realm) fail('binding realm does not match its historical definition source')
+      // Another realm's valid definition is not imported into the current realm.
+      if (binding.realm !== realm) continue
+      const verification = await verifyEIQueryAnswer(original, parsed.query, evidence.answer)
+      if (verification.status !== 'passed' || JSON.stringify(verification) !== JSON.stringify(evidence.verification)) fail('retained binding proof failed historical source consistency checks')
+      bindings.push({ ...(binding as EIPhraseBinding), replyAddress: message.address })
+    } catch (error) { unresolved.push({ address: definition.address, kind: 'invalid-definition', reason: error instanceof Error ? error.message : 'Binding source verification is unavailable' }) }
+  }
+  return freeze({ bindings, unresolved })
+}
+
