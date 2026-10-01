@@ -74,6 +74,7 @@ test('batch evaluates each actually witnessed ordered pair with the same individ
   for(const [index,result] of batch.results.entries()){
    const individual=resolveEIAuthoredComparison(ledger,handle,result.query.left,result.query.right).result
    assert.deepEqual(expandEIAuthoredComparisonBatchResult(batch,index),individual)
+   assert.equal(verifyEIAuthoredComparison(ledger,handle,result.query.left,result.query.right,{origin:batch.origin,result:expandEIAuthoredComparisonBatchResult(batch,index)}).status,'passed')
   }
   assert.equal(batch.sourceClauseCount,1+batch.unapplied.length+batch.witnessCount)
   assert.equal(verifyEIAuthoredComparisonBatch(ledger,handle,batch).status,'passed')
@@ -147,4 +148,30 @@ test('batch validates unsupported clause spans just as an individual evaluation 
  const handle=projectEIGrain(createEIGrainRegistry(ledger),'source','state')
  assert.throws(()=>resolveEIAuthoredComparison(ledger,handle,'a','b'),/invalid source span/)
  assert.throws(()=>resolveEIAuthoredComparisonBatch(ledger,handle),/invalid source span/)
+})
+
+
+test('proof checks ignore object-key insertion order but retain array order and exact field content',()=>{
+ const text=`a≡b;a≡b;${AUTHORED_COMPARE_CLAUSE}`,ledger=createEILedger({records:[{address:'source',value:text,source:{id:'source',text}}]})
+ const handle=projectEIGrain(createEIGrainRegistry(ledger),'source','state')
+ const reverseKeys=(value:unknown):unknown=>Array.isArray(value)?value.map(reverseKeys):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).reverse().map(([key,item])=>[key,reverseKeys(item)])):value
+ const individual=resolveEIAuthoredComparison(ledger,handle,'a','b'),batch=resolveEIAuthoredComparisonBatch(ledger,handle)
+ assert.equal(verifyEIAuthoredComparison(ledger,handle,'a','b',reverseKeys(individual)).status,'passed')
+ assert.equal(verifyEIAuthoredComparisonBatch(ledger,handle,reverseKeys(batch)).status,'passed')
+ const swapped=JSON.parse(JSON.stringify(individual));swapped.result.identityWitnesses.reverse()
+ assert.equal(verifyEIAuthoredComparison(ledger,handle,'a','b',swapped).status,'failed')
+ const extra=JSON.parse(JSON.stringify(individual));extra.unexpected='claim'
+ assert.equal(verifyEIAuthoredComparison(ledger,handle,'a','b',extra).status,'failed')
+})
+
+
+test('proof comparison rejects array extensions, hidden fields and accessors without invoking them',()=>{
+ const text=`a≡b;${AUTHORED_COMPARE_CLAUSE}`,ledger=createEILedger({records:[{address:'source',value:text,source:{id:'source',text}}]})
+ const handle=projectEIGrain(createEIGrainRegistry(ledger),'source','state'),returned=resolveEIAuthoredComparison(ledger,handle,'a','b')
+ const extended=JSON.parse(JSON.stringify(returned));extended.result.proofs.extra='claim'
+ assert.equal(verifyEIAuthoredComparison(ledger,handle,'a','b',extended).status,'failed')
+ const hidden=JSON.parse(JSON.stringify(returned));Object.defineProperty(hidden.result.proofs,'toJSON',{value:()=>[]})
+ assert.equal(verifyEIAuthoredComparison(ledger,handle,'a','b',hidden).status,'failed')
+ const accessor=JSON.parse(JSON.stringify(returned));let invoked=false;Object.defineProperty(accessor.result,'status',{get(){invoked=true;return 'known-identity'}})
+ assert.equal(verifyEIAuthoredComparison(ledger,handle,'a','b',accessor).status,'failed');assert.equal(invoked,false)
 })

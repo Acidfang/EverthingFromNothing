@@ -4,6 +4,20 @@ import type {EILedger} from './ei-engine.ts'
 import {readEIGrain,resolveEIGrainTarget,referenceEIGrain,type EIGrainHandle} from './ei-grain-identity.ts'
 import {AUTHORED_COMPARE_CLAUSE,readRetainedComparisonClause,evaluateAuthoredComparison,parseDirectComparisonPremise,type ClauseRef,type ComparisonSource,type ComparisonResult} from './source-bound-comparison.ts'
 
+/** Object field order is not proof content; array order and every field are. */
+function equalEvidence(expected:unknown,actual:unknown):boolean{
+ if(expected===null||typeof expected!=='object')return Object.is(expected,actual)
+ if(actual===null||typeof actual!=='object')return false
+ if(Array.isArray(expected)!==Array.isArray(actual))return false
+ const prototype=Object.getPrototypeOf(actual)
+ if(prototype!==(Array.isArray(actual)?Array.prototype:Object.prototype)&&prototype!==null)return false
+ const left=Reflect.ownKeys(expected),right=Reflect.ownKeys(actual)
+ return left.length===right.length&&left.every(key=>{
+  const wanted=Object.getOwnPropertyDescriptor(expected,key),given=Object.getOwnPropertyDescriptor(actual,key)
+  return !!given&&'value' in given&&!!wanted&&'value' in wanted&&equalEvidence(wanted.value,given.value)
+ })
+}
+
 export function inspectEIComparisonClauses(ledger:EILedger,handle:EIGrainHandle){
  const address=resolveEIGrainTarget(ledger,handle),state=readEIGrain(ledger,handle)
  const frameId=JSON.stringify([address,state.revision,state.source.id,state.source.realm??null])
@@ -42,7 +56,7 @@ export function resolveEIAuthoredComparison(ledger:EILedger,handle:EIGrainHandle
 export function verifyEIAuthoredComparison(ledger:EILedger,handle:EIGrainHandle,left:string,right:string,returned:unknown,ruleIndex=0){
  const expected=resolveEIAuthoredComparison(ledger,handle,left,right,ruleIndex)
  let matches=false
- try{matches=JSON.stringify(expected)===JSON.stringify(returned)}catch{/* Non-serializable return cannot match. */}
+ try{matches=equalEvidence(expected,returned)}catch{/* Malformed return cannot match. */}
  return Object.freeze({scope:'retained-source-rule-reconstruction' as const,status:matches?'passed' as const:'failed' as const,origin:expected.origin,operands:{left,right},matches})
 }
 
@@ -94,6 +108,6 @@ export function expandEIAuthoredComparisonBatchResult(batch:ReturnType<typeof re
 export function verifyEIAuthoredComparisonBatch(ledger:EILedger,handle:EIGrainHandle,returned:unknown,ruleIndex=0){
  const expected=resolveEIAuthoredComparisonBatch(ledger,handle,ruleIndex)
  let matches=false
- try{matches=JSON.stringify(expected)===JSON.stringify(returned)}catch{/* Non-serializable return cannot match. */}
+ try{matches=equalEvidence(expected,returned)}catch{/* Malformed return cannot match. */}
  return Object.freeze({scope:'retained-source-batch-reconstruction' as const,status:matches?'passed' as const:'failed' as const,origin:expected.origin,matches})
 }
