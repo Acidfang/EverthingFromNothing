@@ -140,3 +140,14 @@ exact-text equality as symbolic identity. Its returned proof is reconstructed fr
 originating operands and checked against the retained source. It is a read-only local
 symbolic result; it does not generate a conversational answer, choose what a new sentence
 means, append a ledger command for the symbol `L`, or complete spatial field animation.
+
+The source inspector can also resolve all witnessed pairs for the selected rule.
+This finite batch groups every supported direct premise by its ordered operands,
+retains duplicate source occurrences, and checks identity/nonidentity conflicts
+before admitting any consequence for that pair. Other retained clauses remain
+inspectable. It does not form a Cartesian product, infer missing comparisons,
+combine source frames or claim every possible pair has been resolved.
+
+Batch evidence stores the common clause set once. Selecting a result reconstructs
+its complete single-query proof, including unused clauses. Repeated resolution is
+read-only: it creates no Act, state revision or receipt and leaves the ledger intact.

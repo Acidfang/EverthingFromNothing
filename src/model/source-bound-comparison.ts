@@ -76,7 +76,7 @@ function pointerString(text: string, pointer: string | undefined): string {
   if (typeof value !== 'string') return fail('pointer target is not a source string')
   return value
 }
-function readClause(sources: readonly ComparisonSource[], ref: ClauseRef): { text: string; frameId: string } {
+export function readRetainedComparisonClause(sources: readonly ComparisonSource[], ref: ClauseRef): { text: string; frameId: string } {
   const records = sources.filter(s => s.recordAddress === ref.recordAddress && s.sourceId === ref.sourceId && s.revision === ref.revision)
   if (records.length !== 1) return fail('missing or ambiguous source revision')
   const source = records[0]
@@ -101,13 +101,13 @@ export function evaluateAuthoredComparison(
   premiseRefs: readonly ClauseRef[], query: ComparisonQuery,
 ): ComparisonResult {
   if (!query.frameId || !isComparisonTerm(query.left) || !isComparisonTerm(query.right)) return fail('query needs an explicit frame and supported exact terms')
-  const readRule = readClause(sources, rule)
+  const readRule = readRetainedComparisonClause(sources, rule)
   if (readRule.text !== AUTHORED_COMPARE_CLAUSE) return fail('unsupported comparison rule')
   if (readRule.frameId !== query.frameId) return fail('rule belongs to a different frame')
   const identityWitnesses: DirectPremise[] = [], differenceWitnesses: DirectPremise[] = []
   const unused: { source: ClauseRef; reason: 'different-frame' | 'unsupported-clause' | 'different-operands' }[] = []
   for (const ref of premiseRefs) {
-    const retained = readClause(sources, ref)
+    const retained = readRetainedComparisonClause(sources, ref)
     if (retained.frameId !== query.frameId) { unused.push({ source: copyRef(ref), reason: 'different-frame' }); continue }
     const premise = parseDirectComparisonPremise(retained.text, ref)
     if (!premise) { unused.push({ source: copyRef(ref), reason: 'unsupported-clause' }); continue }
