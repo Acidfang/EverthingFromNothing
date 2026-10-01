@@ -19,7 +19,7 @@ export function FieldAddressOverlay({stateAddressValue,onOpenState,stateAddressE
  const [stateInput,setStateInput]=useState(stateAddressValue)
  useEffect(()=>setStateInput(stateAddressValue),[stateAddressValue])
  const sourceDetail=useRef<HTMLElement>(null)
- const search=useRef<HTMLInputElement>(null)
+ const search=useRef<HTMLInputElement>(null),stateInputElement=useRef<HTMLInputElement>(null)
  const id=route.ids[route.index],node=nodes.get(id)!,entry=entries.get(id)
  const matched=searchInventory(graph.nodes,query),relations=relationsAt(graph.relations,id)
  const preview=useMemo(()=>resolveTick(continuum.state),[continuum])
@@ -30,12 +30,12 @@ export function FieldAddressOverlay({stateAddressValue,onOpenState,stateAddressE
  const allowedNext=(successor?.entries??[]).filter(item=>item.remainsDifferent&&item.arrivals.some(arrival=>arrival.source===selected))
  const nextReceipt=preview.ledger.entries.find(item=>item.address===selected)
  const go=(target:string)=>{if(!nodes.has(target)||target===id)return;setRoute(current=>({ids:[...current.ids.slice(0,current.index+1),target],index:current.index+1}));setRole("IS")}
- useEffect(()=>{search.current?.focus()},[])
+ useEffect(()=>{stateInputElement.current?.focus({preventScroll:true});const panel=stateInputElement.current?.closest("aside");if(panel)panel.scrollTop=0},[selected,fieldRole])
  useEffect(()=>{setCoordinate(selected);setError("")},[selected])
  return <aside className="field-address-overlay" aria-label="Address and relation inspector" onKeyDown={event=>{if(event.key==="Escape"){event.stopPropagation();onClose()}}}>
   <header><div><small>ONE FIELD · ADDRESSED RELATIONS</small><h1>Address inspector</h1></div><button type="button" onClick={onClose} aria-label="Close address inspector">Close</button></header>
   <section aria-label="Selected runtime address">
-   <form onSubmit={event=>{event.preventDefault();onOpenState(stateInput)}}><label>State address<input aria-label="State address" value={stateInput} onChange={event=>setStateInput(event.target.value)}/></label><button type="submit">Open retained state</button></form><p>Session address: base Act + WAS/IS/NEXT + spatial node. NEXT remains a calculated proposal; opening it does not advance the model.</p>{stateAddressError?<p role="alert">{stateAddressError}</p>:null}
+   <form onSubmit={event=>{event.preventDefault();onOpenState(stateInput)}}><label>State address<input ref={stateInputElement} aria-label="State address" value={stateInput} onChange={event=>setStateInput(event.target.value)}/></label><button type="submit">Open retained state</button></form><p>Session address: base Act + WAS/IS/NEXT + spatial node. NEXT remains a calculated proposal; opening it does not advance the model.</p>{stateAddressError?<p role="alert">{stateAddressError}</p>:null}
    <h2>Selected spatial address · {selected}</h2>
    <form onSubmit={event=>{event.preventDefault();const value=coordinate.trim();if(!validSpatialAddress(value)){setError("Use three safe integers: x,y,z");return}onSelect(value.split(",").map(Number).join(","));setError("")}}><label>Spatial address <input value={coordinate} onChange={event=>setCoordinate(event.target.value)} aria-label="Spatial address"/></label><button type="submit">Select address</button></form>
    {error?<p role="alert">{error}</p>:null}

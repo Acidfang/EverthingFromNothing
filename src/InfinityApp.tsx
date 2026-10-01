@@ -119,11 +119,12 @@ export function InfinityApp(){
    const successor=fieldRole==="WAS"?observed.receipts.at(-1):fieldRole==="IS"?calculated.ledger:following.ledger
    const constraints=successor?constrainedNodes(activeField,successor):[]
    const frameHits:NodeHit[]=stateAddresses.map(address=>({...projectState(address),address,polygons:[]}))
+   const frameHitByAddress=new Map(frameHits.map(hit=>[hit.address,hit]))
    ctx.save();ctx.lineWidth=.7
    for(const node of constraints){const anchor=relativeTo(node.address,source),q=projectPoint(anchor)
     if(!node.next.length){ctx.strokeStyle="#929c9f";ctx.strokeRect(q.x-2,q.y-2,4,4);continue}
     ctx.strokeStyle=node.next.length===1?"#e5ad56":"rgba(229,173,86,.48)";ctx.setLineDash(node.next.length>1?[2,2]:[])
-    for(const candidate of node.next){const tetra=directedTetra(candidate.delta);if(!tetra)continue;const points=tetra.map(p=>projectPoint({x:anchor.x+p.x,y:anchor.y+p.y,z:anchor.z+p.z}));const hit=frameHits.find(h=>h.address===node.address);if(hit)(hit.polygons as ProjectedAddress[][]).push(points);for(const [a,b] of [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]){ctx.beginPath();ctx.moveTo(points[a].x,points[a].y);ctx.lineTo(points[b].x,points[b].y);ctx.stroke()}}
+    for(const candidate of node.next){const tetra=directedTetra(candidate.delta);if(!tetra)continue;const points=tetra.map(p=>projectPoint({x:anchor.x+p.x,y:anchor.y+p.y,z:anchor.z+p.z}));const hit=frameHitByAddress.get(node.address);if(hit)(hit.polygons as ProjectedAddress[][]).push(points);for(const [a,b] of [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]){ctx.beginPath();ctx.moveTo(points[a].x,points[a].y);ctx.lineTo(points[b].x,points[b].y);ctx.stroke()}}
    }
    ctx.restore()
    const selectedPoint=stateByAddress.get(selected);if(selectedPoint){ctx.save();ctx.strokeStyle="#fff0b3";ctx.lineWidth=2;ctx.beginPath();ctx.arc(selectedPoint.x,selectedPoint.y,7,0,Math.PI*2);ctx.stroke();ctx.fillStyle="#fff0b3";ctx.font="12px monospace";ctx.fillText(selected,selectedPoint.x+10,selectedPoint.y-10);ctx.restore()}
