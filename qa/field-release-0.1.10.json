@@ -1,0 +1,26 @@
+{
+  "version": "0.1.10",
+  "sourceBase": "de9b0a803fef23abfdba5028020ff4c89209c4b4",
+  "modelTests": 635,
+  "typescript": "passed",
+  "build": "passed",
+  "releaseAudits": 12,
+  "actualRendererChecks": 140,
+  "rendererEnvironment": "Electron on Linux; Windows and Android device execution not inferred",
+  "implementedSourceRules": [
+    "∀a,b:a≡b?a⋈b:Δab→L",
+    "≡→⋈"
+  ],
+  "retainedPublicClauses": 93,
+  "opaquePublicClauses": 86,
+  "serviceTransport": "in-process addressed committed-event delivery",
+  "fullMechanismComplete": false,
+  "remotePrivateStateTransport": false,
+  "scope": [
+    "source-derived symbolic result selection and actual rendered receipt",
+    "main-root parent tree with shared canonical references",
+    "lower observer horizon",
+    "saved-field-first HOMEBASE startup and protected import",
+    "renderer/workspace local service admission, outbox retry and causal receipts"
+  ]
+}

@@ -2,11 +2,11 @@
 
 This is the technical chronicle of the author's addressed field model, its shared overlay implementation, and the proposed service/thread architecture. It preserves what was requested, what currently runs, which receipts support it, and what remains open. It is a living engineering record, not a claim that every named mechanism has been completed.
 
-Snapshot date: **2 October 2026**. Times below are UTC with NZDT (UTC+13) alongside where an exact timestamp is retained. Calendar-only source dates stay calendar-only; message identifiers do not supply a verified clock time. This Chronicle accompanies the shared 0.1.9 source release [5e38394b](https://github.com/Acidfang/EverthingFromNothing/commit/5e38394b6435ce23ba88b67a6552ee966030ab1c), building on the previously live-verified [4ccd22e9](https://github.com/Acidfang/EverthingFromNothing/commit/4ccd22e9a6a90607dc72e250bf14875300f11017). [Open the current field](https://acidfang.github.io/EverthingFromNothing/).
+Snapshot date: **2 October 2026**. Times below are UTC with NZDT (UTC+13) alongside where an exact timestamp is retained. Calendar-only source dates stay calendar-only; message identifiers do not supply a verified clock time. The latest shared source in this Chronicle is **0.1.10**, with its [release receipt](../qa/field-release-0.1.10.json). It builds on the shared 0.1.9 release [5e38394b](https://github.com/Acidfang/EverthingFromNothing/commit/5e38394b6435ce23ba88b67a6552ee966030ab1c) and the lower-horizon correction [de9b0a8](https://github.com/Acidfang/EverthingFromNothing/commit/de9b0a803fef23abfdba5028020ff4c89209c4b4). [Open the current field](https://acidfang.github.io/EverthingFromNothing/).
 
 ## Current result
 
-The live application presents addresses, source records, WAS/IS/NEXT, relations, selected operations and receipts through one React-owned EI ledger. Its field, inspector, guide, device workspace and sync controls are views and adapters over that common state. An actual selected transition is staged, returned through the addressed rendering check, verified and then admitted. Capturing a sentence records a source occurrence; it does not make the sentence an executable command or a proven fact.
+The application presents addresses, source records, WAS/IS/NEXT, relations, selected operations and receipts through one React-owned EI execution ledger. Version 0.1.10 delivers committed events to separate renderer and workspace consumers within the same process. Its field, inspector, guide, device workspace and sync controls remain views and adapters over that common state. These logical service subscriptions are working local behavior; they are not independently running operating-system services. An actual selected transition is staged, returned through the addressed rendering check, verified and then admitted. Capturing a sentence records a source occurrence; it does not make the sentence an executable command or a proven fact.
 
 The current GitHub hub serves a bounded, versioned **public reference snapshot**. A client verifies its bytes and schema, compares it with its imported public baseline, preserves local conflicts, and requires selection before applying a proposed update. This is not a configured private cross-device live state service. Independent overlay processes, authenticated remote participants and a transport carrying a user's private shared ledger remain open work.
 
@@ -18,7 +18,7 @@ The following short statements were explicitly supplied for this design and its 
 
 | Author statement | Source identifier | Engineering interpretation and current boundary |
 |---|---|---|
-| “each overlay is it's own service” | `Sentinel_ef1d60685f0c8191a818048b1d400be6` | Intended service separation. Current visible overlays share one application ledger; separate deployed services are not established. |
+| “each overlay is it's own service” | `Sentinel_ef1d60685f0c8191a818048b1d400be6` | Intended service separation. Version 0.1.10 has two in-process subscribed consumers of committed state; separate deployed processes are not established. |
 | “ensure the are threads to addresses they can all communicate through” | `Sentinel_9d5c25486b8081918062ed831b8c6421` | Preserve named endpoints, source/target addresses and return provenance. A graph relation alone is not a network transport or permission. |
 | “the fracture threads might as well be quantum tunnels” | `Sentinel_8c926bc766a881919632d880c997f183` | Comparative description of connections between addressed contexts. |
 | “if that helps you” | `Sentinel_168eccf61f5081918c61881de842ccec` | The comparison is offered to help explain the model. |
@@ -85,6 +85,20 @@ The author clarified that each overlay should be its own service, with communica
 
 The compiler candidate currently retains all 93 public clauses, recognises five direct premises and two supported rules, and leaves 86 clauses opaque. A reported finite evaluation produced 10 evaluations and nine proofs. This is partial explicit symbolic processing, not general natural-language intent, reply composition, a complete mechanism compiler or a completed 3D field derivation. It remains outside the published 0.1.9 release.
 
+### 2 October 2026 at 10:18 UTC / 23:18 NZDT — verify shared release 0.1.10
+
+The shared 0.1.10 freeze adds explicit retention of supported symbolic rule results, a Roots tree over canonical addresses, saved-field-first HOMEBASE recovery, and renderer/workspace consumers subscribed to actual addressed commit events. The release passed 635 model tests, TypeScript, production build and 12 audits. The packaged application passed 140 actual Linux Electron checks, including rendering/readback, cancellation, reopening while hashing, saved/corrupt recovery, import, service event identity, failed delivery and explicit outbox retry. See the [0.1.10 receipt](../qa/field-release-0.1.10.json).
+
+The [source-bound program adapter](../src/model/ei-addressed-program.ts) now turns an explicitly selected supported result into a proposal through the existing rendered-readback/commit path. Its [bounded language implementation](../src/model/ei-ledger-language.ts) retains the source clauses and their locators. Two supported rules do not constitute a complete source mechanism: 86 of the 93 retained public clauses remain opaque. The [program tests](../tests/ei-addressed-program.test.ts) and [language tests](../tests/ei-ledger-language.test.ts) record the supported scope.
+
+The [Roots tree](../src/EIRootTree.tsx) and its [model](../src/model/ei-root-tree.ts) navigate retained parents and canonical record references. They do not invent extra entities or physical coordinates. The lower observer horizon remains part of this shared bundle.
+
+The [local shared-field protocol](../src/model/ei-shared-field.ts), [overlay outbox](../src/model/ei-overlay-services.ts) and [React subscriptions](../src/useEIOverlayServices.ts) are now bound into the application. A completed model result is published without a second model commit. Renderer and workspace consume its addressed event, preserve distinct admission state, and expose the event identity. Delivery failure leaves the already committed execution ledger intact and makes retained delivery available for retry. The outbox is local memory; it is not a persistent network queue. [Protocol tests](../tests/ei-shared-field.test.ts) and [outbox tests](../tests/ei-overlay-services.test.ts) cover duplicates, stale/out-of-order delivery and retry boundaries.
+
+HOMEBASE startup first attempts the permitted local saved field, then considers the runtime observation. Corrupt recovery and import remain explicit rather than silently overwriting existing state. Browser Pages does not fabricate a native HOMEBASE observation.
+
+The Windows update was delivered for user application at approximately 10:22 UTC / 23:22 NZDT; its actual Windows 0.1.10 runtime return remains pending. Android packaging is tracked separately. All carriers must verify the same HTML/JavaScript/CSS bytes, while permissions, signing identity, installation and actual device execution retain their own receipts. This release does not configure private cross-device transport, independent service processes or a general native compiler.
+
 ## How the working field carries state
 
 An [EI record](../src/model/ei-engine.ts) holds its canonical address, parent addresses, labelled relations, previous value states, current value/source/revision, and receipt identifiers. A source holds its ID, exact text and optional realm/locator. Multiple views can refer to the same record without creating another record or advancing it.
@@ -117,7 +131,7 @@ A content hash binds bytes. Self-declared repository metadata does not authentic
 
 A future independently running overlay should retain the same field/user identity, source address, target address, source revision, event identity, predecessor and returned receipt. A transport must distinguish received, admitted, rendered and durably stored states. Duplicate delivery must not create another act; stale or out-of-order messages must wait or conflict explicitly. A digest and an address name must not substitute for participant authentication or permission.
 
-The local protocol candidate under development explores shared journal reads, scoped endpoint handles, content-bound events, ordered admission, replay and separate received/applied acknowledgments. Its stated boundary is in-process only: no transport, credentials, timer or automatic I/O. These are implementation directions until their exact source, checks and integration are published. They do not establish remote delivery or a live private shared state between HOMEBASE, Android and Pages.
+Version 0.1.10 implements shared journal reads, scoped endpoint handles, content-bound events, ordered admission, replay and separate received/applied acknowledgments through the linked local protocol. Its boundary remains in-process only: no remote transport, credentials, timer or automatic network I/O. The two subscribed consumers and local outbox do not establish remote delivery or live private shared state between HOMEBASE, Android and Pages.
 
 To close the remaining mechanism, later entries need concrete receipts for:
 

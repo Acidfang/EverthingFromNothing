@@ -1,12 +1,12 @@
 import {useEffect,useRef,useState} from 'react'
-import type {EILedger} from './model/ei-engine'
+import type {EILedger,EIProposal} from './model/ei-engine'
 import {createEIGrainRegistry,projectEIGrain,type EIGrain} from './model/ei-grain-identity'
 import {resolveEIGrainRelations,type EIGrainResolution} from './model/ei-grain-resolution'
 import {presentEICheck} from './model/ei-check-presentation'
 import {EIAuthoredRelations} from './EIAuthoredRelations'
 
 /** Controls select existing operations and exact addresses, never interpret prose. */
-export function EIAddressRelations({ledger,address,grain,disabled,onSelect}:{ledger:EILedger;address:string;grain:EIGrain;disabled:boolean;onSelect:(address:string)=>void}){
+export function EIAddressRelations({ledger,address,grain,disabled,onSelect,onStage}:{ledger:EILedger;address:string;grain:EIGrain;disabled:boolean;onSelect:(address:string)=>void;onStage?:(proposal:EIProposal)=>void}){
  const [other,setOther]=useState(address),[result,setResult]=useState<Awaited<ReturnType<typeof resolveEIGrainRelations>>|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
  const request=useRef(0),origin=useRef({ledger,address}),resultOrigin=useRef<typeof origin.current|null>(null)
  origin.current={ledger,address}
@@ -25,7 +25,7 @@ export function EIAddressRelations({ledger,address,grain,disabled,onSelect}:{led
  const current=result&&resultOrigin.current?.ledger===ledger&&resultOrigin.current.address===address?result:null
  const select=(target:string)=>{if(ledger.records.some(item=>item.address===target))onSelect(target)}
  return <section aria-label="Addressed relation resolution">
-  <EIAuthoredRelations ledger={ledger} address={address} grain={grain} disabled={disabled}/>
+  <EIAuthoredRelations ledger={ledger} address={address} grain={grain} disabled={disabled} onStage={onStage}/>
   <button disabled={disabled||busy} onClick={()=>void run('context')}>Resolve retained relations</button>
   <button disabled={disabled||busy} onClick={()=>void run('trace')}>Trace source paths</button>
   <label>Compare IS with address<select value={other} disabled={disabled||busy} onChange={event=>{request.current++;setOther(event.target.value);setResult(null);setBusy(false)}}>{ledger.records.map(item=><option key={item.address}>{item.address}</option>)}</select></label>

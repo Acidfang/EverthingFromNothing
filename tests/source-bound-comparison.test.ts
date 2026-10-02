@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { AUTHORED_COMPARE_CLAUSE as RULE, evaluateAuthoredComparison as compare, isComparisonTerm,
+import { AUTHORED_COMPARE_CLAUSE as RULE, AUTHORED_IDENTITY_CLAUSE, evaluateAuthoredComparison as compare, isComparisonTerm,
   type ClauseRef, type ComparisonSource } from '../src/model/source-bound-comparison.ts'
 // Exact technical clauses retained in docs/SOURCE-MECHANISM.md.
 // This test fixture is a retained excerpt, not a claim to store its whole message.
@@ -40,9 +40,10 @@ test('conflicting witnesses are retained with no arbitrary chosen consequence',(
   const r=compare([s],ref(s,RULE),[ref(s,'a≡b'),ref(s,'a≠b')],{frameId:s.frameId,left:'a',right:'b'})
   assert.equal(r.status,'unresolved');assert.equal(r.conflict,true);assert.equal(r.identityWitnesses.length,1);assert.equal(r.differenceWitnesses.length,1);assert.deepEqual(r.proofs,[])
 })
-test('parallel premise witnesses remain individually addressable',()=>{
+test('explicitly scoped parallel premise witnesses remain individually addressable',()=>{
   const second={...source,sourceId:'second-retained-source',recordAddress:'source/second'}
-  const r=compare([source,second],rule,[ref(source,'U₀≡R'),ref(second,'U₀≡R')],{frameId:source.frameId,left:'U₀',right:'R'})
+  const programScope={id:'explicit-parallel-test',sources:[source,second].map(({recordAddress,sourceId,revision,frameId})=>({recordAddress,sourceId,revision,frameId}))}
+  const r=compare([source,second],rule,[ref(source,'U₀≡R'),ref(second,'U₀≡R')],{frameId:source.frameId,left:'U₀',right:'R'},programScope)
   assert.equal(r.proofs.length,2);assert.notEqual(r.proofs[0].premise.source.sourceId,r.proofs[1].premise.source.sourceId)
 })
 test('same tokens in different source frame do not supply identity',()=>{
@@ -78,4 +79,26 @@ test('actual public inventory JSON pointer proof preserves older U distinctly fr
 })
 test('unknown is not negative evidence, and no source means no proof',()=>{
   assert.equal(run('U₀','R',[]).status,'unresolved');assert.deepEqual(run('U₀','R',[]).proofs,[])
+})
+test('literal ? and ⊥ form an explicit difference witness, never an absence branch',()=>{
+  const result=run('?','⊥')
+  assert.equal(result.status,'known-difference')
+  assert.deepEqual(result.proofs[0].conclusion,{kind:'transition',from:{operator:'Δ',left:'?',right:'⊥'},to:'L'})
+  assert.equal(run('?','⊥',[]).status,'unresolved')
+})
+test('standalone ≡→⋈ has an identity branch only and retains conflicting evidence',()=>{
+  const s={...source,text:`a≡b;c≠d;${AUTHORED_IDENTITY_CLAUSE}`}
+  const identityRule=ref(s,AUTHORED_IDENTITY_CLAUSE)
+  const identity=compare([s],identityRule,[ref(s,'a≡b')],{frameId:s.frameId,left:'a',right:'b'})
+  assert.equal(identity.proofs.length,1)
+  const difference=compare([s],identityRule,[ref(s,'c≠d')],{frameId:s.frameId,left:'c',right:'d'})
+  assert.equal(difference.status,'known-difference'); assert.deepEqual(difference.proofs,[])
+  const conflictSource={...s,text:`a≡b;a≠b;${AUTHORED_IDENTITY_CLAUSE}`}
+  const conflict=compare([conflictSource],ref(conflictSource,AUTHORED_IDENTITY_CLAUSE),[ref(conflictSource,'a≡b'),ref(conflictSource,'a≠b')],{frameId:s.frameId,left:'a',right:'b'})
+  assert.equal(conflict.conflict,true); assert.deepEqual(conflict.proofs,[])
+})
+test('same frame label alone cannot bind a different source into the rule',()=>{
+  const other={...source,sourceId:'unbound-other',recordAddress:'source/unbound'}
+  const result=compare([source,other],rule,[ref(other,'U₀≡R')],{frameId:source.frameId,left:'U₀',right:'R'})
+  assert.equal(result.status,'unresolved');assert.equal(result.unused[0].reason,'outside-program-scope')
 })
