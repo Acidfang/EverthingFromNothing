@@ -167,8 +167,12 @@ export function parseEILedgerSource(source: ComparisonSource, options: {
     const tokens = lex(retained, text, pointer, limits), clauseIds: string[] = []
     tokenCount += tokens.length
     if (tokenCount > limits.maxTokens) fail('token bound exceeded')
+    let structuredData=false
+    if(pointer===undefined&&/^[\s]*[\[{\"]/.test(text)){try{const value=JSON.parse(text);structuredData=typeof value==='string'||!!value&&typeof value==='object'}catch{/* Not a JSON data envelope. */}}
     let start = 0, tokenIndex = 0
-    for (const piece of text.split(';')) {
+    // A provider's quoted metadata is not a program merely because it contains
+    // semicolons. Explicit source-pointer selection remains available.
+    for (const piece of structuredData?[text]:text.split(';')) {
       const leading = piece.length - piece.trimStart().length, trailing = piece.length - piece.trimEnd().length
       if (piece.trim()) {
         if (clauses.length >= limits.maxClauses) fail('clause bound exceeded')

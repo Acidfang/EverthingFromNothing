@@ -1,5 +1,3 @@
-import {checkEIData,encodeEIBits,equalEIBits} from './ei-binary-machine.ts'
-import {compileEIBinaryRule,executeEIBinaryRule} from './ei-binary-rule-library.ts'
 /** Bounded interpreter for an explicitly retained authored comparison clause.
  * The term grammar, source locators and result schema are engineering bindings.
  * No natural-language meaning, implicit equality, symmetry or transitivity.
@@ -36,7 +34,6 @@ export type ComparisonResult = Readonly<{
   /** On conflict no consequence is admitted; both witness sets are retained. */
   proofs: readonly ComparisonProof[];
   unused: readonly Readonly<{ source: ClauseRef; reason: 'different-frame' | 'outside-program-scope' | 'unsupported-clause' | 'different-operands' }>[];
-  mechanism?: ReturnType<typeof executeEIBinaryRule>['receipt'] & Readonly<{admitted:boolean}>;
   scope: 'direct-retained-symbolic-premises';
   programScope?: ComparisonProgramScope;
 }>
@@ -97,12 +94,7 @@ export function createComparisonSourceStringReader(text: string): (pointer?: str
 export function readComparisonSourceString(text: string, pointer: string | undefined): string {
   return createComparisonSourceStringReader(text)(pointer)
 }
-const retainedReaders=new WeakMap<object,ReturnType<typeof makeClauseReader>>()
-function createClauseReader(sources: readonly ComparisonSource[]){
- if(!Object.isFrozen(sources)||!sources.every(Object.isFrozen))return makeClauseReader(sources)
- let reader=retainedReaders.get(sources);if(!reader){reader=makeClauseReader(sources);retainedReaders.set(sources,reader)}return reader
-}
-function makeClauseReader(sources: readonly ComparisonSource[]) {
+function createClauseReader(sources: readonly ComparisonSource[]) {
  const readers = new Map(sources.map(source => [source, createComparisonSourceStringReader(source.text)]))
  return (ref: ClauseRef): { text: string; frameId: string } => {
   const records = sources.filter(s => s.recordAddress === ref.recordAddress && s.sourceId === ref.sourceId && s.revision === ref.revision)
@@ -131,14 +123,11 @@ export function parseDirectComparisonPremise(text: string, source: ClauseRef): D
 /** Shared retained-source readers for a bounded batch. The snapshot prevents
  * later caller mutation from altering already selected source revisions. */
 export function createAuthoredComparisonEvaluator(inputSources: readonly ComparisonSource[]) {
- checkEIData(inputSources)
- const sources = freeze(inputSources.map(source => ({ ...source, ...(source.provenance ? { provenance: { ...source.provenance } } : {}) })))
+ const sources = inputSources.map(source => ({ ...source, ...(source.provenance ? { provenance: { ...source.provenance } } : {}) }))
  const readClause = createClauseReader(sources)
- const libraries=new Map<string,ReturnType<typeof compileEIBinaryRule>>()
  return (rule: ClauseRef,
   premiseRefs: readonly ClauseRef[], query: ComparisonQuery, programScope?: ComparisonProgramScope,
  ): ComparisonResult => {
-  checkEIData({rule,premiseRefs,query,programScope})
   if (!query.frameId || !isComparisonTerm(query.left) || !isComparisonTerm(query.right)) return fail('query needs an explicit frame and supported exact terms')
   const readRule = readClause(rule)
   if (readRule.text !== AUTHORED_COMPARE_CLAUSE && readRule.text !== AUTHORED_IDENTITY_CLAUSE) return fail('unsupported comparison rule')
@@ -155,7 +144,6 @@ export function createAuthoredComparisonEvaluator(inputSources: readonly Compari
     }
     if (!inScope(rule, readRule.frameId)) return fail('rule is outside explicit program scope')
   }
-  const registers=[encodeEIBits(query.left),encodeEIBits(query.right)] as const
   const identityWitnesses: DirectPremise[] = [], differenceWitnesses: DirectPremise[] = []
   const unused: ComparisonResult['unused'][number][] = []
   for (const ref of premiseRefs) {
@@ -166,17 +154,20 @@ export function createAuthoredComparisonEvaluator(inputSources: readonly Compari
     if (!programScope && retained.frameId !== query.frameId) { unused.push({ source: copyRef(ref), reason: 'different-frame' }); continue }
     const premise = parseDirectComparisonPremise(retained.text, ref)
     if (!premise) { unused.push({ source: copyRef(ref), reason: 'unsupported-clause' }); continue }
-    if (!equalEIBits(encodeEIBits(premise.left),registers[0]) || !equalEIBits(encodeEIBits(premise.right),registers[1])) { unused.push({ source: copyRef(ref), reason: 'different-operands' }); continue }
+    if (premise.left !== query.left || premise.right !== query.right) { unused.push({ source: copyRef(ref), reason: 'different-operands' }); continue }
     ;(premise.relation === '≡' ? identityWitnesses : differenceWitnesses).push(premise)
   }
   const conflict = identityWitnesses.length > 0 && differenceWitnesses.length > 0
   const status = conflict ? 'unresolved' : identityWitnesses.length ? 'known-identity' : differenceWitnesses.length ? 'known-difference' : 'unresolved'
-  const libraryKey=JSON.stringify([rule,programScope??null]),library=libraries.get(libraryKey)??compileEIBinaryRule(sources,rule,programScope);libraries.set(libraryKey,library)
-  const returned=executeEIBinaryRule(library,[...identityWitnesses,...differenceWitnesses],query.left,query.right)
-  // Admission keeps contradictions open; the binary return is not permission.
-  const proofs: ComparisonProof[] = conflict ? [] : [...returned.proofs]
+  const proofWitnesses = readRule.text === AUTHORED_IDENTITY_CLAUSE ? identityWitnesses : [...identityWitnesses, ...differenceWitnesses]
+  const proofs: ComparisonProof[] = conflict ? [] : proofWitnesses.map(premise => ({
+    rule: copyRef(rule), premise, substitution: { a: query.left, b: query.right },
+    conclusion: premise.relation === '≡'
+      ? { kind: 'relation', operator: '⋈', left: query.left, right: query.right }
+      : { kind: 'transition', from: { operator: 'Δ', left: query.left, right: query.right }, to: 'L' },
+  }))
   return freeze({ format: 'source-bound-comparison/v1', query: { ...query }, status, conflict,
-    identityWitnesses, differenceWitnesses, proofs, unused, mechanism:{...returned.receipt,admitted:!conflict&&proofs.length>0}, scope: 'direct-retained-symbolic-premises',
+    identityWitnesses, differenceWitnesses, proofs, unused, scope: 'direct-retained-symbolic-premises',
     ...(programScope ? { programScope: { id: programScope.id, sources: programScope.sources.map(s => ({ ...s })) } } : {}) })
  }
 }

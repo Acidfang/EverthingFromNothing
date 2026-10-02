@@ -77,13 +77,16 @@ export function resolveEIAuthoredComparisonBatch(ledger:EILedger,handle:EIGrainH
   const key=JSON.stringify([premise.left,premise.right]),group=groups.get(key)??{left:premise.left,right:premise.right,refs:[]}
   group.refs.push(ref);groups.set(key,group)
  }
+ const libraries:NonNullable<ComparisonResult['mechanism']>['library'][]=[]
  const results=[...groups.values()].map(({left,right,refs})=>{
-  const {unused:_unused,...result}=evaluateAuthoredComparison([input.source],rule,refs,{frameId:input.source.frameId,left,right})
-  return result
+  const {unused:_unused,mechanism,...result}=evaluateAuthoredComparison([input.source],rule,refs,{frameId:input.source.frameId,left,right})
+  if(!mechanism)return {...result,mechanism:undefined}
+  const {library,...execution}=mechanism;if(!libraries.length)libraries.push(library)
+  return {...result,mechanism:{...execution,libraryIndex:0}}
  })
  return {format:'ei-witnessed-comparison-batch/v1' as const,scope:'retained-direct-witness-pairs' as const,
   origin:input.origin,rule,sourceClauseCount:input.clauses.length,witnessCount:input.premises.length,
-  evaluatedPairCount:results.length,clauses:input.clauses,results,unapplied}
+  evaluatedPairCount:results.length,clauses:input.clauses,libraries,results,unapplied}
 }
 
 /** Expand shared clause evidence into the existing single-query shape when an
@@ -100,7 +103,10 @@ export function expandEIAuthoredComparisonBatchResult(batch:ReturnType<typeof re
   if(premise.left!==result.query.left||premise.right!==result.query.right)return [{source:ref,reason:'different-operands' as const}]
   return []
  })
- return {...result,unused}
+ const {mechanism,...value}=result
+ if(!mechanism)return {...value,unused}
+ const {libraryIndex,...execution}=mechanism,library=batch.libraries[libraryIndex];if(!library)throw Error('Missing retained binary library')
+ return {...value,mechanism:{...execution,library},unused}
 }
 
 /** Re-read the same source, regroup all direct witnesses, then check the actual

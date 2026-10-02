@@ -1,0 +1,132 @@
+[
+  {
+    "schema": "field.homebase.discovery.v1",
+    "requestId": "discovery-fixture",
+    "address": "device",
+    "revision": 0,
+    "scanId": "discovery/49cf07e4-e4cf-492f-b2e8-fb52c2a68010",
+    "kind": "folder",
+    "status": "running",
+    "sequence": 0,
+    "nextCursor": 1,
+    "startedAt": "2026-10-02T18:02:46.009Z",
+    "observedAt": "2026-10-02T18:02:46.010Z",
+    "platform": "linux",
+    "root": {
+      "key": "root/47763a73589c7dddb88c516238c6e1f48bc6a80785fbc325bb7bd7072de642fb",
+      "label": "Synthetic selected folder"
+    },
+    "observations": [
+      {
+        "key": "root/47763a73589c7dddb88c516238c6e1f48bc6a80785fbc325bb7bd7072de642fb",
+        "parentKey": null,
+        "kind": "folder",
+        "label": "Synthetic selected folder",
+        "metadata": {
+          "relativePath": "",
+          "bytes": null,
+          "modifiedAt": "2026-10-02T17:42:10.257Z",
+          "selectedRoot": true
+        },
+        "source": "selected-root-filesystem",
+        "observedAt": "2026-10-02T18:02:46.010Z"
+      }
+    ],
+    "progress": {
+      "visited": 1,
+      "returned": 1,
+      "skipped": 0,
+      "queued": 1
+    },
+    "limits": {
+      "batchSize": 16,
+      "maxEntries": 1024,
+      "maxDepth": 6,
+      "maxSeconds": 120
+    },
+    "diagnostics": [],
+    "contentRead": false,
+    "credentialsRead": false,
+    "externalUpload": false,
+    "applied": false
+  },
+  {
+    "schema": "field.homebase.discovery.v1",
+    "requestId": "discovery-fixture",
+    "address": "device",
+    "revision": 0,
+    "scanId": "discovery/49cf07e4-e4cf-492f-b2e8-fb52c2a68010",
+    "kind": "folder",
+    "status": "complete",
+    "sequence": 1,
+    "nextCursor": null,
+    "startedAt": "2026-10-02T18:02:46.009Z",
+    "observedAt": "2026-10-02T18:02:46.012Z",
+    "platform": "linux",
+    "root": {
+      "key": "root/47763a73589c7dddb88c516238c6e1f48bc6a80785fbc325bb7bd7072de642fb",
+      "label": "Synthetic selected folder"
+    },
+    "observations": [
+      {
+        "key": "entry/b0496957f51d3332dd578b0b9f76e9576e5a8b852f8df9a0e09956eca5d607bf",
+        "parentKey": "root/47763a73589c7dddb88c516238c6e1f48bc6a80785fbc325bb7bd7072de642fb",
+        "kind": "folder",
+        "label": "Nested",
+        "metadata": {
+          "relativePath": "Nested",
+          "bytes": null,
+          "modifiedAt": "2026-10-02T17:42:10.257Z",
+          "selectedRoot": false
+        },
+        "source": "selected-root-filesystem",
+        "observedAt": "2026-10-02T18:02:46.011Z"
+      },
+      {
+        "key": "entry/026781bbc1d30de37622d807a1831b641fba4cf0fd1656b1b3d2896fde41cff7",
+        "parentKey": "root/47763a73589c7dddb88c516238c6e1f48bc6a80785fbc325bb7bd7072de642fb",
+        "kind": "file",
+        "label": "alpha.txt",
+        "metadata": {
+          "relativePath": "alpha.txt",
+          "bytes": 34,
+          "modifiedAt": "2026-10-02T18:02:46.005Z",
+          "selectedRoot": false
+        },
+        "source": "selected-root-filesystem",
+        "observedAt": "2026-10-02T18:02:46.012Z"
+      },
+      {
+        "key": "entry/048e4170fea4d006f03d5955b27ba57536d93f357d8d488e351f5fef60a9ca1a",
+        "parentKey": "entry/b0496957f51d3332dd578b0b9f76e9576e5a8b852f8df9a0e09956eca5d607bf",
+        "kind": "file",
+        "label": "beta.bin",
+        "metadata": {
+          "relativePath": "Nested/beta.bin",
+          "bytes": 7,
+          "modifiedAt": "2026-10-02T18:02:46.005Z",
+          "selectedRoot": false
+        },
+        "source": "selected-root-filesystem",
+        "observedAt": "2026-10-02T18:02:46.012Z"
+      }
+    ],
+    "progress": {
+      "visited": 4,
+      "returned": 4,
+      "skipped": 0,
+      "queued": 0
+    },
+    "limits": {
+      "batchSize": 16,
+      "maxEntries": 1024,
+      "maxDepth": 6,
+      "maxSeconds": 120
+    },
+    "diagnostics": [],
+    "contentRead": false,
+    "credentialsRead": false,
+    "externalUpload": false,
+    "applied": false
+  }
+]

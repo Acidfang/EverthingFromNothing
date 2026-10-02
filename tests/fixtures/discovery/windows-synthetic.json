@@ -1,0 +1,191 @@
+[
+  {
+    "schema": "field.homebase.discovery.v1",
+    "requestId": "discovery-fixture",
+    "address": "device",
+    "revision": 0,
+    "scanId": "discovery/0ec9a985-f740-471d-ac5f-ee507fa5e1fa",
+    "kind": "system",
+    "status": "running",
+    "sequence": 0,
+    "nextCursor": 1,
+    "startedAt": "2026-10-02T17:00:00.000Z",
+    "observedAt": "2026-10-02T17:00:00.000Z",
+    "platform": "win32",
+    "root": null,
+    "observations": [
+      {
+        "key": "system/platform",
+        "parentKey": null,
+        "kind": "platform",
+        "label": "Operating system",
+        "metadata": {
+          "os": "win32",
+          "osType": "Windows_NT",
+          "osRelease": "synthetic-10.0",
+          "architecture": "x64"
+        },
+        "source": "node-os",
+        "observedAt": "2026-10-02T17:00:00.000Z"
+      },
+      {
+        "key": "system/runtime",
+        "parentKey": null,
+        "kind": "runtime",
+        "label": "HOMEBASE runtime",
+        "metadata": {
+          "application": "HOMEBASE",
+          "applicationVersion": "0.1.12-qa",
+          "electron": "44.5.1",
+          "chromium": "synthetic",
+          "node": "synthetic"
+        },
+        "source": "electron-runtime",
+        "observedAt": "2026-10-02T17:00:00.000Z"
+      },
+      {
+        "key": "system/cpu",
+        "parentKey": null,
+        "kind": "cpu",
+        "label": "Processor",
+        "metadata": {
+          "logicalCount": 1,
+          "models": [
+            {
+              "model": "Synthetic QA CPU",
+              "logicalCount": 1
+            }
+          ],
+          "truncated": false
+        },
+        "source": "node-os",
+        "observedAt": "2026-10-02T17:00:00.000Z"
+      },
+      {
+        "key": "system/memory",
+        "parentKey": null,
+        "kind": "memory",
+        "label": "Memory",
+        "metadata": {
+          "totalBytes": 8589934592,
+          "freeBytesAtObservation": 4294967296
+        },
+        "source": "node-os",
+        "observedAt": "2026-10-02T17:00:00.000Z"
+      }
+    ],
+    "progress": {
+      "visited": 4,
+      "returned": 4,
+      "skipped": 0,
+      "queued": 0
+    },
+    "limits": {
+      "batchSize": 16,
+      "maxEntries": 1024,
+      "maxDepth": 6,
+      "maxSeconds": 120
+    },
+    "diagnostics": [
+      {
+        "code": "displays-unavailable",
+        "count": 1
+      }
+    ],
+    "contentRead": false,
+    "credentialsRead": false,
+    "externalUpload": false,
+    "applied": false
+  },
+  {
+    "schema": "field.homebase.discovery.v1",
+    "requestId": "discovery-fixture",
+    "address": "device",
+    "revision": 0,
+    "scanId": "discovery/0ec9a985-f740-471d-ac5f-ee507fa5e1fa",
+    "kind": "system",
+    "status": "complete",
+    "sequence": 1,
+    "nextCursor": null,
+    "startedAt": "2026-10-02T17:00:00.000Z",
+    "observedAt": "2026-10-02T17:00:00.000Z",
+    "platform": "win32",
+    "root": null,
+    "observations": [
+      {
+        "key": "system/firmware",
+        "parentKey": null,
+        "kind": "firmware",
+        "label": "Firmware / BIOS",
+        "metadata": {
+          "manufacturer": "Synthetic QA firmware vendor",
+          "version": "Synthetic 1.0",
+          "releaseDate": "2026-01-01"
+        },
+        "source": "windows-cim",
+        "observedAt": "2026-10-02T17:00:00.000Z"
+      },
+      {
+        "key": "system/kernel",
+        "parentKey": null,
+        "kind": "kernel",
+        "label": "Kernel",
+        "metadata": {
+          "type": "Windows_NT",
+          "release": "Synthetic 10.0",
+          "architecture": "x86_64"
+        },
+        "source": "node-os",
+        "observedAt": "2026-10-02T17:00:00.000Z"
+      },
+      {
+        "key": "system/os",
+        "parentKey": null,
+        "kind": "os",
+        "label": "Operating system",
+        "metadata": {
+          "caption": "Synthetic QA Windows",
+          "version": "Synthetic 10.0",
+          "build": "Synthetic 100",
+          "architecture": "64-bit"
+        },
+        "source": "windows-cim",
+        "observedAt": "2026-10-02T17:00:00.000Z"
+      },
+      {
+        "key": "software/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "parentKey": null,
+        "kind": "software",
+        "label": "Synthetic QA program",
+        "metadata": {
+          "version": "1.0",
+          "publisher": "Synthetic publisher"
+        },
+        "source": "windows-uninstall-registry",
+        "observedAt": "2026-10-02T17:00:00.000Z"
+      }
+    ],
+    "progress": {
+      "visited": 8,
+      "returned": 8,
+      "skipped": 0,
+      "queued": 0
+    },
+    "limits": {
+      "batchSize": 16,
+      "maxEntries": 1024,
+      "maxDepth": 6,
+      "maxSeconds": 120
+    },
+    "diagnostics": [
+      {
+        "code": "displays-unavailable",
+        "count": 1
+      }
+    ],
+    "contentRead": false,
+    "credentialsRead": false,
+    "externalUpload": false,
+    "applied": false
+  }
+]

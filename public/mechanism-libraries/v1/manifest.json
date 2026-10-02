@@ -1,0 +1,220 @@
+{
+  "schema": "ei.binary-library-artifacts.v1",
+  "source": {
+    "recordAddress": "model/inventory-root",
+    "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+    "revision": 0,
+    "textUtf16Sha256": "20146ac4d902c7d49e52aae950e2229be568ed80f1e7d93d0c42cda04a65fdb8"
+  },
+  "libraries": [
+    {
+      "file": "3b0b65e327232579cecf73c55cd5c7ed530efccf6bf0ac2d0f46ba9962340bbd.bin",
+      "sha256": "3b0b65e327232579cecf73c55cd5c7ed530efccf6bf0ac2d0f46ba9962340bbd",
+      "bytes": 15,
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/23",
+        "start": 0,
+        "end": 3,
+        "exact": "≡→⋈"
+      },
+      "instructionOrigins": [
+        {
+          "offset": 2,
+          "rule": {
+            "recordAddress": "model/inventory-root",
+            "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+            "revision": 0,
+            "pointer": "/23",
+            "start": 0,
+            "end": 3,
+            "exact": "≡→⋈"
+          },
+          "branch": {
+            "recordAddress": "model/inventory-root",
+            "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+            "revision": 0,
+            "pointer": "/23",
+            "start": 0,
+            "end": 3,
+            "exact": "≡→⋈"
+          },
+          "fields": [
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/23",
+              "start": 0,
+              "end": 3,
+              "exact": "≡→⋈"
+            },
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/23",
+              "start": 2,
+              "end": 3,
+              "exact": "⋈"
+            },
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/23",
+              "start": 0,
+              "end": 3,
+              "exact": "≡→⋈"
+            }
+          ]
+        }
+      ],
+      "bootstrap": "two-authored-rule-lowering/v1",
+      "selfHosted": false
+    },
+    {
+      "file": "05e6d8209d3c9901712191f57cbf2a7d7cf2b98e535cb242d1c7c4f309e56328.bin",
+      "sha256": "05e6d8209d3c9901712191f57cbf2a7d7cf2b98e535cb242d1c7c4f309e56328",
+      "bytes": 38,
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/67",
+        "start": 0,
+        "end": 18,
+        "exact": "∀a,b:a≡b?a⋈b:Δab→L"
+      },
+      "instructionOrigins": [
+        {
+          "offset": 2,
+          "rule": {
+            "recordAddress": "model/inventory-root",
+            "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+            "revision": 0,
+            "pointer": "/67",
+            "start": 0,
+            "end": 18,
+            "exact": "∀a,b:a≡b?a⋈b:Δab→L"
+          },
+          "branch": {
+            "recordAddress": "model/inventory-root",
+            "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+            "revision": 0,
+            "pointer": "/67",
+            "start": 9,
+            "end": 12,
+            "exact": "a⋈b"
+          },
+          "fields": [
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/67",
+              "start": 9,
+              "end": 10,
+              "exact": "a"
+            },
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/67",
+              "start": 10,
+              "end": 11,
+              "exact": "⋈"
+            },
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/67",
+              "start": 11,
+              "end": 12,
+              "exact": "b"
+            }
+          ]
+        },
+        {
+          "offset": 15,
+          "rule": {
+            "recordAddress": "model/inventory-root",
+            "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+            "revision": 0,
+            "pointer": "/67",
+            "start": 0,
+            "end": 18,
+            "exact": "∀a,b:a≡b?a⋈b:Δab→L"
+          },
+          "branch": {
+            "recordAddress": "model/inventory-root",
+            "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+            "revision": 0,
+            "pointer": "/67",
+            "start": 13,
+            "end": 18,
+            "exact": "Δab→L"
+          },
+          "fields": [
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/67",
+              "start": 13,
+              "end": 14,
+              "exact": "Δ"
+            },
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/67",
+              "start": 14,
+              "end": 15,
+              "exact": "a"
+            },
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/67",
+              "start": 15,
+              "end": 16,
+              "exact": "b"
+            },
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/67",
+              "start": 16,
+              "end": 17,
+              "exact": "→"
+            },
+            {
+              "recordAddress": "model/inventory-root",
+              "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+              "revision": 0,
+              "pointer": "/67",
+              "start": 17,
+              "end": 18,
+              "exact": "L"
+            }
+          ]
+        }
+      ],
+      "bootstrap": "two-authored-rule-lowering/v1",
+      "selfHosted": false
+    }
+  ],
+  "verifiedRawBinaryReplays": 10,
+  "opaqueClauses": 86,
+  "artifactScope": "exact emitted rule instructions; not a complete standalone application",
+  "compilerHosted": true,
+  "executionAuthority": false
+}

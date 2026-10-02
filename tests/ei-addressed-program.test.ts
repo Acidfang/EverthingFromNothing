@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import {createEILedger,exportEILedger,advanceEI,proposeEI,executeEI,chooseEI,commitEI,verifyEI,verifyLocalEI} from '../src/model/ei-engine.ts'
 import {createEIPublicFieldRecords} from '../src/model/ei-public-field.ts'
 import {createEIGrainRegistry,projectEIGrain,EI_GRAINS} from '../src/model/ei-grain-identity.ts'
-import {compileEIAddressedProgram,proposeEIAddressedDerivation} from '../src/model/ei-addressed-program.ts'
+import {compileEIAddressedProgram,recompileEIAddressedProgram,proposeEIAddressedDerivation} from '../src/model/ei-addressed-program.ts'
 
 test('all five grains compile the same retained public program without a commit',()=>{
  const ledger=createEILedger({records:createEIPublicFieldRecords()}),before=exportEILedger(ledger),registry=createEIGrainRegistry(ledger)
@@ -70,4 +70,21 @@ test('unknown and conflicting comparisons cannot manufacture an executable conse
   await assert.rejects(proposeEIAddressedDerivation(ledger,[handle],0,'none'),/no unopposed/)
   assert.equal(ledger.receipts.length,0)
  }
+})
+
+test('actual source edit fractures its retained snapshot and deterministically rebuilds addressed code',()=>{
+ const source={id:'before',text:'a≡b;∀a,b:a≡b?a⋈b:Δab→L'},ledger=createEILedger({records:[{address:'root',value:source.text,source}]}),previous=compileEIAddressedProgram(ledger,[projectEIGrain(createEIGrainRegistry(ledger),'root','node')]),history=JSON.stringify(previous)
+ const updated={id:'after',text:'a≠b;∀a,b:a≡b?a⋈b:Δab→L'},next=advanceEI(ledger,proposeEI(ledger,{id:'edit',producer:'root',input:updated,candidates:[{id:'edit',label:'Supplied source edit',owner:'engine',source:updated,conditions:[],patches:[{address:'root',value:updated.text,source:updated}]}]})).ledger
+ const handle=projectEIGrain(createEIGrainRegistry(next),'root','coordinate'),result=recompileEIAddressedProgram(next,previous,[handle])
+ assert.equal(result.invalidation.status,'stale');assert.equal(result.verifiedRebuild,true);assert.equal(result.selfCompilation,false);assert.equal(result.fracture.gates.length,1);assert.ok(result.fracture.nodes.every(node=>node.canonicalEntityAddress==='root'))
+ assert.deepEqual(result.current,compileEIAddressedProgram(next,[handle]));assert.equal(result.current.compilation.evaluations[0].result.proofs[0].conclusion.kind,'transition');assert.equal(JSON.stringify(previous),history);assert.equal(next.records[0].was[0].source.text,source.text)
+ const replay=recompileEIAddressedProgram(next,result.current,[handle]);assert.equal(replay.invalidation.status,'current');assert.equal(replay.fracture.gates.length,0)
+ assert.throws(()=>recompileEIAddressedProgram(next,JSON.parse(history),[handle]),/not compiled/)
+})
+
+test('new binary execution receipts do not allocate a duplicate canonical result for an older proof',async()=>{
+ const source={id:'source',text:'a≡b;≡→⋈'},ledger=createEILedger({records:[{address:'root',value:source.text,source}]}),handle=projectEIGrain(createEIGrainRegistry(ledger),'root','node'),candidate=await proposeEIAddressedDerivation(ledger,[handle],0,'initial')
+ assert.ok(candidate);const input=JSON.parse(JSON.stringify(candidate.input)),parsed=JSON.parse(input.input.text);delete parsed.mechanism;const oldText=JSON.stringify(parsed);input.input.text=oldText;input.candidates[0].source.text=oldText;input.candidates[0].patches[0].source.text=oldText
+ const oldProposal=proposeEI(ledger,input),execution=executeEI(ledger,oldProposal,chooseEI(oldProposal,'retain-derived-relation'));if(execution.status!=='staged')throw Error('not staged');const old=commitEI(ledger,verifyLocalEI(execution)).ledger
+ const result=await proposeEIAddressedDerivation(old,[projectEIGrain(createEIGrainRegistry(old),'root','state')],0,'again');assert.equal(result,null);assert.equal(old.records.length,2)
 })

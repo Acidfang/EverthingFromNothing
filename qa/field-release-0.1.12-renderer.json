@@ -1,0 +1,1599 @@
+{
+  "schema": "homebase.renderer-validation.v1",
+  "runtime": "Actual Linux Electron44.5.1 renderer",
+  "windowsDeviceExecution": false,
+  "nativeUnitTests": 163,
+  "nativeRouteChecks": 15,
+  "suites": [
+    {
+      "suite": "qa7-full",
+      "checks": 131,
+      "scenarios": [
+        {
+          "scenario": "system",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "a791253b5fd597f846646472dc493837e0504b8a3ab7e210aa1bc142a410cc6e",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "rescan",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "rescan preserves exact stable target addresses",
+              "pass": true
+            },
+            {
+              "name": "new scan has distinct occurrence identity",
+              "pass": true
+            },
+            {
+              "name": "rescan binds previous revisions rather than losing history",
+              "pass": true
+            },
+            {
+              "name": "unchanged observations do not manufacture a value difference",
+              "pass": true
+            },
+            {
+              "name": "rescan completes with no renderer error",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "5434776e41b40783368d3a1178eb819ef499722505e19da38993840c79da7ab2",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "folder",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "selected-root batches are admitted through actual DOM return",
+              "pass": true
+            },
+            {
+              "name": "folder containment preserves actual parent keys",
+              "pass": true
+            },
+            {
+              "name": "native-selected folder becomes observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "file mapping retains metadata without content or absolute path",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "bf7c010ce71b1893e04fa9ef59dbb8d682fd658382b4e293b68ad34e18d0c7d5",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "cancel",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "Idle obtains actual cancelled native return",
+              "pass": true
+            },
+            {
+              "name": "late cancelled batch adds no folder entries",
+              "pass": true
+            },
+            {
+              "name": "Idle leaves prior admitted root and receipts intact",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "3ec4828c148354995f55d024522a702daf1a0bdcb8e04f6e02d90ec8499d0595",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "replace",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "import replaced source while first native continuation was pending",
+              "pass": true
+            },
+            {
+              "name": "old native acquisition was cancelled on source replacement",
+              "pass": true
+            },
+            {
+              "name": "late old-scope return was never committed to the new field",
+              "pass": true
+            },
+            {
+              "name": "imported source retains its original value",
+              "pass": true
+            },
+            {
+              "name": "imported user field cannot be overwritten by the startup import route",
+              "pass": true
+            }
+          ],
+          "reportSha256": "badfd4a99bd51d5c83ab1da6071f2f117aa5fc7950975eebe11a7977b4b80be2",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "ownership",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "explicit UI edit retains its own source at observed address",
+              "pass": true
+            },
+            {
+              "name": "rescan refuses conflicting retained source ownership",
+              "pass": true
+            },
+            {
+              "name": "ownership failure does not overwrite the user edit",
+              "pass": true
+            },
+            {
+              "name": "ownership failure cancels native scan",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "f99db49ca47678cd620b67b71b9f6a094be9220d045ac5a3252f24a31defcf7b",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "capacity",
+          "checks": [
+            {
+              "name": "capacity is a surfaced stop with prior receipts retained",
+              "pass": true
+            },
+            {
+              "name": "capacity stop cancels native acquisition",
+              "pass": true
+            },
+            {
+              "name": "pending batch remains available for explicit save/retry",
+              "pass": true
+            },
+            {
+              "name": "prior commits still have actual matching readback",
+              "pass": true
+            },
+            {
+              "name": "saved pending bytes preserve actual native scope unapplied",
+              "pass": true
+            }
+          ],
+          "reportSha256": "ebfea23975899ca683eae385b2c8b2b5db6b72adb997a54255755d9568d6fba9",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "saved",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "explicit local save returns a stored envelope",
+              "pass": true
+            },
+            {
+              "name": "reload preserves every previously saved receipt",
+              "pass": true
+            },
+            {
+              "name": "new initial map adds observations to the restored source",
+              "pass": true
+            },
+            {
+              "name": "restored saved field cannot be replaced by startup import",
+              "pass": true
+            },
+            {
+              "name": "new saved generation follows actual returned commits",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "28340ade2409424027a5980aa84763660818f1661d86ecc481f31014650243b5",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "corrupt",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "corrupt stored bytes remain exactly intact",
+              "pass": true
+            },
+            {
+              "name": "corrupt storage is surfaced without a fallback commit",
+              "pass": true
+            },
+            {
+              "name": "corrupt source prevents automatic provider acquisition",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "5c1062c099920805af02b652985cc2f8a0966d5c3c04d41d664b882a57feaea0",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "zero",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "trusted ZERO navigation happened while continuation was pending",
+              "pass": true
+            },
+            {
+              "name": "later source admission preserves the user observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "observer movement itself creates no model receipt",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "42da43bae8d054c5ef6758610bbf64c9453cc28bea63c82251e2a0cb66350e73",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "proof",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "large proof document stays unmounted until opened",
+              "pass": true
+            },
+            {
+              "name": "proof view displays the current committed revision",
+              "pass": true
+            },
+            {
+              "name": "proof view includes source/receipt/quota boundaries",
+              "pass": true
+            },
+            {
+              "name": "proof quotas use actual retained-address and receipt counts",
+              "pass": true
+            },
+            {
+              "name": "opening proof creates no engine receipt",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "5c9c49070bdb9a975777c0a9f1d0d5ba2e444a0b3820f501e62a22017f40e664",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "7ccb8a8cf26deb6411f900f8503b1274c690cfb5922e852120dbdf385048f8e8"
+              },
+              {
+                "path": "assets/index-Dia3-t5G.js",
+                "bytes": 875704,
+                "sha256": "de12c98cba7a785e5b732adc2d1bd7cbba60ee7fc9e7d50a167be78abe7dd224"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "suite": "qa8-final",
+      "checks": 80,
+      "scenarios": [
+        {
+          "scenario": "system",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "3725c39436f52cfb1b837b78c8c6cd7fe51e8055d173bae597027cd2e69bd7de",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "9ece211d1c0a7766d6d89d8e628ab96353a77626a114d1e753484d33d0609925"
+              },
+              {
+                "path": "assets/index-CuUjvriC.js",
+                "bytes": 876636,
+                "sha256": "87b98cd37f4af2252f76bc302acaef7fbcdd87d93837b2c3fdd16ccc0a352dcb"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "proof",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "large proof document stays unmounted until opened",
+              "pass": true
+            },
+            {
+              "name": "proof view displays the current committed revision",
+              "pass": true
+            },
+            {
+              "name": "proof view includes source/receipt/quota boundaries",
+              "pass": true
+            },
+            {
+              "name": "proof quotas use actual retained-address and receipt counts",
+              "pass": true
+            },
+            {
+              "name": "opening proof creates no engine receipt",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "4d880a49679591a4e5002bc5024562ba82179dde234ca9a5cf328150c7a54d27",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "9ece211d1c0a7766d6d89d8e628ab96353a77626a114d1e753484d33d0609925"
+              },
+              {
+                "path": "assets/index-CuUjvriC.js",
+                "bytes": 876636,
+                "sha256": "87b98cd37f4af2252f76bc302acaef7fbcdd87d93837b2c3fdd16ccc0a352dcb"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "saved",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "explicit local save returns a stored envelope",
+              "pass": true
+            },
+            {
+              "name": "reload preserves every previously saved receipt",
+              "pass": true
+            },
+            {
+              "name": "new initial map adds observations to the restored source",
+              "pass": true
+            },
+            {
+              "name": "restored saved field cannot be replaced by startup import",
+              "pass": true
+            },
+            {
+              "name": "new saved generation follows actual returned commits",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "fdbdcdf8938fb8e3b58bb2dd45b64c5cfa198246faca976687c2e91809c27a87",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "9ece211d1c0a7766d6d89d8e628ab96353a77626a114d1e753484d33d0609925"
+              },
+              {
+                "path": "assets/index-CuUjvriC.js",
+                "bytes": 876636,
+                "sha256": "87b98cd37f4af2252f76bc302acaef7fbcdd87d93837b2c3fdd16ccc0a352dcb"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "corrupt",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "corrupt stored bytes remain exactly intact",
+              "pass": true
+            },
+            {
+              "name": "corrupt storage is surfaced without a fallback commit",
+              "pass": true
+            },
+            {
+              "name": "corrupt source prevents automatic provider acquisition",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "757eee8782c1f22b215552dbf0527ddafdb61182bc50ba7104664a26232467a0",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "9ece211d1c0a7766d6d89d8e628ab96353a77626a114d1e753484d33d0609925"
+              },
+              {
+                "path": "assets/index-CuUjvriC.js",
+                "bytes": 876636,
+                "sha256": "87b98cd37f4af2252f76bc302acaef7fbcdd87d93837b2c3fdd16ccc0a352dcb"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "authored",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "authored rules are available only from selected source",
+              "pass": true
+            },
+            {
+              "name": "literal source relation is derived before retention",
+              "pass": true
+            },
+            {
+              "name": "resolution itself adds no receipt",
+              "pass": true
+            },
+            {
+              "name": "exact consequence commits through actual DOM readback",
+              "pass": true
+            },
+            {
+              "name": "retained proof is source-bound with no OS execution authority",
+              "pass": true
+            },
+            {
+              "name": "retained result remains parented to its authored address",
+              "pass": true
+            },
+            {
+              "name": "same source result is an idempotent no-op",
+              "pass": true
+            },
+            {
+              "name": "recompilation return is exposed as hosted and verified",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "6398aa3c65c973de4b18a16e69e79c0cbd7fa2df3f4a200302cfca71afd2ed40",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "9ece211d1c0a7766d6d89d8e628ab96353a77626a114d1e753484d33d0609925"
+              },
+              {
+                "path": "assets/index-CuUjvriC.js",
+                "bytes": 876636,
+                "sha256": "87b98cd37f4af2252f76bc302acaef7fbcdd87d93837b2c3fdd16ccc0a352dcb"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "derive-cancel",
+          "checks": [
+            {
+              "name": "initial system mapping starts once",
+              "pass": true
+            },
+            {
+              "name": "actual native mapping reaches the next cursor",
+              "pass": true
+            },
+            {
+              "name": "both actual native batches commit through rendered readback",
+              "pass": true
+            },
+            {
+              "name": "native source scope and cursor remain exact",
+              "pass": true
+            },
+            {
+              "name": "provider root became actual observer ZERO",
+              "pass": true
+            },
+            {
+              "name": "returned OS observations are drawn on canvas",
+              "pass": true
+            },
+            {
+              "name": "renderer and workspace consume same committed event",
+              "pass": true
+            },
+            {
+              "name": "mapping has no surfaced operation error",
+              "pass": true,
+              "detail": []
+            },
+            {
+              "name": "authored rules are available only from selected source",
+              "pass": true
+            },
+            {
+              "name": "literal source relation is derived before retention",
+              "pass": true
+            },
+            {
+              "name": "resolution itself adds no receipt",
+              "pass": true
+            },
+            {
+              "name": "close/reopen invalidates delayed retention without a commit",
+              "pass": true
+            },
+            {
+              "name": "cancelled derivation creates no derived address",
+              "pass": true
+            },
+            {
+              "name": "untouched initial automatic map offers session import",
+              "pass": true
+            }
+          ],
+          "reportSha256": "8651c7fcc51ac2d9038e4219d6eb4385ef9adff6296634c9ddc945a153bcd874",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "9ece211d1c0a7766d6d89d8e628ab96353a77626a114d1e753484d33d0609925"
+              },
+              {
+                "path": "assets/index-CuUjvriC.js",
+                "bytes": 876636,
+                "sha256": "87b98cd37f4af2252f76bc302acaef7fbcdd87d93837b2c3fdd16ccc0a352dcb"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "suite": "qa8-final-gestures",
+      "checks": 46,
+      "scenarios": [
+        {
+          "scenario": "large",
+          "checks": [
+            {
+              "name": "one environment horizon",
+              "pass": true
+            },
+            {
+              "name": "environment surface covers full viewport behind dock",
+              "pass": true
+            },
+            {
+              "name": "no outer page scroll overflow",
+              "pass": true
+            },
+            {
+              "name": "file object is physically hit-testable",
+              "pass": true
+            },
+            {
+              "name": "single mouse click selects exact object without opening workspace",
+              "pass": true
+            },
+            {
+              "name": "double click opens actual device/files workspace",
+              "pass": true
+            },
+            {
+              "name": "file selection control belongs to the open workspace",
+              "pass": true
+            },
+            {
+              "name": "Enter on selected object opens workspace",
+              "pass": true
+            },
+            {
+              "name": "left drag pans observer camera",
+              "pass": true
+            },
+            {
+              "name": "pan preserves selected address and ledger receipts",
+              "pass": true
+            },
+            {
+              "name": "wheel changes zoom",
+              "pass": true
+            },
+            {
+              "name": "wheel retains source point under cursor",
+              "pass": true
+            },
+            {
+              "name": "middle button drag pans the observer",
+              "pass": true
+            },
+            {
+              "name": "Shift-left drag orbits without panning",
+              "pass": true
+            },
+            {
+              "name": "right drag changes projected horizon/pitch",
+              "pass": true
+            },
+            {
+              "name": "orbit does not pan or commit",
+              "pass": true
+            },
+            {
+              "name": "two-pointer touch changes camera zoom",
+              "pass": true
+            },
+            {
+              "name": "touch rotates observer roll",
+              "pass": true
+            },
+            {
+              "name": "touch gesture preserves selection and receipt count",
+              "pass": true
+            },
+            {
+              "name": "touch cancellation leaves camera stable",
+              "pass": true
+            },
+            {
+              "name": "explicit ZERO changes observer focus to selected address",
+              "pass": true
+            },
+            {
+              "name": "view gestures and ZERO create no engine mutation",
+              "pass": true
+            },
+            {
+              "name": "mouse and touch reached trusted pointer handlers",
+              "pass": true
+            }
+          ],
+          "reportSha256": "17117c95c4a88325659397525abe10157f6e4390b45212384dd8efc04bcd1221",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "9ece211d1c0a7766d6d89d8e628ab96353a77626a114d1e753484d33d0609925"
+              },
+              {
+                "path": "assets/index-CuUjvriC.js",
+                "bytes": 876636,
+                "sha256": "87b98cd37f4af2252f76bc302acaef7fbcdd87d93837b2c3fdd16ccc0a352dcb"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        },
+        {
+          "scenario": "small",
+          "checks": [
+            {
+              "name": "one environment horizon",
+              "pass": true
+            },
+            {
+              "name": "environment surface covers full viewport behind dock",
+              "pass": true
+            },
+            {
+              "name": "no outer page scroll overflow",
+              "pass": true
+            },
+            {
+              "name": "file object is physically hit-testable",
+              "pass": true
+            },
+            {
+              "name": "single mouse click selects exact object without opening workspace",
+              "pass": true
+            },
+            {
+              "name": "double click opens actual device/files workspace",
+              "pass": true
+            },
+            {
+              "name": "file selection control belongs to the open workspace",
+              "pass": true
+            },
+            {
+              "name": "Enter on selected object opens workspace",
+              "pass": true
+            },
+            {
+              "name": "left drag pans observer camera",
+              "pass": true
+            },
+            {
+              "name": "pan preserves selected address and ledger receipts",
+              "pass": true
+            },
+            {
+              "name": "wheel changes zoom",
+              "pass": true
+            },
+            {
+              "name": "wheel retains source point under cursor",
+              "pass": true
+            },
+            {
+              "name": "middle button drag pans the observer",
+              "pass": true
+            },
+            {
+              "name": "Shift-left drag orbits without panning",
+              "pass": true
+            },
+            {
+              "name": "right drag changes projected horizon/pitch",
+              "pass": true
+            },
+            {
+              "name": "orbit does not pan or commit",
+              "pass": true
+            },
+            {
+              "name": "two-pointer touch changes camera zoom",
+              "pass": true
+            },
+            {
+              "name": "touch rotates observer roll",
+              "pass": true
+            },
+            {
+              "name": "touch gesture preserves selection and receipt count",
+              "pass": true
+            },
+            {
+              "name": "touch cancellation leaves camera stable",
+              "pass": true
+            },
+            {
+              "name": "explicit ZERO changes observer focus to selected address",
+              "pass": true
+            },
+            {
+              "name": "view gestures and ZERO create no engine mutation",
+              "pass": true
+            },
+            {
+              "name": "mouse and touch reached trusted pointer handlers",
+              "pass": true
+            }
+          ],
+          "reportSha256": "7b32982f32362e9f738cd2870223ba17d26bbec1ba79266f20f342f234cb8449",
+          "bundle": {
+            "schema": "homebase.shared-bundle.v1",
+            "release": "0.1.12",
+            "files": [
+              {
+                "path": "index.html",
+                "bytes": 594,
+                "sha256": "9ece211d1c0a7766d6d89d8e628ab96353a77626a114d1e753484d33d0609925"
+              },
+              {
+                "path": "assets/index-CuUjvriC.js",
+                "bytes": 876636,
+                "sha256": "87b98cd37f4af2252f76bc302acaef7fbcdd87d93837b2c3fdd16ccc0a352dcb"
+              },
+              {
+                "path": "assets/index-BUcaksSE.css",
+                "bytes": 96131,
+                "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Windows CIM/registry execution remains unverified on a Windows device.",
+    "Folder chooser and capacity/latency faults use explicitly synthetic fixtures.",
+    "PowerShell updater execution not available in this recovered workspace."
+  ],
+  "qa8ProofSnapshotChecks": [
+    {
+      "name": "proof displays691 tests and768 finite oracle cases",
+      "passed": true
+    },
+    {
+      "name": "proof displays actual AVR build figures and marks board execution untested",
+      "passed": true
+    }
+  ]
+}

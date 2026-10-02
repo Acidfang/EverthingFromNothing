@@ -29,6 +29,15 @@ const inventorySource = source(JSON.stringify({ inventory_statements: { retained
 })
 const pointers = retained.map((_, index) => `/inventory_statements/retained_binary_relations/${index}`)
 
+test('quoted provider metadata never becomes an executable program through semicolon splitting',()=>{
+ const text=JSON.stringify({description:`display text;A≡B;${RULE};more display text`}),raw=parse(source(text));assert.equal(raw.clauses.length,1);assert.equal(compile([raw]).evaluations.length,0);assert.equal(renderEILedgerDocument(raw.documents[0]),text)
+ const selected=parse(source(text),{pointers:['/description']});assert.equal(compile([selected]).evaluations.length,1)
+})
+
+test('unbound resolution notations remain exact source, never floating point or guessed precision',()=>{
+ for(const text of ['.infinity1... .00100infinity1','. 9999infinty.199999infinty1']){const ast=parse(source(text));assert.equal(renderEILedgerDocument(ast.documents[0]),text);assert.equal(compile([ast]).evaluations.length,0);assert.equal(compile([ast]).opaqueClauses[0].source.exact,text)}
+})
+
 test('all 93 public clauses roundtrip with exact JSON pointers, provenance and unsupported syntax', () => {
   assert.equal(retained.length, 93)
   const ast = parse(inventorySource, { pointers })

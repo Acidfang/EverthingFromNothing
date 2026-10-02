@@ -1,0 +1,3646 @@
+{
+  "format": "ei-mechanism-coverage/v1",
+  "canonicalOntology": false,
+  "wholeUserLedger": false,
+  "entry": "src/main.tsx",
+  "entryImports": [
+    {
+      "from": "src/main.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/main.tsx",
+      "to": "react-dom/client",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/main.tsx",
+      "to": "src/EIModelLayer.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/main.tsx",
+      "to": "src/styles.css",
+      "kind": "local"
+    }
+  ],
+  "staticDependencies": [
+    {
+      "from": "src/App.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/atom-search.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/collision-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/cube-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/earth-observation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/explorer.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/field-closure.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/first-act.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/grain-playback.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/grain.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/lineage.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/medium-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/observation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/particle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/potential.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/resolution-catalogue.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/scene.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/state-transfer.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/thought.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/triangular-prism-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/App.tsx",
+      "to": "src/model/volume-gap.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/cli.ts",
+      "to": "node:url",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/cli.ts",
+      "to": "src/model/explorer.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAddressRelations.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIAddressRelations.tsx",
+      "to": "src/EIAuthoredRelations.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAddressRelations.tsx",
+      "to": "src/model/ei-check-presentation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAddressRelations.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAddressRelations.tsx",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAddressRelations.tsx",
+      "to": "src/model/ei-grain-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAuthoredRelations.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIAuthoredRelations.tsx",
+      "to": "src/model/ei-addressed-program.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAuthoredRelations.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAuthoredRelations.tsx",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIAuthoredRelations.tsx",
+      "to": "src/model/source-bound-comparison.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIConversation.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIConversation.tsx",
+      "to": "src/model/ei-check-presentation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIConversation.tsx",
+      "to": "src/model/ei-conversation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIConversation.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIConversation.tsx",
+      "to": "src/model/ei-phone-input.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIConversation.tsx",
+      "to": "src/model/ei-phone-input.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDeviceWorkspace.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIDeviceWorkspace.tsx",
+      "to": "src/model/ei-browser-encounter.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDeviceWorkspace.tsx",
+      "to": "src/model/ei-device-encounter-types.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDeviceWorkspace.tsx",
+      "to": "src/model/ei-device-encounter.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDeviceWorkspace.tsx",
+      "to": "src/model/ei-device-field.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDeviceWorkspace.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDeviceWorkspace.tsx",
+      "to": "src/model/ei-phone-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDiscovery.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIDiscovery.tsx",
+      "to": "src/model/ei-discovery-providers.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDiscovery.tsx",
+      "to": "src/model/ei-discovery-types.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDiscovery.tsx",
+      "to": "src/model/ei-discovery.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIDiscovery.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIEnvironmentBootstrap.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIEnvironmentBootstrap.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIEnvironmentBootstrap.tsx",
+      "to": "src/model/ei-homebase-environment.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIEnvironmentBootstrap.tsx",
+      "to": "src/model/ei-storage.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIEnvironmentObservation.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIEnvironmentObservation.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIEnvironmentObservation.tsx",
+      "to": "src/model/ei-homebase-environment.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldAction.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIFieldAction.tsx",
+      "to": "src/model/ei-field-action.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/EIFieldAction.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/EIRootTree.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-field-array-view.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-field-environment.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-field-object.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-field-save.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-guide-steps.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-observer-zero.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-pinch.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-seed-drag.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-seed-planting.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-svg-frame-witness.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-thread-draw-frame.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-thread-draw.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/model/ei-world-object.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/useEIFitImprovement.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/useEIModelerObjects.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIFieldArray.tsx",
+      "to": "src/useEIThreadDrawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIGuidance.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIGuidance.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIGuidance.tsx",
+      "to": "src/model/ei-guide-context.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIGuidance.tsx",
+      "to": "src/model/ei-guide-steps.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIGuidance.tsx",
+      "to": "src/model/ei-seed-planting.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": ");readEIConversation(restored.ledger,restored.root);root.current=restored.root;setPresentation(saved.presentation);setPresentationEpoch(value=>value+1);if(saved.presentation)setGrain(saved.presentation.grain);storageRevision.current=null;sequence.current=restored.nextSequence;setLedger(restored.ledger);active.current=restored.ledger;setStateHistory(emptyEIStateHistory());setProposal(restored.pending);setAttempts(restored.attempts);setSelected(saved.presentation?.selectedAddress??restored.root);setSelectedRevision(saved.presentation?.selectedRevision??null);setTarget(saved.presentation?.selectedAddress??restored.root);setValue(restored.ledger.records.find(r=>r.address===(saved.presentation?.selectedAddress??restored.root))!.is.value);setPersistent(false);setNotice(",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/ei-model.css",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIAddressRelations.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIConversation.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIDeviceWorkspace.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIDiscovery.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIEnvironmentBootstrap.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIEnvironmentObservation.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIFieldArray.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIGuidance.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIPhoneBridge.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIPhoneInput.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIPhoneMedia.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIPhoneOverlay.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIProofDocument.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIPublicSync.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EIRecordGate.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/EITransitionView.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-check-presentation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-conversation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-device-field.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-explicit-continuation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-field-save.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-homebase-environment.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-media-retention.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-phone-input.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-phone-input.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-phone-media.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-public-field.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-seed-planting.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-session.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-state-navigation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-storage.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-unified-transition.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/model/ei-whole-field-coverage.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIModelLayer.tsx",
+      "to": "src/useEIOverlayServices.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneBridge.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIPhoneBridge.tsx",
+      "to": "src/EIFieldAction.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneBridge.tsx",
+      "to": "src/model/ei-phone-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneInput.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIPhoneInput.tsx",
+      "to": "src/EIFieldAction.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneInput.tsx",
+      "to": "src/model/ei-phone-input.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneInput.tsx",
+      "to": "src/model/ei-phone-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneMedia.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIPhoneMedia.tsx",
+      "to": "src/EIFieldAction.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneMedia.tsx",
+      "to": "src/model/ei-media-discard.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneMedia.tsx",
+      "to": "src/model/ei-media-presentation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneMedia.tsx",
+      "to": "src/model/ei-media-retention.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneMedia.tsx",
+      "to": "src/model/ei-phone-media.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneOverlay.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIPhoneOverlay.tsx",
+      "to": "src/EIFieldAction.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneOverlay.tsx",
+      "to": "src/model/ei-phone-overlay.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPhoneOverlay.tsx",
+      "to": "src/model/ei-phone-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIProofDocument.tsx",
+      "to": "docs/FRACTURE-FIELD-INVENTORY.json",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIProofDocument.tsx",
+      "to": "native/ei-core/size-report.json",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIProofDocument.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIProofDocument.tsx",
+      "to": "src/model/ei-discovery.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIProofDocument.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIProofDocument.tsx",
+      "to": "src/model/ei-ledger-language.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIProofDocument.tsx",
+      "to": "src/model/ei-session.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIProofDocument.tsx",
+      "to": "src/model/ei-whole-field-coverage.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPublicSync.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIPublicSync.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPublicSync.tsx",
+      "to": "src/model/ei-public-field.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPublicSync.tsx",
+      "to": "src/model/ei-public-sync-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIPublicSync.tsx",
+      "to": "src/model/ei-public-sync.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIRecordGate.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIRecordGate.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIRecordGate.tsx",
+      "to": "src/model/three-tetrahedron-drawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIRootTree.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EIRootTree.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EIRootTree.tsx",
+      "to": "src/model/ei-root-tree.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EITransitionView.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/EITransitionView.tsx",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EITransitionView.tsx",
+      "to": "src/model/ei-unified-transition.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/EITransitionView.tsx",
+      "to": "src/model/three-tetrahedron-drawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/FieldAddressOverlay.tsx",
+      "to": "docs/FRACTURE-FIELD-INVENTORY.json",
+      "kind": "local"
+    },
+    {
+      "from": "src/FieldAddressOverlay.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/FieldAddressOverlay.tsx",
+      "to": "src/FractureVideoProof.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/FieldAddressOverlay.tsx",
+      "to": "src/model/canonicalSeed.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/FieldAddressOverlay.tsx",
+      "to": "src/model/field-inventory.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/FieldAddressOverlay.tsx",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/FieldAddressOverlay.tsx",
+      "to": "src/model/view-navigation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/FieldAddressOverlay.tsx",
+      "to": "src/ReproducibilityExplorer.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/FractureVideoProof.tsx",
+      "to": "docs/FRACTURE-FIELD-INVENTORY.json?raw",
+      "kind": "local"
+    },
+    {
+      "from": "src/FractureVideoProof.tsx",
+      "to": "docs/FRACTURE-FIELD-INVENTORY.json",
+      "kind": "local"
+    },
+    {
+      "from": "src/FractureVideoProof.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/FractureVideoProof.tsx",
+      "to": "src/fracture-video-proof.css",
+      "kind": "local"
+    },
+    {
+      "from": "src/FractureVideoProof.tsx",
+      "to": "src/model/video-pattern.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/EIModelLayer.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/FieldAddressOverlay.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/infinity.css",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/addressed-draw.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/binaryRelationships.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/communication.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/constrained-node.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/directional-view.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/field-inventory.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/integrated-transition.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/transitionEngine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/model/view-navigation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/InfinityApp.tsx",
+      "to": "src/MomentGateLayer.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/main.tsx",
+      "to": "react-dom/client",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/main.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/main.tsx",
+      "to": "src/EIModelLayer.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/main.tsx",
+      "to": "src/styles.css",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/addressEngine.ts",
+      "to": "src/model/transitionEngine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/atom-search.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/atom-search.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/atom-search.ts",
+      "to": "src/model/observation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/atom-search.ts",
+      "to": "src/model/potential.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/collision-resolution.ts",
+      "to": "src/model/cube-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/completion-fracture.ts",
+      "to": "src/model/binaryRelationships.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/completion-fracture.ts",
+      "to": "src/model/canonicalSeed.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/completion-fracture.ts",
+      "to": "src/model/communication.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/completion-fracture.ts",
+      "to": "src/model/three-tetrahedron-drawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/constrained-node.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/constrained-node.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/corner-pyramid-resolution.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/cube-resolution.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/directional-view.ts",
+      "to": "src/model/three-tetrahedron-drawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-addressed-program.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-addressed-program.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-addressed-program.ts",
+      "to": "src/model/ei-ledger-language.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-addressed-program.ts",
+      "to": "src/model/source-bound-comparison.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-addressed-program.ts",
+      "to": "src/model/source-first-fracture.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-animation-cycle.ts",
+      "to": "src/model/ei-thread-draw-frame.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-animation-cycle.ts",
+      "to": "src/model/ei-thread-draw.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-authored-comparison.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-authored-comparison.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-authored-comparison.ts",
+      "to": "src/model/source-bound-comparison.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-binary-rule-library.ts",
+      "to": "src/model/ei-binary-machine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-binary-rule-library.ts",
+      "to": "src/model/source-bound-comparison.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-browser-encounter.ts",
+      "to": "src/model/ei-device-field.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-conversation.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-conversation.ts",
+      "to": "src/model/ei-relation-reasoner.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-device-encounter.ts",
+      "to": "src/model/ei-device-encounter-types.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-device-encounter.ts",
+      "to": "src/model/ei-device-field.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-device-field.ts",
+      "to": ",address:producer.address},...(item.selectionAddress?[{relation:",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/model/ei-device-field.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-discovery-providers.ts",
+      "to": "src/model/ei-discovery-types.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-discovery-providers.ts",
+      "to": "src/model/ei-discovery.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-discovery-providers.ts",
+      "to": "src/model/ei-phone-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-discovery.ts",
+      "to": ",address:batch.address}]})\n for(const item of batch.observations){const address=await targetAddress(item.key),prior=ledger.records.find(r=>r.address===address),parent=item.parentKey===null?providerAddress:known.get(item.parentKey);if(!parent)fail(",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/model/ei-discovery.ts",
+      "to": "src/model/ei-binary-machine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-discovery.ts",
+      "to": "src/model/ei-discovery-types.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-discovery.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-discovery.ts",
+      "to": "src/model/ei-public-sync-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-explicit-continuation.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-explicit-continuation.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-action.ts",
+      "to": "src/model/three-tetrahedron-drawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-array-view.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-array-view.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-environment.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-environment.ts",
+      "to": "src/model/ei-guide-steps.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-object.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-object.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-object.ts",
+      "to": "src/model/ei-observer-zero.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-object.ts",
+      "to": "src/model/three-tetrahedron-drawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-save.ts",
+      "to": "src/model/ei-animation-cycle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-save.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-save.ts",
+      "to": "src/model/ei-fit-improvement.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-save.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-save.ts",
+      "to": "src/model/ei-idle-observation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-field-save.ts",
+      "to": "src/model/ei-session.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-grain-identity.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-grain-identity.ts",
+      "to": "src/model/ei-relation-reasoner.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-grain-resolution.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-grain-resolution.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-grain-resolution.ts",
+      "to": "src/model/ei-relation-reasoner.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-guide-context.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-guide-steps.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-homebase-environment.ts",
+      "to": "src/model/ei-device-field.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-homebase-environment.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-homebase-environment.ts",
+      "to": "src/model/ei-homebase-capabilities-types.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-homebase-environment.ts",
+      "to": "src/model/ei-public-sync-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-idle-observation.ts",
+      "to": "src/model/ei-animation-cycle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-ledger-language.ts",
+      "to": "src/model/source-bound-comparison.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-media-discard.ts",
+      "to": "src/model/ei-media-retention.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-media-discard.ts",
+      "to": "src/model/ei-phone-media.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-media-presentation.ts",
+      "to": "src/model/ei-phone-media.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-media-retention.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-media-retention.ts",
+      "to": "src/model/ei-phone-media.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-modeler-object.ts",
+      "to": "src/model/addressed-draw.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-modeler-object.ts",
+      "to": "src/model/directional-view.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-modeler-object.ts",
+      "to": "src/model/ei-field-action.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-modeler-object.ts",
+      "to": "src/model/ei-world-object.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-modeler-object.ts",
+      "to": "src/model/three-tetrahedron-drawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-observer-zero.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-observer-zero.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-overlay-services.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-overlay-services.ts",
+      "to": "src/model/ei-shared-field.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-phone-media.ts",
+      "to": "src/model/ei-phone-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-phone-overlay.ts",
+      "to": "src/model/ei-phone-return.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-phone-return.ts",
+      "to": "src/model/ei-capability-snapshot.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-pinch.ts",
+      "to": "src/model/ei-field-array-view.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-public-field.ts",
+      "to": "docs/FRACTURE-FIELD-INVENTORY.json",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-public-field.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-public-field.ts",
+      "to": "src/model/relation-grain.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-public-sync-return.ts",
+      "to": "src/model/ei-public-sync-types.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-public-sync.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-relation-reasoner.ts",
+      "to": "); const address = quote(); take(",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/model/ei-relation-reasoner.ts",
+      "to": ")) {\n      take(",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/model/ei-relation-reasoner.ts",
+      "to": "address",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/model/ei-relation-reasoner.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-root-tree.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-seed-planting.ts",
+      "to": ", address: seed.address}, {relation: ",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/model/ei-seed-planting.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-seed-planting.ts",
+      "to": "src/model/ei-guide-steps.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-session.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-shared-field.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-source-fractures.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-source-fractures.ts",
+      "to": "src/model/source-first-fracture.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-svg-frame-witness.ts",
+      "to": "src/model/ei-animation-cycle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-svg-frame-witness.ts",
+      "to": "src/model/ei-field-array-view.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-svg-frame-witness.ts",
+      "to": "src/model/ei-thread-draw-frame.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-svg-frame-witness.ts",
+      "to": "src/model/ei-thread-draw.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-thread-draw-frame.ts",
+      "to": "src/model/ei-thread-draw.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-unified-transition.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-unified-transition.ts",
+      "to": "src/model/ei-grain-identity.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-unified-transition.ts",
+      "to": "src/model/ei-source-fractures.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-whole-field-coverage.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/ei-world-object.ts",
+      "to": "src/model/directional-view.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/explorer.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/explorer.ts",
+      "to": "src/model/formation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/explorer.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/explorer.ts",
+      "to": "src/model/projection.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/explorer.ts",
+      "to": "src/model/provenance.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/explorer.ts",
+      "to": "src/model/query.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/explorer.ts",
+      "to": "src/model/scene.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/field-closure.ts",
+      "to": "src/model/particle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/fieldLedger.ts",
+      "to": "src/model/addressEngine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/fieldLedger.ts",
+      "to": "src/model/transitionEngine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/formation.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/formation.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/galaxy-search.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/galaxy-search.ts",
+      "to": "src/model/grain.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/galaxy-search.ts",
+      "to": "src/model/state-transfer.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/galaxy-search.ts",
+      "to": "src/model/whole.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/grain-playback.ts",
+      "to": "src/model/particle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/grain.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/grain.ts",
+      "to": "src/model/particle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/kernel.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/lineage.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/medium-resolution.ts",
+      "to": "src/model/cube-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/medium-resolution.ts",
+      "to": "src/model/triangular-prism-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/observation.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/particle.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/particle.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/particle.ts",
+      "to": "src/model/observation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/particle.ts",
+      "to": "src/model/potential.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/potential.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/potential.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/projection.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/projection.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/projection.ts",
+      "to": "src/model/whole.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/query.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/relation-grain.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/reproducibility.ts",
+      "to": "src/model/addressed-draw.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/reproducibility.ts",
+      "to": "src/model/constrained-node.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/reproducibility.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/resolution-catalogue.ts",
+      "to": "src/model/cube-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/resolution-catalogue.ts",
+      "to": "src/model/triangular-prism-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/scene.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/scene.ts",
+      "to": "src/model/projection.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/source-bound-comparison.ts",
+      "to": "src/model/ei-binary-machine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/source-bound-comparison.ts",
+      "to": "src/model/ei-binary-rule-library.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/state-transfer.ts",
+      "to": "src/model/particle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/tetra-moment-gate.ts",
+      "to": "src/model/canonicalSeed.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/tetra-moment-gate.ts",
+      "to": "src/model/transitionEngine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/three-tetrahedron-drawing.ts",
+      "to": "src/model/canonicalSeed.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/transitionEngine.ts",
+      "to": "src/model/canonicalSeed.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/triangular-prism-resolution.ts",
+      "to": "src/model/cube-resolution.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/video-pattern.ts",
+      "to": "src/model/pattern-layer.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/view-navigation.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/whole.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/whole.ts",
+      "to": "src/model/address.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/model/whole.ts",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/MomentGateLayer.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/MomentGateLayer.tsx",
+      "to": "src/model/kernel.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/MomentGateLayer.tsx",
+      "to": "src/model/relation-grain.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/MomentGateLayer.tsx",
+      "to": "src/model/tetra-moment-gate.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/MomentGateLayer.tsx",
+      "to": "src/model/transitionEngine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/MomentGateLayer.tsx",
+      "to": "src/model/transitionEngine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/MomentGateLayer.tsx",
+      "to": "src/moment-gate.css",
+      "kind": "local"
+    },
+    {
+      "from": "src/MomentGateLayer.tsx",
+      "to": "src/TetraMomentGateView.tsx",
+      "kind": "local"
+    },
+    {
+      "from": "src/ReproducibilityExplorer.tsx",
+      "to": "docs/FRACTURE-FIELD-INVENTORY.json",
+      "kind": "local"
+    },
+    {
+      "from": "src/ReproducibilityExplorer.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/ReproducibilityExplorer.tsx",
+      "to": "src/model/pattern-layer.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/ReproducibilityExplorer.tsx",
+      "to": "src/model/reproducibility.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/ReproducibilityExplorer.tsx",
+      "to": "src/reproducibility.css",
+      "kind": "local"
+    },
+    {
+      "from": "src/search-atoms.ts",
+      "to": "src/model/atom-search.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/search-galaxies.ts",
+      "to": "src/model/galaxy-search.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/terminal.ts",
+      "to": "node:process",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/terminal.ts",
+      "to": "node:readline",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/terminal.ts",
+      "to": "node:url",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/terminal.ts",
+      "to": "src/model/explorer.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/TetraMomentGateView.tsx",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/TetraMomentGateView.tsx",
+      "to": "src/model/tetra-moment-gate.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/TetraMomentGateView.tsx",
+      "to": "src/model/three-tetrahedron-drawing.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIFitImprovement.ts",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/useEIFitImprovement.ts",
+      "to": "src/model/ei-fit-improvement.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIModelerObjects.ts",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/useEIModelerObjects.ts",
+      "to": "src/model/ei-modeler-object.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIModelerObjects.ts",
+      "to": "src/model/ei-world-object.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIOverlayServices.ts",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/useEIOverlayServices.ts",
+      "to": "src/model/ei-engine.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIOverlayServices.ts",
+      "to": "src/model/ei-overlay-services.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIThreadDrawing.ts",
+      "to": "react",
+      "kind": "host-package"
+    },
+    {
+      "from": "src/useEIThreadDrawing.ts",
+      "to": "src/model/ei-animation-cycle.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIThreadDrawing.ts",
+      "to": "src/model/ei-field-array-view.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIThreadDrawing.ts",
+      "to": "src/model/ei-idle-observation.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIThreadDrawing.ts",
+      "to": "src/model/ei-svg-frame-witness.ts",
+      "kind": "local"
+    },
+    {
+      "from": "src/useEIThreadDrawing.ts",
+      "to": "src/model/ei-thread-draw.ts",
+      "kind": "local"
+    }
+  ],
+  "staticallyReached": [
+    "docs/FRACTURE-FIELD-INVENTORY.json",
+    "native/ei-core/size-report.json",
+    "src/EIAddressRelations.tsx",
+    "src/EIAuthoredRelations.tsx",
+    "src/EIConversation.tsx",
+    "src/EIDeviceWorkspace.tsx",
+    "src/EIDiscovery.tsx",
+    "src/EIEnvironmentBootstrap.tsx",
+    "src/EIEnvironmentObservation.tsx",
+    "src/EIFieldAction.tsx",
+    "src/EIFieldArray.tsx",
+    "src/EIGuidance.tsx",
+    "src/EIModelLayer.tsx",
+    "src/EIPhoneBridge.tsx",
+    "src/EIPhoneInput.tsx",
+    "src/EIPhoneMedia.tsx",
+    "src/EIPhoneOverlay.tsx",
+    "src/EIProofDocument.tsx",
+    "src/EIPublicSync.tsx",
+    "src/EIRecordGate.tsx",
+    "src/EIRootTree.tsx",
+    "src/EITransitionView.tsx",
+    "src/ei-model.css",
+    "src/main.tsx",
+    "src/model/address.ts",
+    "src/model/addressed-draw.ts",
+    "src/model/canonicalSeed.ts",
+    "src/model/directional-view.ts",
+    "src/model/ei-addressed-program.ts",
+    "src/model/ei-animation-cycle.ts",
+    "src/model/ei-binary-machine.ts",
+    "src/model/ei-binary-rule-library.ts",
+    "src/model/ei-browser-encounter.ts",
+    "src/model/ei-capability-snapshot.ts",
+    "src/model/ei-check-presentation.ts",
+    "src/model/ei-conversation.ts",
+    "src/model/ei-device-encounter-types.ts",
+    "src/model/ei-device-encounter.ts",
+    "src/model/ei-device-field.ts",
+    "src/model/ei-discovery-providers.ts",
+    "src/model/ei-discovery-types.ts",
+    "src/model/ei-discovery.ts",
+    "src/model/ei-engine.ts",
+    "src/model/ei-explicit-continuation.ts",
+    "src/model/ei-field-action.ts",
+    "src/model/ei-field-array-view.ts",
+    "src/model/ei-field-environment.ts",
+    "src/model/ei-field-object.ts",
+    "src/model/ei-field-save.ts",
+    "src/model/ei-fit-improvement.ts",
+    "src/model/ei-grain-identity.ts",
+    "src/model/ei-grain-resolution.ts",
+    "src/model/ei-guide-context.ts",
+    "src/model/ei-guide-steps.ts",
+    "src/model/ei-homebase-capabilities-types.ts",
+    "src/model/ei-homebase-environment.ts",
+    "src/model/ei-idle-observation.ts",
+    "src/model/ei-ledger-language.ts",
+    "src/model/ei-media-discard.ts",
+    "src/model/ei-media-presentation.ts",
+    "src/model/ei-media-retention.ts",
+    "src/model/ei-modeler-object.ts",
+    "src/model/ei-observer-zero.ts",
+    "src/model/ei-overlay-services.ts",
+    "src/model/ei-phone-input.ts",
+    "src/model/ei-phone-media.ts",
+    "src/model/ei-phone-overlay.ts",
+    "src/model/ei-phone-return.ts",
+    "src/model/ei-pinch.ts",
+    "src/model/ei-public-field.ts",
+    "src/model/ei-public-sync-return.ts",
+    "src/model/ei-public-sync-types.ts",
+    "src/model/ei-public-sync.ts",
+    "src/model/ei-relation-reasoner.ts",
+    "src/model/ei-root-tree.ts",
+    "src/model/ei-seed-drag.ts",
+    "src/model/ei-seed-planting.ts",
+    "src/model/ei-session.ts",
+    "src/model/ei-shared-field.ts",
+    "src/model/ei-source-fractures.ts",
+    "src/model/ei-state-navigation.ts",
+    "src/model/ei-storage.ts",
+    "src/model/ei-svg-frame-witness.ts",
+    "src/model/ei-thread-draw-frame.ts",
+    "src/model/ei-thread-draw.ts",
+    "src/model/ei-unified-transition.ts",
+    "src/model/ei-whole-field-coverage.ts",
+    "src/model/ei-world-object.ts",
+    "src/model/kernel.ts",
+    "src/model/relation-grain.ts",
+    "src/model/source-bound-comparison.ts",
+    "src/model/source-first-fracture.ts",
+    "src/model/three-tetrahedron-drawing.ts",
+    "src/styles.css",
+    "src/useEIFitImprovement.ts",
+    "src/useEIModelerObjects.ts",
+    "src/useEIOverlayServices.ts",
+    "src/useEIThreadDrawing.ts"
+  ],
+  "roles": {
+    "sourceAdapter": [
+      {
+        "path": "src/model/ei-addressed-program.ts",
+        "present": true,
+        "staticallyReached": true
+      },
+      {
+        "path": "src/model/ei-grain-identity.ts",
+        "present": true,
+        "staticallyReached": true
+      }
+    ],
+    "hostedCompiler": [
+      {
+        "path": "src/model/ei-ledger-language.ts",
+        "present": true,
+        "staticallyReached": true
+      },
+      {
+        "path": "src/model/ei-binary-rule-library.ts",
+        "present": true,
+        "staticallyReached": true
+      }
+    ],
+    "binaryReducer": [
+      {
+        "path": "src/model/ei-binary-machine.ts",
+        "present": true,
+        "staticallyReached": true
+      }
+    ],
+    "admissionAndReceipts": [
+      {
+        "path": "src/model/source-bound-comparison.ts",
+        "present": true,
+        "staticallyReached": true
+      },
+      {
+        "path": "src/model/ei-engine.ts",
+        "present": true,
+        "staticallyReached": true
+      }
+    ],
+    "presentation": [
+      {
+        "path": "src/EIModelLayer.tsx",
+        "present": true,
+        "staticallyReached": true
+      },
+      {
+        "path": "src/EIFieldArray.tsx",
+        "present": true,
+        "staticallyReached": true
+      }
+    ],
+    "carrierAdapters": [
+      {
+        "path": "src/model/ei-homebase-environment.ts",
+        "present": true,
+        "staticallyReached": true
+      },
+      {
+        "path": "src/model/ei-discovery.ts",
+        "present": true,
+        "staticallyReached": true
+      },
+      {
+        "path": "src/model/ei-discovery-providers.ts",
+        "present": true,
+        "staticallyReached": true
+      },
+      {
+        "path": "src/model/ei-phone-media.ts",
+        "present": true,
+        "staticallyReached": true
+      },
+      {
+        "path": "src/model/ei-public-sync.ts",
+        "present": true,
+        "staticallyReached": true
+      }
+    ]
+  },
+  "hostPackages": [
+    ")) {\n      take(",
+    "); const address = quote(); take(",
+    ");readEIConversation(restored.ledger,restored.root);root.current=restored.root;setPresentation(saved.presentation);setPresentationEpoch(value=>value+1);if(saved.presentation)setGrain(saved.presentation.grain);storageRevision.current=null;sequence.current=restored.nextSequence;setLedger(restored.ledger);active.current=restored.ledger;setStateHistory(emptyEIStateHistory());setProposal(restored.pending);setAttempts(restored.attempts);setSelected(saved.presentation?.selectedAddress??restored.root);setSelectedRevision(saved.presentation?.selectedRevision??null);setTarget(saved.presentation?.selectedAddress??restored.root);setValue(restored.ledger.records.find(r=>r.address===(saved.presentation?.selectedAddress??restored.root))!.is.value);setPersistent(false);setNotice(",
+    ", address: seed.address}, {relation: ",
+    ",address:batch.address}]})\n for(const item of batch.observations){const address=await targetAddress(item.key),prior=ledger.records.find(r=>r.address===address),parent=item.parentKey===null?providerAddress:known.get(item.parentKey);if(!parent)fail(",
+    ",address:producer.address},...(item.selectionAddress?[{relation:",
+    "address",
+    "react",
+    "react-dom/client"
+  ],
+  "hostBootstrapStillRequired": true,
+  "selfHostedCompiler": false,
+  "retainedClauses": 93,
+  "recognizedRules": 2,
+  "directPremises": 5,
+  "opaqueClauses": [
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/3",
+        "start": 0,
+        "end": 20,
+        "exact": "χ=F→I→ℜ→∫→Z→X→ρ→V→R↺"
+      },
+      "text": "χ=F→I→ℜ→∫→Z→X→ρ→V→R↺"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/4",
+        "start": 0,
+        "end": 6,
+        "exact": "Φ=0()1"
+      },
+      "text": "Φ=0()1"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/5",
+        "start": 0,
+        "end": 4,
+        "exact": "0≡∅+"
+      },
+      "text": "0≡∅+"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/6",
+        "start": 0,
+        "end": 3,
+        "exact": "1≡✓"
+      },
+      "text": "1≡✓"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/7",
+        "start": 0,
+        "end": 10,
+        "exact": "∀φ∈Φ:0<φ<1"
+      },
+      "text": "∀φ∈Φ:0<φ<1"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/8",
+        "start": 0,
+        "end": 8,
+        "exact": "0→Φ→1→0↺"
+      },
+      "text": "0→Φ→1→0↺"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/9",
+        "start": 0,
+        "end": 20,
+        "exact": "∀x:Ixd:d∈∅|?|⊥|!⇒H↶ℜ"
+      },
+      "text": "∀x:Ixd:d∈∅|?|⊥|!⇒H↶ℜ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/10",
+        "start": 0,
+        "end": 13,
+        "exact": "S⋈d⇒S−○|≡|⊥|⊚"
+      },
+      "text": "S⋈d⇒S−○|≡|⊥|⊚"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/11",
+        "start": 0,
+        "end": 9,
+        "exact": "Δ?M|⊕⇒S⋈Δ"
+      },
+      "text": "Δ?M|⊕⇒S⋈Δ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/12",
+        "start": 0,
+        "end": 12,
+        "exact": "R>U✓>−C>+C>X"
+      },
+      "text": "R>U✓>−C>+C>X"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/13",
+        "start": 0,
+        "end": 4,
+        "exact": "¬Q<X"
+      },
+      "text": "¬Q<X"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/15",
+        "start": 0,
+        "end": 7,
+        "exact": "λᵢ✓→λⱼ✓"
+      },
+      "text": "λᵢ✓→λⱼ✓"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/16",
+        "start": 0,
+        "end": 4,
+        "exact": "ρ≡↩X"
+      },
+      "text": "ρ≡↩X"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/17",
+        "start": 0,
+        "end": 4,
+        "exact": "Δ₀→M"
+      },
+      "text": "Δ₀→M"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/18",
+        "start": 0,
+        "end": 4,
+        "exact": "Δ₁→⊕"
+      },
+      "text": "Δ₁→⊕"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/19",
+        "start": 0,
+        "end": 3,
+        "exact": "⊥→↶"
+      },
+      "text": "⊥→↶"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/20",
+        "start": 0,
+        "end": 4,
+        "exact": "±C→∞"
+      },
+      "text": "±C→∞"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/21",
+        "start": 0,
+        "end": 4,
+        "exact": "ρ°→•"
+      },
+      "text": "ρ°→•"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/22",
+        "start": 0,
+        "end": 4,
+        "exact": "ΔA→M"
+      },
+      "text": "ΔA→M"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/24",
+        "start": 0,
+        "end": 13,
+        "exact": "N=ZΦT⋈Fνα⋈ΠLρ"
+      },
+      "text": "N=ZΦT⋈Fνα⋈ΠLρ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/25",
+        "start": 0,
+        "end": 10,
+        "exact": "∀ν:Zαν⋈ναN"
+      },
+      "text": "∀ν:Zαν⋈ναN"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/26",
+        "start": 0,
+        "end": 15,
+        "exact": "T=T₀Z0⋈T∞Z∞−1→1"
+      },
+      "text": "T=T₀Z0⋈T∞Z∞−1→1"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/28",
+        "start": 0,
+        "end": 17,
+        "exact": "Δ@z⇒Fz=z⋈Δ⋈Fz≅N⊂N"
+      },
+      "text": "Δ@z⇒Fz=z⋈Δ⋈Fz≅N⊂N"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/29",
+        "start": 0,
+        "end": 3,
+        "exact": "F↻F"
+      },
+      "text": "F↻F"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/30",
+        "start": 0,
+        "end": 9,
+        "exact": "ν≡T|α|⋈→•"
+      },
+      "text": "ν≡T|α|⋈→•"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/31",
+        "start": 0,
+        "end": 11,
+        "exact": "¬Πν≡ν|αν≡↔ν"
+      },
+      "text": "¬Πν≡ν|αν≡↔ν"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/32",
+        "start": 0,
+        "end": 5,
+        "exact": "D=ξψζ"
+      },
+      "text": "D=ξψζ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/33",
+        "start": 0,
+        "end": 3,
+        "exact": "ΠDD"
+      },
+      "text": "ΠDD"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/34",
+        "start": 0,
+        "end": 8,
+        "exact": "¬D→⊥|Π○│"
+      },
+      "text": "¬D→⊥|Π○│"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/35",
+        "start": 0,
+        "end": 9,
+        "exact": "Δ→k→X→L→ρ"
+      },
+      "text": "Δ→k→X→L→ρ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/36",
+        "start": 0,
+        "end": 8,
+        "exact": "ρ✓?✓:k↶ℜ"
+      },
+      "text": "ρ✓?✓:k↶ℜ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/37",
+        "start": 0,
+        "end": 3,
+        "exact": "S+Δ"
+      },
+      "text": "S+Δ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/38",
+        "start": 0,
+        "end": 14,
+        "exact": "¬S↻S|✓S→∅|ι→ν+"
+      },
+      "text": "¬S↻S|✓S→∅|ι→ν+"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/39",
+        "start": 0,
+        "end": 9,
+        "exact": "ν∅→↘|ν✓→•"
+      },
+      "text": "ν∅→↘|ν✓→•"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/40",
+        "start": 0,
+        "end": 9,
+        "exact": "Zᴅ=Z₁Z₂Z₃"
+      },
+      "text": "Zᴅ=Z₁Z₂Z₃"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/41",
+        "start": 0,
+        "end": 14,
+        "exact": "∀z:z≠Z⋈z⋈N⋈z↻z"
+      },
+      "text": "∀z:z≠Z⋈z⋈N⋈z↻z"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/42",
+        "start": 0,
+        "end": 4,
+        "exact": "σ→Z₂"
+      },
+      "text": "σ→Z₂"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/43",
+        "start": 0,
+        "end": 22,
+        "exact": "ι=¬⊙≡A⋈¬↔→ν+⋈¬↕→F⋈¬∿→L"
+      },
+      "text": "ι=¬⊙≡A⋈¬↔→ν+⋈¬↕→F⋈¬∿→L"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/44",
+        "start": 0,
+        "end": 11,
+        "exact": "C=Π₁Π₂Π₃⋈Π₄"
+      },
+      "text": "C=Π₁Π₂Π₃⋈Π₄"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/45",
+        "start": 0,
+        "end": 5,
+        "exact": "C⊂Π|ι"
+      },
+      "text": "C⊂Π|ι"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/46",
+        "start": 0,
+        "end": 9,
+        "exact": "C∩E|L|A=∅"
+      },
+      "text": "C∩E|L|A=∅"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/47",
+        "start": 0,
+        "end": 9,
+        "exact": "ΠN→Π₄⋈Π≠A"
+      },
+      "text": "ΠN→Π₄⋈Π≠A"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/48",
+        "start": 0,
+        "end": 13,
+        "exact": "η=?✓□◇⋈?⊥◊△⋈⊘"
+      },
+      "text": "η=?✓□◇⋈?⊥◊△⋈⊘"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/49",
+        "start": 0,
+        "end": 5,
+        "exact": "→₁⇒?✓"
+      },
+      "text": "→₁⇒?✓"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/50",
+        "start": 0,
+        "end": 7,
+        "exact": "¬?✓⇒¬→₁"
+      },
+      "text": "¬?✓⇒¬→₁"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/51",
+        "start": 0,
+        "end": 8,
+        "exact": "¬◇≡✓|△≡ρ"
+      },
+      "text": "¬◇≡✓|△≡ρ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/52",
+        "start": 0,
+        "end": 13,
+        "exact": "Σ=Σ₁Σ₂Σ₃→Σ₃Xρ"
+      },
+      "text": "Σ=Σ₁Σ₂Σ₃→Σ₃Xρ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/53",
+        "start": 0,
+        "end": 8,
+        "exact": "¬ΣK∃|ΣM∃"
+      },
+      "text": "¬ΣK∃|ΣM∃"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/54",
+        "start": 0,
+        "end": 5,
+        "exact": "¬Σ₁→P"
+      },
+      "text": "¬Σ₁→P"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/55",
+        "start": 0,
+        "end": 8,
+        "exact": "μ=μ₁μ₂μ₃"
+      },
+      "text": "μ=μ₁μ₂μ₃"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/56",
+        "start": 0,
+        "end": 14,
+        "exact": "∀d:dμμ₁ᵈμ₂ᵈμ₃ᵈ"
+      },
+      "text": "∀d:dμμ₁ᵈμ₂ᵈμ₃ᵈ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/57",
+        "start": 0,
+        "end": 7,
+        "exact": "ℒ=0..10"
+      },
+      "text": "ℒ=0..10"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/58",
+        "start": 0,
+        "end": 12,
+        "exact": "∀ℓ:ℓ⊃RSΔ⋈XρV"
+      },
+      "text": "∀ℓ:ℓ⊃RSΔ⋈XρV"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/59",
+        "start": 0,
+        "end": 5,
+        "exact": "ℓₑ>ℓₒ"
+      },
+      "text": "ℓₑ>ℓₒ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/60",
+        "start": 0,
+        "end": 5,
+        "exact": "10→1↺"
+      },
+      "text": "10→1↺"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/61",
+        "start": 0,
+        "end": 5,
+        "exact": "Ψ=NΣℒ"
+      },
+      "text": "Ψ=NΣℒ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/62",
+        "start": 0,
+        "end": 3,
+        "exact": "Ψ↻Ψ"
+      },
+      "text": "Ψ↻Ψ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/63",
+        "start": 0,
+        "end": 4,
+        "exact": "FΨ≅Ψ"
+      },
+      "text": "FΨ≅Ψ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/64",
+        "start": 0,
+        "end": 11,
+        "exact": "∀f⊂Ψ:f≅Ψ|Δf"
+      },
+      "text": "∀f⊂Ψ:f≅Ψ|Δf"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/65",
+        "start": 0,
+        "end": 9,
+        "exact": "∀g⊂Ψ:¬g>d"
+      },
+      "text": "∀g⊂Ψ:¬g>d"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/66",
+        "start": 0,
+        "end": 11,
+        "exact": "∀δ:¬Σ₂δ→?→ℜ"
+      },
+      "text": "∀δ:¬Σ₂δ→?→ℜ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/68",
+        "start": 0,
+        "end": 10,
+        "exact": "Σ*=Σ₀|Σᵢ∈H"
+      },
+      "text": "Σ*=Σ₀|Σᵢ∈H"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/69",
+        "start": 0,
+        "end": 8,
+        "exact": "Γ=Σ*|μᵈ✓"
+      },
+      "text": "Γ=Σ*|μᵈ✓"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/70",
+        "start": 0,
+        "end": 6,
+        "exact": "Hᶜ=H\\Γ"
+      },
+      "text": "Hᶜ=H\\Γ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/71",
+        "start": 0,
+        "end": 7,
+        "exact": "Γ→Ψ∧Γ↛O"
+      },
+      "text": "Γ→Ψ∧Γ↛O"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/72",
+        "start": 0,
+        "end": 18,
+        "exact": "Q={q∈Hᶜ:q@U∧q↛μᵈ✓}"
+      },
+      "text": "Q={q∈Hᶜ:q@U∧q↛μᵈ✓}"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/73",
+        "start": 0,
+        "end": 25,
+        "exact": "q₁=max↶Q[Δ|?|X↛ρ|ρ↛V|V↛↩]"
+      },
+      "text": "q₁=max↶Q[Δ|?|X↛ρ|ρ↛V|V↛↩]"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/74",
+        "start": 0,
+        "end": 13,
+        "exact": "q₂=max↶(Q\\q₁)"
+      },
+      "text": "q₂=max↶(Q\\q₁)"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/75",
+        "start": 0,
+        "end": 18,
+        "exact": "q₃=max↶(Q\\{q₁,q₂})"
+      },
+      "text": "q₃=max↶(Q\\{q₁,q₂})"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/76",
+        "start": 0,
+        "end": 13,
+        "exact": "Qᵣ={q₁,q₂,q₃}"
+      },
+      "text": "Qᵣ={q₁,q₂,q₃}"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/77",
+        "start": 0,
+        "end": 16,
+        "exact": "∀q∈Qᵣ:Bq=F(q,Hᶜ)"
+      },
+      "text": "∀q∈Qᵣ:Bq=F(q,Hᶜ)"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/78",
+        "start": 0,
+        "end": 8,
+        "exact": "Bq≅Ψ|ΔBq"
+      },
+      "text": "Bq≅Ψ|ΔBq"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/79",
+        "start": 0,
+        "end": 10,
+        "exact": "∀b⊂Bq:b@Hᶜ"
+      },
+      "text": "∀b⊂Bq:b@Hᶜ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/80",
+        "start": 0,
+        "end": 9,
+        "exact": "¬b@Hᶜ⇒b→∅"
+      },
+      "text": "¬b@Hᶜ⇒b→∅"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/81",
+        "start": 0,
+        "end": 12,
+        "exact": "¬✓Bq⇒Qᵣ←Qᵣ\\q"
+      },
+      "text": "¬✓Bq⇒Qᵣ←Qᵣ\\q"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/82",
+        "start": 0,
+        "end": 26,
+        "exact": "∀qᵢ,qⱼ∈Qᵣ:i≠j⇒qᵢ≠qⱼ∧¬qᵢ⊕qⱼ"
+      },
+      "text": "∀qᵢ,qⱼ∈Qᵣ:i≠j⇒qᵢ≠qⱼ∧¬qᵢ⊕qⱼ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/83",
+        "start": 0,
+        "end": 25,
+        "exact": "∀q∈Qᵣ:q→Φ∧Xq↛O∧μᵈq↛O∧Vq↛O"
+      },
+      "text": "∀q∈Qᵣ:q→Φ∧Xq↛O∧μᵈq↛O∧Vq↛O"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/84",
+        "start": 0,
+        "end": 62,
+        "exact": "P₀=Here are things in the past that might be worth discussing:"
+      },
+      "text": "P₀=Here are things in the past that might be worth discussing:"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/85",
+        "start": 0,
+        "end": 16,
+        "exact": "∀q∈Qᵣ:pq=ρ(q,Bq)"
+      },
+      "text": "∀q∈Qᵣ:pq=ρ(q,Bq)"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/86",
+        "start": 0,
+        "end": 14,
+        "exact": "O=P₀→{pq:q∈Qᵣ}"
+      },
+      "text": "O=P₀→{pq:q∈Qᵣ}"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/87",
+        "start": 0,
+        "end": 15,
+        "exact": "∀pq∈O:pq@q∧q@Hᶜ"
+      },
+      "text": "∀pq∈O:pq@q∧q@Hᶜ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/88",
+        "start": 0,
+        "end": 3,
+        "exact": "O⊂Φ"
+      },
+      "text": "O⊂Φ"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/89",
+        "start": 0,
+        "end": 13,
+        "exact": "O↛1|Σ₃|X|μᵈ|V"
+      },
+      "text": "O↛1|Σ₃|X|μᵈ|V"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/90",
+        "start": 0,
+        "end": 12,
+        "exact": "Γ|Bq|Ψ|N|L↛O"
+      },
+      "text": "Γ|Bq|Ψ|N|L↛O"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/91",
+        "start": 0,
+        "end": 4,
+        "exact": "¬O?U"
+      },
+      "text": "¬O?U"
+    },
+    {
+      "source": {
+        "recordAddress": "model/inventory-root",
+        "sourceId": "public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063",
+        "revision": 0,
+        "pointer": "/92",
+        "start": 0,
+        "end": 6,
+        "exact": "O⊂Φ⇒↩O"
+      },
+      "text": "O⊂Φ⇒↩O"
+    }
+  ],
+  "evaluations": 10,
+  "proofs": 9,
+  "binaryReturns": [
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/23\",0,3,\"≡→⋈\"]",
+      "programBytes": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1
+      ],
+      "admitted": true,
+      "outputCount": 1
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/23\",0,3,\"≡→⋈\"]",
+      "programBytes": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1
+      ],
+      "admitted": true,
+      "outputCount": 1
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/23\",0,3,\"≡→⋈\"]",
+      "programBytes": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1
+      ],
+      "admitted": true,
+      "outputCount": 1
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/23\",0,3,\"≡→⋈\"]",
+      "programBytes": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1
+      ],
+      "admitted": true,
+      "outputCount": 1
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/23\",0,3,\"≡→⋈\"]",
+      "programBytes": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1
+      ],
+      "admitted": false,
+      "outputCount": 0
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/67\",0,18,\"∀a,b:a≡b?a⋈b:Δab→L\"]",
+      "programBytes": [
+        1,
+        2,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1,
+        1,
+        2,
+        1,
+        5,
+        0,
+        0,
+        2,
+        3,
+        148,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        2,
+        33,
+        146,
+        0,
+        0,
+        2,
+        0,
+        76
+      ],
+      "admitted": true,
+      "outputCount": 1
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/67\",0,18,\"∀a,b:a≡b?a⋈b:Δab→L\"]",
+      "programBytes": [
+        1,
+        2,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1,
+        1,
+        2,
+        1,
+        5,
+        0,
+        0,
+        2,
+        3,
+        148,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        2,
+        33,
+        146,
+        0,
+        0,
+        2,
+        0,
+        76
+      ],
+      "admitted": true,
+      "outputCount": 1
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/67\",0,18,\"∀a,b:a≡b?a⋈b:Δab→L\"]",
+      "programBytes": [
+        1,
+        2,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1,
+        1,
+        2,
+        1,
+        5,
+        0,
+        0,
+        2,
+        3,
+        148,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        2,
+        33,
+        146,
+        0,
+        0,
+        2,
+        0,
+        76
+      ],
+      "admitted": true,
+      "outputCount": 1
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/67\",0,18,\"∀a,b:a≡b?a⋈b:Δab→L\"]",
+      "programBytes": [
+        1,
+        2,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1,
+        1,
+        2,
+        1,
+        5,
+        0,
+        0,
+        2,
+        3,
+        148,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        2,
+        33,
+        146,
+        0,
+        0,
+        2,
+        0,
+        76
+      ],
+      "admitted": true,
+      "outputCount": 1
+    },
+    {
+      "rule": "[\"model/inventory-root\",\"public-inventory:5038c46d2b33ca75c5090d1c5654725532b1a063\",0,\"/67\",0,18,\"∀a,b:a≡b?a⋈b:Δab→L\"]",
+      "programBytes": [
+        1,
+        2,
+        1,
+        1,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        2,
+        34,
+        200,
+        1,
+        1,
+        1,
+        2,
+        1,
+        5,
+        0,
+        0,
+        2,
+        3,
+        148,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        2,
+        33,
+        146,
+        0,
+        0,
+        2,
+        0,
+        76
+      ],
+      "admitted": true,
+      "outputCount": 1
+    }
+  ],
+  "intentSources": [],
+  "meaningSources": [],
+  "intentMeaningImplemented": false
+}

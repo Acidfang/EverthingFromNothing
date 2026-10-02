@@ -1,0 +1,4 @@
+import {test} from 'node:test'
+import assert from 'node:assert/strict'
+import {auditMechanismCoverage} from '../scripts/audit-mechanism-coverage.ts'
+test('executable coverage follows current entry, retained source and actual binary returns',()=>{const a=auditMechanismCoverage();assert.ok(a.entryImports.some(e=>e.to==='src/EIModelLayer.tsx'));assert.ok(!a.entryImports.some(e=>e.to.includes('InfinityApp')));assert.equal(a.retainedClauses,93);assert.equal(a.recognizedRules,2);assert.equal(a.directPremises,5);assert.equal(a.opaqueClauses.length,86);assert.equal(a.evaluations,10);assert.equal(a.proofs,9);assert.ok(a.binaryReturns.every(r=>r.programBytes?.length));assert.equal(a.intentMeaningImplemented,false);assert.equal(a.selfHostedCompiler,false);assert.equal(JSON.stringify(a),JSON.stringify(auditMechanismCoverage()))})

@@ -121,6 +121,14 @@ and publication gates are defined in [`SPEC.md`](SPEC.md).
 the author’s comparative model, addressed state and receipts, shared overlay releases,
 public GitHub sync, verification evidence and remaining service/3D-mapping work.
 
+## Mechanism proof and coverage
+
+Open **Mechanism proof · sources, tickets, receipts and quotas** inside the field workspace.
+The [claim and evidence](docs/MECHANISM-CLAIM-EVIDENCE.md),
+[executable coverage](docs/MECHANISM-EXECUTION-COVERAGE.md), and
+[raw binary library manifest](public/mechanism-libraries/v1/manifest.json)
+record what runs, its source, verification receipts and remaining limits.
+
 ## Fracture field inventory
 
 [NOTHING through WAS / IS / NEXT](docs/FRACTURE-FIELD-INVENTORY.md) inventories the

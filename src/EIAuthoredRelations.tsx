@@ -1,12 +1,14 @@
 import {useEffect,useMemo,useRef,useState} from 'react'
 import type {EILedger,EIProposal} from './model/ei-engine'
 import {createEIGrainRegistry,projectEIGrain,type EIGrain} from './model/ei-grain-identity'
-import {compileEIAddressedProgram,proposeEIAddressedDerivation} from './model/ei-addressed-program'
+import {compileEIAddressedProgram,recompileEIAddressedProgram,proposeEIAddressedDerivation} from './model/ei-addressed-program'
 import {AUTHORED_COMPARE_CLAUSE} from './model/source-bound-comparison'
 
 export function EIAuthoredRelations({ledger,address,grain,disabled,onStage}:{ledger:EILedger;address:string;grain:EIGrain;disabled:boolean;onStage?:(proposal:EIProposal)=>void}){
  const handle=useMemo(()=>projectEIGrain(createEIGrainRegistry(ledger),address,grain),[ledger,address,grain])
- const parsed=useMemo(()=>{try{return {program:compileEIAddressedProgram(ledger,[handle]),error:''}}catch(reason){return {program:null,error:reason instanceof Error?reason.message:String(reason)}}},[ledger,handle])
+ const previous=useRef<ReturnType<typeof compileEIAddressedProgram>|null>(null)
+ const parsed=useMemo(()=>{try{const prior=previous.current;if(prior?.origins.length===1&&prior.origins[0].address===address){const recompiled=recompileEIAddressedProgram(ledger,prior,[handle]);return {program:recompiled.current,recompiled,error:''}}return {program:compileEIAddressedProgram(ledger,[handle]),recompiled:null,error:''}}catch(reason){return {program:null,recompiled:null,error:reason instanceof Error?reason.message:String(reason)}}},[ledger,handle])
+ useEffect(()=>{previous.current=parsed.program},[parsed.program])
  const program=parsed.program?.compilation
  const rules=useMemo(()=>program?.asts.flatMap(ast=>ast.clauses).filter(clause=>clause.syntax.kind==='comparison-rule').sort((a,b)=>Number(b.source.exact===AUTHORED_COMPARE_CLAUSE)-Number(a.source.exact===AUTHORED_COMPARE_CLAUSE))??[],[program])
  const [ruleId,setRuleId]=useState(''),[pair,setPair]=useState(''),[shown,setShown]=useState<readonly string[]>([]),[error,setError]=useState(''),[busy,setBusy]=useState(false)
@@ -33,6 +35,7 @@ export function EIAuthoredRelations({ledger,address,grain,disabled,onStage}:{led
   <button disabled={disabled||busy||!pair} onClick={()=>setShown([pair])}>Resolve source relation</button>
   <button disabled={disabled||busy} onClick={()=>setShown(evaluations.map(item=>item.id))}>Resolve witnessed pairs</button>
   {program.evaluations.filter(item=>shown.includes(item.id)).map(item=><div key={item.id} aria-label="Derived symbolic relation"><strong>{item.result.status}{item.result.conflict?' · conflicting premises':''}</strong>{item.result.proofs.map((proof,index)=><pre key={index}>{proof.conclusion.kind==='relation'?`${proof.conclusion.left}⋈${proof.conclusion.right}`:`Δ${proof.conclusion.from.left}${proof.conclusion.from.right}→${proof.conclusion.to}`}</pre>)}{onStage&&item.result.proofs.length>0&&!item.result.conflict&&<button disabled={disabled||busy} onClick={()=>void retain(program.evaluations.indexOf(item))}>Retain derived relation</button>}<details><summary>Rule, premises and source addresses</summary><pre>{JSON.stringify(item,null,2)}</pre></details></div>)}
+  {parsed.recompiled&&<details><summary>Recompiled source · {parsed.recompiled.invalidation.status}</summary><pre>{JSON.stringify({verificationScope:parsed.recompiled.verificationScope,verifiedRebuild:parsed.recompiled.verifiedRebuild,changes:parsed.recompiled.invalidation.changes,fractures:parsed.recompiled.fracture.gates,compilerHosted:true,selfCompilation:false},null,2)}</pre></details>}
   <details><summary>Other retained clauses · {program.opaqueClauses.length}</summary>{program.opaqueClauses.map(item=><pre key={item.id}>{item.source.exact}</pre>)}</details>
   {error&&<p role="alert">{error}</p>}
  </section>
