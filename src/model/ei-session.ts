@@ -1,6 +1,6 @@
 import { EI_LIMITS, exportEILedger, importEILedger, proposeEI, type EILedger, type EIProposal } from './ei-engine.ts'
 
-export type EIPageAttempt = Readonly<{ transactionId: string; producer: string; phase: 'engine' | 'render' | 'storage'; message: string; detail: string; committed: false }>
+export type EIPageAttempt = Readonly<{ transactionId: string; producer: string; phase: 'engine' | 'render' | 'storage' | 'mechanism'; message: string; detail: string; committed: false }>
 export const EI_SESSION_LIMITS = Object.freeze({ storedBytes: 1_048_576, expandedBytes: EI_LIMITS.jsonBytes + 1_048_576, tableEntries: 65_536, references: 250_000, expandedNodes: 250_000, depth: 32, referenceDepth: 64 })
 type JSONValue = null | boolean | number | string | JSONValue[] | { [key: string]: JSONValue }
 /** Positional IDs are not cryptographic hashes. Interning uses exact equality. */
@@ -226,7 +226,7 @@ export function restoreEISession(json: string) {
   const attempts: readonly EIPageAttempt[] = Object.freeze(value.attempts.map((item: unknown) => {
     const a = object(item)
     fields(a, ['transactionId', 'producer', 'phase', 'message', 'detail', 'committed'])
-    if (a.committed !== false || !['engine', 'render', 'storage'].includes(String(a.phase)) || ['transactionId', 'producer', 'message', 'detail'].some(key => typeof a[key] !== 'string')) fail('invalid attempt record')
+    if (a.committed !== false || !['engine', 'render', 'storage', 'mechanism'].includes(String(a.phase)) || ['transactionId', 'producer', 'message', 'detail'].some(key => typeof a[key] !== 'string')) fail('invalid attempt record')
     if ((a.transactionId as string).length > 256 || (a.producer as string).length > 256 || (a.message as string).length > 8192 || (a.detail as string).length > 524288) fail('attempt record exceeds bounds')
     return Object.freeze({ ...a }) as EIPageAttempt
   }))

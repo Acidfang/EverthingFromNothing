@@ -1,0 +1,52 @@
+{
+  "version": "0.1.14",
+  "sourceDirectory": "/workspace/shared/field-common-014-source",
+  "sourceBase": "54e81f9a249aaf27ec67e18bbe2cf7336f2c8a33",
+  "sourceManifestSha256": "c543cdcc3575b137a374f30410d3642ccddfbc865cc8ea7e9a99bf291d537313",
+  "files": [
+    {
+      "path": "assets/index-DLQZSgzW.css",
+      "bytes": 98187,
+      "sha256": "41e9e58edb312b1d30a0de57dc10145ef40d4f0905cf02ce081bf2e9a1bf4ba1"
+    },
+    {
+      "path": "assets/index-JqygsP5U.js",
+      "bytes": 969943,
+      "sha256": "be02794bb62de44ee305a707e70f0a8313227db89a4136851f590c38ef852372"
+    },
+    {
+      "path": "index.html",
+      "bytes": 594,
+      "sha256": "44410df87f2737cd5f111ef615e87a4bf7b31160857616c01d18d1ae1fcca5d0"
+    }
+  ],
+  "validation": {
+    "affectedTests": 47,
+    "sessionAndFieldSaveTests": 30,
+    "testSetsOverlap": true,
+    "typescript": "passed",
+    "build": "passed",
+    "releaseAudits": 12,
+    "finalRuntimeChecks": 40,
+    "runtimeBreakdown": {
+      "commonCoreDomCancel": 12,
+      "packagedAsarUnsignedRevisions": 7,
+      "phoneSizedTouchPlanting": 12,
+      "approvedAndroidCsp": 5,
+      "freshRendererReceiptImport": 4
+    },
+    "nativeRouteTests": 22,
+    "priorSpoolChecks": 101,
+    "priorGroundChecks": "175/176; failed centre hit corrected and passed in final12"
+  },
+  "coreWasmSha256": "9281d287649f165a047fe2c38b8896719ce3e7f9ae2c03a4cad4740081e18349",
+  "homebaseKernelSha256": "bc74d0ca77e7788271e8a3184011e103107e08021855cf8cabc5876789024c80",
+  "platforms": {
+    "web": "same shared assets; origin-specific local storage",
+    "homebase": "same shared assets plus fixed local Node worker bridge",
+    "android": "same shared assets, approved serial WASM policy, existing native APIs"
+  },
+  "crossDevicePrivateStateSync": false,
+  "fullMechanismComplete": false,
+  "actualDeviceVerification": false
+}

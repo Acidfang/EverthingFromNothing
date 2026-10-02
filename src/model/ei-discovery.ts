@@ -1,3 +1,5 @@
+import {inspectEIDiscoveryMechanism,bindEIDiscoveryMechanism} from './ei-discovery-mechanism.ts'
+import type {EIMechanismResult} from './ei-mechanism.ts'
 import {checkEIData,encodeEIBits,equalEIBits} from './ei-binary-machine.ts'
 import {proposeEI,EI_LIMITS,type EILedger,type EIPatch,type EIProposal} from './ei-engine.ts'
 import {readBoundedPublicText} from './ei-public-sync-return.ts'
@@ -40,7 +42,7 @@ export function readEIDiscoverySteps(ledger:EILedger){return ledger.records.flat
 /** Stable targets and immutable child-step occurrences are different identities.
  * A repeated transport batch is idempotent; a new scan can observe equal values
  * and retain a new occurrence without manufacturing a value Difference. */
-export async function proposeEIDiscoveryBatch(ledger:EILedger,userRoot:string,returned:EIDiscoveryReturn):Promise<Readonly<{proposal:EIProposal|null;focusAddress:string;stepAddress:string}>>{
+export async function proposeEIDiscoveryBatch(ledger:EILedger,userRoot:string,returned:EIDiscoveryReturn,mechanism?:EIMechanismResult):Promise<Readonly<{proposal:EIProposal|null;focusAddress:string;stepAddress:string}>>{
  if(!issued.has(returned))fail('unvalidated provider return');const batch=returned.value,owner=ledger.records.find(r=>r.address===userRoot),origin=ledger.records.find(r=>r.address===batch.address)
  if(!owner||!origin||origin.is.revision!==batch.revision)fail('original user field/source scope changed')
  const namespace=await hash([userRoot,returned.carrier]),scan=await hash([userRoot,returned.carrier,batch.scanId]),providerAddress=`provider/${namespace}`,scanAddress=`discovery/${scan}`,stepAddress=`${scanAddress}/${batch.sequence}`
@@ -61,7 +63,8 @@ export async function proposeEIDiscoveryBatch(ledger:EILedger,userRoot:string,re
   if(prior){let binding:Record<string,unknown>|null=null;try{binding=JSON.parse(prior.is.source.locator??'')}catch{}if(prior.is.source.realm!=='returned-device-observation'||binding?.namespace!==namespace||binding?.key!==item.key||binding?.carrier!==returned.carrier||binding?.userRoot!==userRoot)fail('observed address has a different retained source owner');patches.push({address,value,source:observationSource})}else patches.push({kind:'create',address,value,source:observationSource,parents:[parent],relations:[]})
   known.set(item.key,address);relations.push({relation:'observed-target',address});differences.push({address,key:item.key,valueDifferent:!!prior&&!equalEIBits(encodeEIBits(prior.is.value),encodeEIBits(value)),hadBefore:!!prior,previousRevision:prior?.is.revision??null})
  }
- const detail={format:'ei-discovery-step/v1',carrier:returned.carrier,userRoot,parentStep:last?.address??null,raw:returned.raw,differences,logicalSnapshotRevision:ledger.revision,simultaneousPhysicalObservation:false,observationInterval:{startedAt:batch.startedAt,returnedAt:batch.observedAt},comparison:'exact-encoded-observation-value',childOccurrences:differences.map((item,index)=>({address:`${stepAddress}/item/${index}`,parentOccurrence:stepAddress,targetAddress:item.address,key:item.key,hadBefore:item.hadBefore,valueDifferent:item.valueDifferent,sourceRef:`${source.id}/${index}`,grain:'returned-observation-within-batch'})),wholeComputerComplete:false};source.text=JSON.stringify(detail)
+ const mechanismReturn=await bindEIDiscoveryMechanism(ledger,userRoot,returned,mechanism??await inspectEIDiscoveryMechanism(ledger,userRoot,returned))
+ const detail={format:'ei-discovery-step/v1',mechanism:mechanismReturn,carrier:returned.carrier,userRoot,parentStep:last?.address??null,raw:returned.raw,differences,logicalSnapshotRevision:ledger.revision,simultaneousPhysicalObservation:false,observationInterval:{startedAt:batch.startedAt,returnedAt:batch.observedAt},comparison:'exact-encoded-observation-value',childOccurrences:differences.map((item,index)=>({address:`${stepAddress}/item/${index}`,parentOccurrence:stepAddress,targetAddress:item.address,key:item.key,hadBefore:item.hadBefore,valueDifferent:item.valueDifferent,sourceRef:`${source.id}/${index}`,grain:'returned-observation-within-batch'})),wholeComputerComplete:false};source.text=JSON.stringify(detail)
  patches.push({kind:'create',address:stepAddress,value:`${batch.status} · ${batch.progress.returned} returned`,source,parents:[last?.address??scanAddress],relations})
  if(ledger.records.length+patches.filter(p=>p.kind==='create').length>EI_LIMITS.records)fail('field capacity reached; pending batch remains uncommitted')
  const proposal=proposeEI(ledger,{id:source.id,producer:batch.address,input:source,candidates:[{id:'ingest-returned-neighbours',label:'Ingest returned addressed observations',owner:'engine',source,conditions:[{address:batch.address,equals:origin.is.value}],patches}]})

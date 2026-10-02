@@ -1,0 +1,276 @@
+{
+  "schema": "homebase.mechanism-bridge-evidence.v1",
+  "candidate": "0.1.14 QA9",
+  "bundle": {
+    "schema": "homebase.shared-bundle.v1",
+    "release": "0.1.14-qa9",
+    "files": [
+      {
+        "path": "index.html",
+        "bytes": 594,
+        "sha256": "44410df87f2737cd5f111ef615e87a4bf7b31160857616c01d18d1ae1fcca5d0"
+      },
+      {
+        "path": "assets/index-JqygsP5U.js",
+        "bytes": 969943,
+        "sha256": "be02794bb62de44ee305a707e70f0a8313227db89a4136851f590c38ef852372"
+      },
+      {
+        "path": "assets/index-DLQZSgzW.css",
+        "bytes": 98187,
+        "sha256": "41e9e58edb312b1d30a0de57dc10145ef40d4f0905cf02ce081bf2e9a1bf4ba1"
+      }
+    ]
+  },
+  "adapterFiles": {
+    "main.cjs": {
+      "bytes": 5865,
+      "sha256": "c6fec1b2baf37183219e2fd52067d908fcfbc831895bf654d1c4ecf6182ed6ac"
+    },
+    "router.cjs": {
+      "bytes": 2927,
+      "sha256": "20342145f491fe05bfb022b20f886527ebc5874a97ac919f3b1d4c13d1531504"
+    },
+    "mechanism/route.cjs": {
+      "bytes": 5013,
+      "sha256": "e3e45f2c0eaabc83aa1b1b42672c39ceafbaea0c52acdbe8a4234fa22afe65ef"
+    },
+    "mechanism/worker.cjs": {
+      "bytes": 581,
+      "sha256": "462318acd68c28be2c7a8511263308e7fcd9af173d3d380885f76c9e05126671"
+    },
+    "mechanism/kernel.cjs": {
+      "bytes": 23923,
+      "sha256": "bc74d0ca77e7788271e8a3184011e103107e08021855cf8cabc5876789024c80"
+    },
+    "shared-bundle.json": {
+      "bytes": 553,
+      "sha256": "a885fbabe6e0dd4dc3c6369a21fd959fcdacd96551e6f3e83e3e050273e86e0e"
+    }
+  },
+  "compiledKernelSHA256": "9281d287649f165a047fe2c38b8896719ce3e7f9ae2c03a4cad4740081e18349",
+  "nativeRouteTests": {
+    "passed": 22,
+    "report": "mechanism-tests.txt",
+    "sha256": "e29a1865b8d7d86c580520dedcc94ff33352dcd4f079757ffedad0dcf211ab7a",
+    "scope": "Retained focused routing/concurrency/source/replay tests; shared kernel subsequently changed only text boundary and uint32 field interpretation, verified by final ASAR smoke."
+  },
+  "finalRuntimeChecks": 40,
+  "reports": [
+    {
+      "case": "common",
+      "sha256": "eda9bc702546a8fd695af6796211885d52a1026f45725128cccc697a4942ef13",
+      "checks": [
+        {
+          "name": "startup and mapping commit only after actual compiled-core calls",
+          "pass": true
+        },
+        {
+          "name": "actual native mechanism uses two worker threads",
+          "pass": true
+        },
+        {
+          "name": "startup engine receipts retain matching DOM readback",
+          "pass": true
+        },
+        {
+          "name": "latest core return is correlated with committed engine transaction",
+          "pass": true
+        },
+        {
+          "name": "HOMEBASE returns observer to existing Crackheadverse root",
+          "pass": true
+        },
+        {
+          "name": "HOMEBASE navigation itself adds no engine receipt",
+          "pass": true
+        },
+        {
+          "name": "ordinary input passes native C return before actual DOM commit",
+          "pass": true
+        },
+        {
+          "name": "correlated core return is retained as a separate mechanism ticket",
+          "pass": true
+        },
+        {
+          "name": "typed input is retained without an invented reply engine",
+          "pass": true
+        },
+        {
+          "name": "pending C return is visibly staged and not committed",
+          "pass": true
+        },
+        {
+          "name": "cancelled native return cannot commit late",
+          "pass": true
+        },
+        {
+          "name": "no uncaught renderer exception",
+          "pass": true
+        }
+      ],
+      "errors": []
+    },
+    {
+      "case": "asar",
+      "sha256": "67a68abc0decedfb9615f5a96bfe928e8a498ace1b9953371a7391d7de83d4a6",
+      "checks": [
+        {
+          "name": "packaged route returns correlated unapplied result",
+          "pass": true
+        },
+        {
+          "name": "ASAR loads two real workers without serial fallback",
+          "pass": true
+        },
+        {
+          "name": "unsigned revision fields preserve their exact uint32 values",
+          "pass": true
+        },
+        {
+          "name": "both addressed child results are complete",
+          "pass": true
+        },
+        {
+          "name": "packaged route replays exact cached return",
+          "pass": true
+        },
+        {
+          "name": "disposal waits for both actual thread exits",
+          "pass": true
+        },
+        {
+          "name": "frozen CSP remains unchanged inside ASAR",
+          "pass": true
+        }
+      ],
+      "errors": []
+    },
+    {
+      "case": "planting-touch-eligible",
+      "sha256": "c232e97d9b8ce96a37f888fe5ea72d82060e8ce9fb4d442b80cd840bd0fca33c",
+      "checks": [
+        {
+          "name": "synthetic field imported at original source root",
+          "pass": true
+        },
+        {
+          "name": "exact declared seed and ground are displayed",
+          "pass": true
+        },
+        {
+          "name": "HOMEBASE landmark remains visible at the exact synthetic user root during sowing",
+          "pass": true
+        },
+        {
+          "name": "seed ZERO is physically hit-testable",
+          "pass": true
+        },
+        {
+          "name": "declared ground target is physically hit-testable",
+          "pass": true
+        },
+        {
+          "name": "ZERO begins a bounded planting gesture",
+          "pass": true
+        },
+        {
+          "name": "one actual DOM-verified planting commit",
+          "pass": true
+        },
+        {
+          "name": "placement preserves exact source seed and environment",
+          "pass": true
+        },
+        {
+          "name": "planting asserts no physical execution or completion",
+          "pass": true
+        },
+        {
+          "name": "eligible drop atomically links placement and selected guide attempt",
+          "pass": true
+        },
+        {
+          "name": "ground view links its actual planting receipt",
+          "pass": true
+        },
+        {
+          "name": "repeated pointer-up makes no duplicate receipt",
+          "pass": true
+        }
+      ],
+      "errors": []
+    },
+    {
+      "case": "android-csp",
+      "sha256": "9085789f67a2710524bfce59126c37ec04547673873df2104aa90ead08c64fb0",
+      "checks": [
+        {
+          "name": "Android policy explicitly permits only WASM compilation while blocking workers",
+          "pass": true
+        },
+        {
+          "name": "Android adapter uses actual serial C execution under the restricted policy",
+          "pass": true
+        },
+        {
+          "name": "CSP blocks an explicit isolated synthetic worker probe",
+          "pass": true
+        },
+        {
+          "name": "serial C return precedes actual matching DOM commit",
+          "pass": true
+        },
+        {
+          "name": "serial mechanism ticket retains its exact user root",
+          "pass": true
+        }
+      ],
+      "errors": []
+    },
+    {
+      "case": "restore",
+      "sha256": "cdf83fce16e8a763cf2067f1d92a8e4a10f8a7a43563183918a578048a2a75d6",
+      "checks": [
+        {
+          "name": "fresh renderer import restores all original committed receipts",
+          "pass": true
+        },
+        {
+          "name": "all exact source-correlated mechanism tickets survive export/import",
+          "pass": true
+        },
+        {
+          "name": "stored core ticket remains separate from applied engine receipt",
+          "pass": true
+        },
+        {
+          "name": "restored typed input remains visible in the existing conversation",
+          "pass": true
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "limits": {
+    "activeNativeFrames": 2,
+    "bodyReaders": 4,
+    "requestBytes": 1060000,
+    "responseBytes": 2200000,
+    "requestIds": 128,
+    "retainedBytes": 8388608,
+    "bodyDeadlineMs": 5000,
+    "fixedWorkerThreads": 2
+  },
+  "boundaries": [
+    "Linux Electron and Node worker execution verified; actual Windows execution remains unverified",
+    "Desktop CSP remains byte-identical; the renderer receives structured data from a fixed local route",
+    "Android policy test used the exact approved CSP in a Linux appassets renderer; no Android device/runtime test",
+    "Native worker return remains applied:false; a separate current-source and actual DOM check determines engine admission",
+    "Renderer cancellation aborts fetch and invalidates admission; an already accepted bounded pure calculation may finish/cache until carrier closure",
+    "Host OS provides scheduling, files, permissions, hardware and process lifetime; this is not a standalone OS/kernel",
+    "No general guide reply model, cross-device transport or arbitrary-code execution authority added"
+  ],
+  "passed": true
+}

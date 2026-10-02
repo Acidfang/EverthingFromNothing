@@ -1,0 +1,28 @@
+{
+  "release": "0.1.14-candidate",
+  "sourceBase": "54e81f9a249aaf27ec67e18bbe2cf7336f2c8a33",
+  "node": "v24.19.0",
+  "react": "19.2.8",
+  "compiler": "official Zig 0.17.0 hosted C to WebAssembly",
+  "buildCommands": [
+    "node node_modules/typescript/bin/tsc -b",
+    "node node_modules/vite/bin/vite.js build --configLoader runner"
+  ],
+  "wasmBuild": "native/ei-core/wasm/build.sh; set ZIG and task-local ZIG cache paths",
+  "files": {
+    "src/model/ei-mechanism.ts": "94b30ca3cd0b81c1fc4c209b3776f445077ae7968b0777d2a91a20fa8da98b31",
+    "src/model/ei-mechanism-transport.ts": "c170cb4be4530dac0d80e30ac21b73cd040b0d82406981801a64907dd6ef917b",
+    "src/model/ei-operation-mechanism.ts": "cb5c268cd59dc503054d6a75f760677f294371474e4751f813dc242532ab916b",
+    "native/ei-core/wasm/ei-core.wasm": "9281d287649f165a047fe2c38b8896719ce3e7f9ae2c03a4cad4740081e18349",
+    "native/homebase-mechanism/kernel.cjs": "bc74d0ca77e7788271e8a3184011e103107e08021855cf8cabc5876789024c80",
+    "native/homebase-mechanism/route.cjs": "e3e45f2c0eaabc83aa1b1b42672c39ceafbaea0c52acdbe8a4234fa22afe65ef"
+  },
+  "executionEvidence": {
+    "actualNodeWorkers": true,
+    "actualPhysicalBoard": false,
+    "actualUserDevice": false,
+    "electronInSharedOwner": "startup failed before navigation; no further retries",
+    "finalCarrierHarness": "awaited from existing Windows owner"
+  },
+  "credentialsIncluded": false
+}

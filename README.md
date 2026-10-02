@@ -157,3 +157,19 @@ uses actual retained replies or available user-authored Guide steps.
 See [the voice contract](docs/GUIDE-VOICE-CONTRACT.md) for provider availability,
 source receipts, resource limits and verification boundaries. The general
 reply-generation mechanism remains unimplemented; no canned answer is supplied.
+
+## Paged source retention and grounded navigation
+
+With local retention selected, exact provider returns can continue into a
+user-rooted IndexedDB spool after the working field reaches capacity. Stored
+pages remain inspectable and exportable; storage acknowledgments do not claim
+engine admission. See [the external spool contract](docs/EXTERNAL-SPOOL-CONTRACT.md).
+
+The single low horizon stays fixed in the viewport. The well and state buckets
+share a ground-contact plane, and the HOMEBASE landmark opens the existing user
+root. See [the ground-view contract](docs/GROUND-VIEW-CONTRACT.md).
+
+
+### Shared mechanism release 0.1.14
+
+[Release scope and final evidence](docs/RELEASE-0.1.14.md) · [source-linked bridge coverage](docs/SHARED-MECHANISM-014.md) · [deterministic OS target](docs/OS-TARGET-COVERAGE.md)

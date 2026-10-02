@@ -1,0 +1,37 @@
+{
+  "version": "0.1.14-candidate",
+  "sourceBase": "54e81f9a249aaf27ec67e18bbe2cf7336f2c8a33",
+  "focusedAffectedTests": 44,
+  "typescript": "passed",
+  "build": "passed",
+  "runtimeGate": "all staged field producers, before DOM commit",
+  "coreWasmSha256": "9281d287649f165a047fe2c38b8896719ce3e7f9ae2c03a4cad4740081e18349",
+  "pending": [
+    "final rendered common-gate/home/phone-hit-test check",
+    "approved Android policy runtime check",
+    "release freeze and platform staging"
+  ],
+  "scope": "source checkpoint; not installed or published",
+  "additionalReceiptSessionTests": {
+    "passed": 30,
+    "overlapWithAffectedSet": true
+  },
+  "finalUnsignedRevisionAndOperationTests": {
+    "passed": 13,
+    "overlapWithOtherSets": true
+  },
+  "audits": "12/12 passed",
+  "durableRuntimeReturns": "mechanism tickets in existing session exports and opt-in atomic local saves",
+  "candidateAssets": [
+    {
+      "path": "assets/index-DLQZSgzW.css",
+      "sha256": "41e9e58edb312b1d30a0de57dc10145ef40d4f0905cf02ce081bf2e9a1bf4ba1",
+      "bytes": 98187
+    },
+    {
+      "path": "assets/index-DjKyiD_g.js",
+      "sha256": "a5ed13940a13114c53bbf897bc71cf1e174041e733a88130e7e9447da6608639",
+      "bytes": 969928
+    }
+  ]
+}

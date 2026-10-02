@@ -1,0 +1,13 @@
+import {useEffect,useState} from 'react'
+import type {EISpoolStorage,EISpoolStoredPage} from './model/ei-spool'
+import {readEIDiscoveryReturn,type EIDiscoveryReturn} from './model/ei-discovery'
+/** Read-only window into one user-rooted external spool. Viewing a stored
+ * provider return does not assert an engine commit or a physical outcome. */
+export function EISpoolView({store,userRoot,generation,disabled,onRecover}:{store:EISpoolStorage;userRoot:string;generation:number;disabled:boolean;onRecover:(value:EIDiscoveryReturn)=>void}){
+ const [after,setAfter]=useState(0),[pages,setPages]=useState<readonly EISpoolStoredPage[]>([]),[error,setError]=useState(''),[open,setOpen]=useState(false)
+ useEffect(()=>{setAfter(0);setPages([])},[userRoot])
+ useEffect(()=>{let current=true;if(open)void store.window(userRoot,after).then(value=>{if(current){setPages(value.filter(page=>page.ordinal<=generation));setError('')}}).catch(reason=>{if(current)setError(String(reason))});return()=>{current=false}},[store,userRoot,generation,after,open])
+ const source=(page:EISpoolStoredPage)=>{const c=JSON.parse(page.page.content),b=JSON.parse(c.raw);return readEIDiscoveryReturn(c.raw,{requestId:b.requestId,address:b.address,revision:b.revision},c.carrier)}
+ const exportPage=(page:EISpoolStoredPage)=>{const raw=JSON.parse(page.page.content).raw,url=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`returned-source-${page.ordinal}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+ return <details onToggle={event=>setOpen(event.currentTarget.open)}><summary>Stored source spool · {generation} pages</summary><p>Same user root: {userRoot}. Unencrypted local source pages; stored returns are separate from working-field commits.</p>{pages.map(page=><details key={page.page.address}><summary>{page.ordinal} · {page.page.address}</summary><p>Storage predecessor: {page.parentAddress??userRoot}</p><pre>{JSON.stringify({kind:'stored-provider-return',head:page.storageHead,address:page.page.address,sha256:page.page.sha256,bytes:page.page.bytes,engineCommitted:false,durability:'indexeddb-transaction-complete'},null,2)}</pre><pre>{page.page.content}</pre><button onClick={()=>exportPage(page)}>Export exact return</button><button disabled={disabled} onClick={()=>onRecover(source(page))}>Retry in working field</button></details>)}<button disabled={after===0} onClick={()=>setAfter(Math.max(0,after-32))}>Previous source pages</button><button disabled={!pages.length||pages.at(-1)!.ordinal>=generation} onClick={()=>setAfter(pages.at(-1)!.ordinal)}>Next source pages</button>{error&&<p role="alert">{error}</p>}</details>
+}

@@ -1,6 +1,6 @@
 {
   "schema": "ei.public-field-manifest.v1",
-  "release": "0.1.13",
+  "release": "0.1.14",
   "payloadSha256": "9b63945706409f663e613ac0819bbc5844e78c0bd0ac1e501a5ecb7ff2c8e94b",
   "payloadBytes": 504843,
   "recordCount": 137,

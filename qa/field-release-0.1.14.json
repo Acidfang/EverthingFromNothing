@@ -1,0 +1,34 @@
+{
+  "version": "0.1.14",
+  "sourceBase": "54e81f9a249aaf27ec67e18bbe2cf7336f2c8a33",
+  "validation": {
+    "affectedTests": 47,
+    "sessionAndFieldSaveTests": 30,
+    "testSetsOverlap": true,
+    "typescript": "passed",
+    "build": "passed",
+    "releaseAudits": 12,
+    "finalRuntimeChecks": 40,
+    "runtimeBreakdown": {
+      "commonCoreDomCancel": 12,
+      "packagedAsarUnsignedRevisions": 7,
+      "phoneSizedTouchPlanting": 12,
+      "approvedAndroidCsp": 5,
+      "freshRendererReceiptImport": 4
+    },
+    "nativeRouteTests": 22,
+    "priorSpoolChecks": 101,
+    "priorGroundChecks": "175/176; failed centre hit corrected and passed in final12"
+  },
+  "actualRuntime": "Linux Electron with exact final assets; Android policy tested at synthetic appassets origin",
+  "notTested": [
+    "physical Android device",
+    "physical Windows device with this release",
+    "physical AVR board"
+  ],
+  "coreRuntimeReceipts": "serialized as correlated mechanism tickets; separate engine receipt owns admission",
+  "sourceSpool": "opt-in, exact provider pages; archive-only retention is not engine admission",
+  "fullMechanismComplete": false,
+  "osTarget": "docs/OS-TARGET-COVERAGE.md",
+  "coverage": "docs/SHARED-MECHANISM-014.md"
+}

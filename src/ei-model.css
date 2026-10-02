@@ -51,3 +51,23 @@
 .ei-model-layer>.ei-field-array{border:0}.ei-world-dock{pointer-events:none}.ei-world-dock .ei-field-action{pointer-events:auto}
 
 .ei-world-dock[hidden]{display:none}
+
+/* The well and every state bucket share the existing model y=0 ground plane. */
+.ei-world-dock{bottom:auto;height:auto;max-width:none;align-items:flex-start}
+.ei-world-dock .ei-field-action{height:calc(180px * var(--ground-unit));max-width:none;align-items:flex-start}
+.ei-world-dock .ei-field-action-inputs,.ei-world-dock .ei-field-action-outputs{flex:none;flex-direction:row;align-items:flex-start;justify-content:flex-start;max-height:none;margin-top:calc(72px * var(--ground-unit))}
+.ei-world-dock .ei-field-action-inspect{flex:none;width:calc(76px * var(--ground-unit))}
+.ei-world-dock .ei-grounded-well{position:relative;display:block;flex:none;width:calc(192px * var(--ground-unit))}
+.ei-world-dock .ei-field-action-trigger{width:100%;min-width:0;max-height:none}
+.ei-world-dock .ei-field-action-trigger svg{width:calc(192px * var(--ground-unit));height:calc(180px * var(--ground-unit));max-height:none;max-width:none}
+.ei-world-dock .ei-field-action-inspect svg{width:calc(76px * var(--ground-unit));height:calc(88px * var(--ground-unit));max-height:none;max-width:none}
+.ei-world-dock .ei-field-action-zero{top:calc(133px * var(--ground-unit) - 14px);left:calc(248px * var(--ground-unit) - 14px);z-index:2}
+.ei-model-layer .ei-homebase-landmark{position:absolute;top:calc(39px * var(--ground-unit));left:50%;transform:translateX(-50%);border:1px solid #e9c87e;border-radius:3px;background:#493655;color:#fff0bc;font-size:clamp(7px,calc(10px * var(--ground-unit)),10px);line-height:1.3;padding:2px 4px;white-space:nowrap;cursor:pointer}
+.ei-homebase-landmark:focus-visible{outline:2px solid #fff0bc;outline-offset:3px}
+
+.ei-world-dock[data-sowing-active="true"] .ei-field-action-inputs,.ei-world-dock[data-sowing-active="true"] .ei-field-action-outputs{visibility:hidden;pointer-events:none}
+
+/* Empty landmark layout space must pass through to the addressed ground. */
+.ei-world-dock .ei-field-action{pointer-events:none}
+.ei-world-dock .ei-field-action-trigger,.ei-world-dock .ei-field-action-inspect,.ei-world-dock .ei-field-action-zero,.ei-world-dock .ei-homebase-landmark,.ei-world-dock .ei-field-action-inspection{pointer-events:auto}
+.ei-world-dock[data-sowing-active="true"] .ei-field-action-inspect{pointer-events:none}

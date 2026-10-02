@@ -182,3 +182,12 @@ The retained [Sym-PLE-Fied source binding](../SYM-PLE-FIED-SOURCE.md) is `669337
 Add a dated entry for each material change. Preserve the author requirement, exact public source revision, implemented scope, test command/result, runtime environment and verification limit. Link the commit and its CI/deployment once confirmed. A proposal stays a proposal until its own returned evidence closes it. Correct an earlier claim visibly rather than silently erasing the earlier state.
 
 Keep public technical receipts here. Private source text, user ledgers, credentials, signing material and unrelated personal information do not belong in this public record.
+
+
+## Shared release 0.1.14
+
+The common application now executes its packaged C/WASM addressing core for recursive discovery frames and for exact staged values from every field producer before the existing DOM commit barrier. Core returns are retained as correlated session tickets, with separate engine admission receipts. Source spooling extends retained provider history beyond the working window through verified atomic IndexedDB pages. Horizon and ground contacts are fixed in screen space; HOMEBASE returns to the existing user root named Crackheadverse.
+
+Final verification passed 47 affected model tests, 30 overlapping session/save tests, 12 release audits and 40 focused Linux Electron checks. The final checks close the earlier phone target-centre hit-test and verify Android's approved serial-WASM policy; candidate wording in the embedded coverage document records earlier checkpoints and is superseded by the final release receipt. Physical Android/Windows/AVR execution is not established by these tests.
+
+See [final release scope](RELEASE-0.1.14.md), [shared mechanism coverage](SHARED-MECHANISM-014.md), [OS target and dependencies](OS-TARGET-COVERAGE.md), and [exact shared contract](../qa/field-release-0.1.14-contract.json).

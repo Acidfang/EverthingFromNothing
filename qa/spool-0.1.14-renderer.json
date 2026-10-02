@@ -1,0 +1,699 @@
+{
+  "schema": "homebase.spool-final-qa.v1",
+  "completedAt": "2026-10-02T22:05:35Z",
+  "candidate": "unreleased 0.1.14",
+  "storage": {
+    "totalChecks": 65,
+    "source": {
+      "source": "/workspace/shared/field-spool-014",
+      "files": {
+        "src/model/ei-discovery.ts": {
+          "sha256": "b53fc4b7ab6945946914c2f921c22c326e0e37aba1737dbdf3f82e7aa8397d5f",
+          "bytes": 12318
+        },
+        "src/model/ei-public-sync-return.ts": {
+          "sha256": "c441b4e3499335e696f2f39c8a7530371290ef6dd758af11db0416f075ed5562",
+          "bytes": 5525
+        },
+        "src/model/ei-engine.ts": {
+          "sha256": "07687399bfd1c668ce573b56e159b17f79b89d4308d2b48ec3196e6a1ada3cd9",
+          "bytes": 33326
+        },
+        "src/model/ei-binary-machine.ts": {
+          "sha256": "a3314d57f5b427842d9f78bd6e37d8606a36267b7a2597f495c1ac323f29650b",
+          "bytes": 6586
+        },
+        "src/model/ei-spool-storage.ts": {
+          "sha256": "5cb71ddadf907f66651fff899ea2269b8bdeef0f1068bd3f6922d83f4f50a98a",
+          "bytes": 11230
+        },
+        "src/model/ei-spool.ts": {
+          "sha256": "894a4263aa65ab4bc05e566c3f7a762558268141acce0cd846ea5e2291c494d2",
+          "bytes": 7026
+        }
+      },
+      "fixtureSHA256": "e5e0afda24b4b169c28aba323ce78192db7843e2ed4b50112fe24728128d9d2e"
+    },
+    "reports": [
+      {
+        "file": "write.json",
+        "sha256": "4493d07d36ac9552ba552635bc3ff94fb5091daf34783a2b197aa22f964ad8d7",
+        "checks": [
+          {
+            "name": "import and constructor perform no IndexedDB creation",
+            "pass": true
+          },
+          {
+            "name": "unavailable storage fails explicitly",
+            "pass": true,
+            "detail": {
+              "name": "Error",
+              "message": "EI spool: IndexedDB unavailable"
+            }
+          },
+          {
+            "name": "empty head is exact",
+            "pass": true
+          },
+          {
+            "name": "append uses actual strict durability transaction",
+            "pass": true
+          },
+          {
+            "name": "append receipt is storage-only and completed",
+            "pass": true
+          },
+          {
+            "name": "atomic first page head and parent match",
+            "pass": true
+          },
+          {
+            "name": "exact page readback matches receipt",
+            "pass": true
+          },
+          {
+            "name": "source bytes remain intact",
+            "pass": true
+          },
+          {
+            "name": "exact duplicate accepts old expected head without append",
+            "pass": true
+          },
+          {
+            "name": "changed bytes retain same occurrence address",
+            "pass": true
+          },
+          {
+            "name": "changed bytes at same occurrence are rejected",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "source-conflict",
+              "message": "EI spool: the same occurrence already retains different source bytes"
+            }
+          },
+          {
+            "name": "conflicting replay preserves original bytes and head",
+            "pass": true
+          },
+          {
+            "name": "valid continuation links predecessor and advances exact count",
+            "pass": true
+          },
+          {
+            "name": "stale nonduplicate head is rejected",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "head-conflict",
+              "message": "EI spool: the addressed whole changed; reload its head before retrying"
+            }
+          },
+          {
+            "name": "new scan cannot begin after cursor zero",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "continuation-conflict",
+              "message": "EI spool: provider order or original scope changed; pending return is preserved"
+            }
+          },
+          {
+            "name": "completed scan cannot continue",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "continuation-conflict",
+              "message": "EI spool: provider order or original scope changed; pending return is preserved"
+            }
+          },
+          {
+            "name": "separate user root gets independent head and address",
+            "pass": true
+          },
+          {
+            "name": "one root cannot read another root occurrence",
+            "pass": true
+          },
+          {
+            "name": "scan continuation rejects original scope change",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "continuation-conflict",
+              "message": "EI spool: provider order or original scope changed; pending return is preserved"
+            }
+          },
+          {
+            "name": "concurrent same-head distinct writes have one winner",
+            "pass": true
+          },
+          {
+            "name": "losing concurrent transaction leaves exactly one occurrence",
+            "pass": true
+          },
+          {
+            "name": "loser can append only after fresh head retry",
+            "pass": true
+          },
+          {
+            "name": "concurrent byte-identical returns store one page",
+            "pass": true
+          },
+          {
+            "name": "injected quota failure rejects append",
+            "pass": true,
+            "detail": {
+              "name": "QuotaExceededError",
+              "code": 22,
+              "message": "Injected quota failure after page add was queued"
+            }
+          },
+          {
+            "name": "quota rollback preserves all three stores",
+            "pass": true
+          },
+          {
+            "name": "real explicit transaction abort rejects append",
+            "pass": true,
+            "detail": {
+              "name": "AbortError",
+              "code": 20,
+              "message": "The transaction was aborted, so the request cannot be fulfilled."
+            }
+          },
+          {
+            "name": "abort rolls back page head and scan continuation",
+            "pass": true
+          },
+          {
+            "name": "same source retries after failures without hidden cursor advance",
+            "pass": true
+          },
+          {
+            "name": "whole spool retains more than 256 provider pages",
+            "pass": true
+          },
+          {
+            "name": "32-page windows recover all 300 records exactly",
+            "pass": true
+          },
+          {
+            "name": "whole-root chain and byte totals survive window boundaries",
+            "pass": true
+          },
+          {
+            "name": "normal beyond-head window is empty",
+            "pass": true
+          },
+          {
+            "name": "window over configured maximum is rejected",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "invalid-window",
+              "message": "EI spool: invalid bounded page window"
+            }
+          }
+        ],
+        "errors": [],
+        "exceptionCount": 0,
+        "bundle": null
+      },
+      {
+        "file": "restart.json",
+        "sha256": "aed0f0f0aeadaa552a9374415c3242c95599815b61d4dbbaff6242009c999d59",
+        "checks": [
+          {
+            "name": "restart restores exact head for user/a",
+            "pass": true
+          },
+          {
+            "name": "restart restores every exact stored occurrence for user/a",
+            "pass": true
+          },
+          {
+            "name": "restart restores exact head for user/b",
+            "pass": true
+          },
+          {
+            "name": "restart restores every exact stored occurrence for user/b",
+            "pass": true
+          },
+          {
+            "name": "restart restores exact head for user/concurrent",
+            "pass": true
+          },
+          {
+            "name": "restart restores every exact stored occurrence for user/concurrent",
+            "pass": true
+          },
+          {
+            "name": "restart restores exact head for user/duplicates",
+            "pass": true
+          },
+          {
+            "name": "restart restores every exact stored occurrence for user/duplicates",
+            "pass": true
+          },
+          {
+            "name": "restart restores exact head for user/failures",
+            "pass": true
+          },
+          {
+            "name": "restart restores every exact stored occurrence for user/failures",
+            "pass": true
+          },
+          {
+            "name": "restart restores exact head for user/bulk",
+            "pass": true
+          },
+          {
+            "name": "restart restores every exact stored occurrence for user/bulk",
+            "pass": true
+          },
+          {
+            "name": "new process appends after recovered exact head",
+            "pass": true
+          },
+          {
+            "name": "recovered append is read back intact",
+            "pass": true
+          }
+        ],
+        "errors": [],
+        "exceptionCount": 0,
+        "bundle": null
+      },
+      {
+        "file": "integrity.json",
+        "sha256": "61174142d3b6dee884c42cb39740856c712cb8fa6ce2579d2d4386b75bc4230e",
+        "checks": [
+          {
+            "name": "pages readback mismatch rejects complete append",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "readback-mismatch",
+              "message": "EI spool: page readback differs; transaction is aborted"
+            }
+          },
+          {
+            "name": "pages mismatch aborts all three persisted writes",
+            "pass": true
+          },
+          {
+            "name": "heads readback mismatch rejects complete append",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "readback-mismatch",
+              "message": "EI spool: whole-root head readback differs"
+            }
+          },
+          {
+            "name": "heads mismatch aborts all three persisted writes",
+            "pass": true
+          },
+          {
+            "name": "scans readback mismatch rejects complete append",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "readback-mismatch",
+              "message": "EI spool: provider continuation readback differs"
+            }
+          },
+          {
+            "name": "scans mismatch aborts all three persisted writes",
+            "pass": true
+          },
+          {
+            "name": "altered storage parent is rejected by read",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "corrupt-link",
+              "message": "EI spool: stored predecessor or cumulative byte receipt differs"
+            }
+          },
+          {
+            "name": "altered storage parent is rejected by window",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "corrupt-link",
+              "message": "EI spool: stored predecessor or cumulative byte receipt differs"
+            }
+          },
+          {
+            "name": "terminal head inconsistent with retained occurrence is rejected",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "corrupt-head",
+              "message": "EI spool: whole-root head differs from its terminal occurrence receipt"
+            }
+          },
+          {
+            "name": "altered cumulative byte receipt is rejected",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "corrupt-link",
+              "message": "EI spool: stored predecessor or cumulative byte receipt differs"
+            }
+          },
+          {
+            "name": "window rejects missing prior occurrence instead of silently skipping",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "corrupt-window",
+              "message": "EI spool: stored occurrence window has a missing or reordered page"
+            }
+          },
+          {
+            "name": "corrupt payload hash is rejected after envelope checks",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "corrupt-page",
+              "message": "EI spool: stored source, address, hash or byte count changed"
+            }
+          },
+          {
+            "name": "repairing only synthetic corrupt rows recovers original chain",
+            "pass": true
+          },
+          {
+            "name": "same-scan continuation cannot switch selected folder root",
+            "pass": true,
+            "detail": {
+              "name": "EISpoolError",
+              "code": "continuation-conflict",
+              "message": "EI spool: provider order or original scope changed; pending return is preserved"
+            }
+          },
+          {
+            "name": "rejected root switch preserves head and source page",
+            "pass": true
+          },
+          {
+            "name": "unavailable strict transaction fails without relaxed fallback",
+            "pass": true,
+            "detail": {
+              "name": "NotSupportedError",
+              "code": 9,
+              "message": "Injected unavailable strict durability"
+            }
+          },
+          {
+            "name": "no relaxed write or partial state after strict failure",
+            "pass": true
+          },
+          {
+            "name": "bounded window after storage maximum is empty",
+            "pass": true
+          }
+        ],
+        "errors": [],
+        "exceptionCount": 0,
+        "bundle": null
+      }
+    ]
+  },
+  "wholeApplication": {
+    "totalChecks": 29,
+    "reports": [
+      {
+        "file": "persistent.json",
+        "sha256": "a5099bdbc92cc89f4d6fdf90635008fe8b3c530359798cc63d66d8364be055e1",
+        "checks": [
+          {
+            "name": "memory-only startup creates no spool database",
+            "pass": true
+          },
+          {
+            "name": "initial synthetic provider returns have actual DOM readback receipts",
+            "pass": true
+          },
+          {
+            "name": "persistent mode is entered only after explicit retention",
+            "pass": true
+          },
+          {
+            "name": "working-field capacity retains actual earlier receipts",
+            "pass": true
+          },
+          {
+            "name": "capacity does not advance cursor before explicit continuation",
+            "pass": true
+          },
+          {
+            "name": "pending capacity return is stored before engine admission",
+            "pass": true
+          },
+          {
+            "name": "capacity offers explicit continuation without early native cancel",
+            "pass": true
+          },
+          {
+            "name": "explicit continuation stores all 42 source occurrences",
+            "pass": true
+          },
+          {
+            "name": "archive-only pages create no false engine commits",
+            "pass": true
+          },
+          {
+            "name": "all stored pages preserve exact source response bytes",
+            "pass": true
+          },
+          {
+            "name": "archive-only completion preserves same working-field receipt count",
+            "pass": true
+          },
+          {
+            "name": "first visible window contains exact pages 1 to 32",
+            "pass": true
+          },
+          {
+            "name": "next visible window contains pages 33 to 42",
+            "pass": true
+          },
+          {
+            "name": "export retains exact original provider bytes",
+            "pass": true
+          },
+          {
+            "name": "viewing navigation and export make no model or native change",
+            "pass": true
+          },
+          {
+            "name": "no renderer exception",
+            "pass": true
+          }
+        ],
+        "errors": [],
+        "exceptionCount": 0,
+        "bundle": {
+          "schema": "homebase.shared-bundle.v1",
+          "release": "0.1.14-qa2",
+          "files": [
+            {
+              "path": "index.html",
+              "bytes": 594,
+              "sha256": "240e69543a90fe3fe9bb8e4e179f800ef8cc6e84fd9a5f387080825528327678"
+            },
+            {
+              "path": "assets/index-DUmQjpzO.js",
+              "bytes": 920277,
+              "sha256": "6427e2e82fd7b171138526e08266b68797976aca1e90ccc19acf82429b9941fd"
+            },
+            {
+              "path": "assets/index-BUcaksSE.css",
+              "bytes": 96131,
+              "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+            }
+          ]
+        }
+      },
+      {
+        "file": "memory.json",
+        "sha256": "291eeb1af94f82f8f7264dcd30163f5b866b200d3bc207f3b192157d9f1dc460",
+        "checks": [
+          {
+            "name": "memory-only startup creates no spool database",
+            "pass": true
+          },
+          {
+            "name": "initial synthetic provider returns have actual DOM readback receipts",
+            "pass": true
+          },
+          {
+            "name": "working-field capacity retains actual earlier receipts",
+            "pass": true
+          },
+          {
+            "name": "capacity does not advance cursor before explicit continuation",
+            "pass": true
+          },
+          {
+            "name": "memory-only capacity makes no spool writes",
+            "pass": true
+          },
+          {
+            "name": "memory-only capacity cannot offer stored continuation",
+            "pass": true
+          },
+          {
+            "name": "memory-only capacity cancels native acquisition",
+            "pass": true
+          }
+        ],
+        "errors": [],
+        "exceptionCount": 0,
+        "bundle": {
+          "schema": "homebase.shared-bundle.v1",
+          "release": "0.1.14-qa2",
+          "files": [
+            {
+              "path": "index.html",
+              "bytes": 594,
+              "sha256": "240e69543a90fe3fe9bb8e4e179f800ef8cc6e84fd9a5f387080825528327678"
+            },
+            {
+              "path": "assets/index-DUmQjpzO.js",
+              "bytes": 920277,
+              "sha256": "6427e2e82fd7b171138526e08266b68797976aca1e90ccc19acf82429b9941fd"
+            },
+            {
+              "path": "assets/index-BUcaksSE.css",
+              "bytes": 96131,
+              "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+            }
+          ]
+        }
+      },
+      {
+        "file": "restart.json",
+        "sha256": "849f5ed257d167b2fa0871977a60fb9bce8e274c7e56d69a73767b197f1d4a69",
+        "checks": [
+          {
+            "name": "fresh process preserves all previous stored pages exactly",
+            "pass": true
+          },
+          {
+            "name": "fresh process restores prior committed receipts",
+            "pass": true
+          },
+          {
+            "name": "restart admits only matching actual DOM receipts and retains capacity pending",
+            "pass": true
+          },
+          {
+            "name": "restarted spool exposes a bounded window",
+            "pass": true
+          },
+          {
+            "name": "retry of recovered page never resumes old native scan",
+            "pass": true
+          },
+          {
+            "name": "recovered retry leaves original spool bytes intact",
+            "pass": true
+          }
+        ],
+        "errors": [],
+        "exceptionCount": 0,
+        "bundle": {
+          "schema": "homebase.shared-bundle.v1",
+          "release": "0.1.14-qa2",
+          "files": [
+            {
+              "path": "index.html",
+              "bytes": 594,
+              "sha256": "240e69543a90fe3fe9bb8e4e179f800ef8cc6e84fd9a5f387080825528327678"
+            },
+            {
+              "path": "assets/index-DUmQjpzO.js",
+              "bytes": 920277,
+              "sha256": "6427e2e82fd7b171138526e08266b68797976aca1e90ccc19acf82429b9941fd"
+            },
+            {
+              "path": "assets/index-BUcaksSE.css",
+              "bytes": 96131,
+              "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "componentRootSwitch": {
+    "totalChecks": 7,
+    "source": {
+      "source": "isolated EIDiscovery and EISpoolView component tests",
+      "files": {
+        "EIDiscovery.tsx": "557fef267ae3de83b0e947b46417e8312383b60a3180dc54a89360de711c31f9",
+        "EISpoolView.tsx": "59018c60ceaec5b580d2cfe5e38f0d196a90b25fc6f3b4cfba1e83813c351401",
+        "model/ei-spool.ts": "894a4263aa65ab4bc05e566c3f7a762558268141acce0cd846ea5e2291c494d2",
+        "model/ei-spool-storage.ts": "5cb71ddadf907f66651fff899ea2269b8bdeef0f1068bd3f6922d83f4f50a98a"
+      }
+    },
+    "report": {
+      "file": "write.json",
+      "sha256": "7b18a796172465457ac87b8498dd6bf7b5a3e5d3fa77f723ea46e4ec7860cac5",
+      "checks": [
+        {
+          "name": "populated root reports its exact retained page count",
+          "pass": true
+        },
+        {
+          "name": "component reaches the second bounded page window",
+          "pass": true
+        },
+        {
+          "name": "same mounted discovery view replaces populated count with empty root count",
+          "pass": true
+        },
+        {
+          "name": "empty root cannot navigate old source pages",
+          "pass": true
+        },
+        {
+          "name": "switching back restores populated root from first window",
+          "pass": true
+        },
+        {
+          "name": "view-only root switches preserve both exact heads",
+          "pass": true
+        },
+        {
+          "name": "disabled view-only scope switching creates no provider or engine operation",
+          "pass": true
+        }
+      ],
+      "errors": [],
+      "exceptionCount": 0,
+      "bundle": null
+    }
+  },
+  "earlierCandidate": {
+    "qa1Checks": 16,
+    "countedAgain": false,
+    "note": "Earlier QA1 DOM flow retained separately. QA2 repeated the flow with visible workspace verification and an inspected screenshot."
+  },
+  "totalFinalChecks": 101,
+  "limitations": [
+    "Actual Electron44.5.1/Linux, IndexedDB and DOM rendering with synthetic discovery fixtures",
+    "No user device or HOMEBASE profile accessed; no Windows runtime or power-loss verification",
+    "QuotaExceededError and strict-transaction unavailability were injected; physical quota exhaustion not tested",
+    "65 storage,29 full-application and7 isolated component checks are distinct scopes",
+    "Storage receipt acknowledges only persisted provider bytes; engine/DOM commit remains separate",
+    "Explicit unencrypted local persistence and browser eviction limits remain",
+    "No publication, packaging for end users, native permission expansion, microphone or audio access"
+  ],
+  "passed": true
+}
