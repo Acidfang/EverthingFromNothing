@@ -115,6 +115,12 @@ exported by the model. Desktop and narrow-screen verification evidence is
 retained in [`qa/verified.json`](qa/verified.json). The complete public behavior
 and publication gates are defined in [`SPEC.md`](SPEC.md).
 
+## Technical chronicle
+
+[Fracture threads and overlay services](docs/FRACTURE-THREAD-CHRONICLE.md) records
+the author’s comparative model, addressed state and receipts, shared overlay releases,
+public GitHub sync, verification evidence and remaining service/3D-mapping work.
+
 ## Fracture field inventory
 
 [NOTHING through WAS / IS / NEXT](docs/FRACTURE-FIELD-INVENTORY.md) inventories the
