@@ -1,0 +1,42 @@
+{
+  "schema": "public-source-checkpoint.v1",
+  "baseCommit": "82c2183df1949ed9e0beef97d76a5befd12cfa77",
+  "releaseStatus": "RECOVERY_CHECKPOINT_NOT_DEPLOYED",
+  "scope": "Public repository snapshot validation and explicit conflict-safe proposal core only. Transport/UI/native integration is not claimed.",
+  "verifiedAt": "2026-10-02T07:21:08.670579+00:00",
+  "checks": {
+    "command": "node --experimental-strip-types --test tests/ei-public-sync.test.ts",
+    "passed": 11,
+    "failed": 0,
+    "fullRepositorySuite": "not yet rerun after reconstruction",
+    "typescript": "strict TypeScript check passed after reconstruction"
+  },
+  "files": [
+    {
+      "path": "src/model/ei-public-sync.ts",
+      "bytes": 12684,
+      "sha256": "bdbbbebd92428f0737477b24fd0454e02e76e1a5f13b0cc9a784040971c7c723"
+    },
+    {
+      "path": "tests/ei-public-sync.test.ts",
+      "bytes": 11550,
+      "sha256": "87a250fcd2cfe5a88d449f339a24d1bb83bdf69766b62c63c6aa1afae4f09b5b"
+    },
+    {
+      "path": "scripts/generate-public-sync.ts",
+      "bytes": 1704,
+      "sha256": "d7806f4f1702c9ed0dee1875a0ac017b7ec31fb83e04211b291028c87f8d6761"
+    },
+    {
+      "path": "public/shared-field/v1/latest.json",
+      "bytes": 304,
+      "sha256": "945c24518fc9d917e2a25054aeb8c4f0e2bad51c31a3b4bbde33bb4660ece0d8"
+    },
+    {
+      "path": "public/shared-field/v1/snapshots/9b63945706409f663e613ac0819bbc5844e78c0bd0ac1e501a5ecb7ff2c8e94b.json",
+      "bytes": 504843,
+      "sha256": "9b63945706409f663e613ac0819bbc5844e78c0bd0ac1e501a5ecb7ff2c8e94b"
+    }
+  ],
+  "trustBoundary": "SHA256 binds bytes, not author identity. Fixed HTTPS repository origin provides transport provenance. No user sessions or private media are published."
+}
