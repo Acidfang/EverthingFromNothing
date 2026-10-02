@@ -1,0 +1,19 @@
+{
+  "schema": "ei.voice-candidate-validation.v1",
+  "version": "0.1.13-candidate",
+  "modelTests": 719,
+  "focusedVoiceTests": 28,
+  "typeScript": "passed",
+  "build": "passed",
+  "releaseAudits": 12,
+  "androidNativeFixtures": 14,
+  "windowsNativeFixtures": 10,
+  "assets": {
+    "index-Dd__ZlDF.js": "2727aaba9aa72288cb70e7d47888be51f150f00358708a3ebb6e3eeaedbdcb51",
+    "index-BUcaksSE.css": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+  },
+  "physicalAudioTested": false,
+  "generalReplyEngineImplemented": false,
+  "renderedQa": "passed:104 exact final checks; physical audio untested",
+  "published": false
+}

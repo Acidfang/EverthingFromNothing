@@ -1,0 +1,576 @@
+{
+  "schema": "field.voice.renderer-evidence.v1",
+  "releaseCandidate": "0.1.13 final QA5",
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 594,
+      "sha256": "5d0ff5fda4663ee3d83ed322c05a235bbc3a86293a5b5b0812cab04f978c588d"
+    },
+    {
+      "path": "assets/index-Dd__ZlDF.js",
+      "bytes": 904131,
+      "sha256": "2727aaba9aa72288cb70e7d47888be51f150f00358708a3ebb6e3eeaedbdcb51"
+    },
+    {
+      "path": "assets/index-BUcaksSE.css",
+      "bytes": 96131,
+      "sha256": "33bed08b06301c858587f8d77082900e7559c65759439faec5d4248ac1e3854e"
+    }
+  ],
+  "groups": {
+    "windows-carrier": {
+      "passed": 37,
+      "scenarios": [
+        {
+          "scenario": "actual-native",
+          "reportFile": "voice-actual-native.json",
+          "reportSHA256": "79189c2d5a11535cba3f9f065be0a50c3e28d1a6cdc4d45f50901023f0b1cb17",
+          "checks": [
+            {
+              "name": "voice stays inactive until explicit Start",
+              "pass": true
+            },
+            {
+              "name": "real Linux native adapter returns unavailable",
+              "pass": true
+            },
+            {
+              "name": "actual native route opens no audio process",
+              "pass": true
+            },
+            {
+              "name": "source scope is preserved on actual unavailable return",
+              "pass": true
+            },
+            {
+              "name": "explicit native End acknowledgment completes",
+              "pass": true
+            }
+          ],
+          "passed": 5,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "native",
+          "reportFile": "voice-native.json",
+          "reportSHA256": "b0de0a13b058a55af22281064b55c5022d4ed78ebcdb220f090c9d47682abc2e",
+          "checks": [
+            {
+              "name": "voice stays inactive until explicit Start",
+              "pass": true
+            },
+            {
+              "name": "availability event preserves exact provider return and quotas",
+              "pass": true
+            },
+            {
+              "name": "queued native start is not labeled listening",
+              "pass": true
+            },
+            {
+              "name": "actual native audio-start callback drives listening label",
+              "pass": true
+            },
+            {
+              "name": "native transcript preserves exact text and native source event",
+              "pass": true
+            },
+            {
+              "name": "native speech return itself makes no field receipt",
+              "pass": true
+            },
+            {
+              "name": "existing composer requires explicit replacement wording",
+              "pass": true
+            },
+            {
+              "name": "explicit Retain commits native transcript through DOM readback",
+              "pass": true
+            },
+            {
+              "name": "general reply engine remains unbound",
+              "pass": true
+            },
+            {
+              "name": "mute waits for native child release",
+              "pass": true
+            },
+            {
+              "name": "muting invalidates late native transcripts immediately",
+              "pass": true
+            },
+            {
+              "name": "Listen starts new monotonic operation",
+              "pass": true
+            },
+            {
+              "name": "collapsing view waits for cancel and ends native session",
+              "pass": true
+            },
+            {
+              "name": "End during native availability prevents late microphone start",
+              "pass": true
+            },
+            {
+              "name": "application blur ends native process and session",
+              "pass": true
+            },
+            {
+              "name": "source navigation releases old native scope",
+              "pass": true
+            },
+            {
+              "name": "provider end does not auto-restart native audio",
+              "pass": true
+            },
+            {
+              "name": "native resource limit is surfaced with the stopped provider return",
+              "pass": true
+            },
+            {
+              "name": "native requests preserve original context throughout each session",
+              "pass": true
+            },
+            {
+              "name": "all observed native replies remain unapplied and local",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 21,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "native-guide",
+          "reportFile": "voice-native-guide.json",
+          "reportSHA256": "a8250e0f14d97e93b16acf8c89c31ae0c58114e32ced4f81b6136856efdf2781",
+          "checks": [
+            {
+              "name": "voice stays inactive until explicit Start",
+              "pass": true
+            },
+            {
+              "name": "retained authored guide step is available",
+              "pass": true
+            },
+            {
+              "name": "queued TTS is not falsely labeled speaking",
+              "pass": true
+            },
+            {
+              "name": "capture was stopped before speech process started",
+              "pass": true
+            },
+            {
+              "name": "actual callback retains spoken-source and native event provenance",
+              "pass": true
+            },
+            {
+              "name": "speech creates no model commit",
+              "pass": true
+            },
+            {
+              "name": "End stays stopping until speech child exits",
+              "pass": true
+            },
+            {
+              "name": "late cancelled speech cannot add completion",
+              "pass": true
+            },
+            {
+              "name": "native requests preserve original context throughout each session",
+              "pass": true
+            },
+            {
+              "name": "all observed native replies remain unapplied and local",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 11,
+          "errors": 0,
+          "rendererExceptions": 0
+        }
+      ]
+    },
+    "android-fixture-replay": {
+      "passed": 67,
+      "scenarios": [
+        {
+          "scenario": "capture",
+          "reportFile": "android-voice-capture.json",
+          "reportSHA256": "2f240fafd4ed44cd472a3a835d8387ccfada98c6a3f9bb0110809475752baf42",
+          "checks": [
+            {
+              "name": "appassets origin uses no automatic voice request",
+              "pass": true
+            },
+            {
+              "name": "actual browser mic permission is still denied",
+              "pass": true
+            },
+            {
+              "name": "availability checking progresses through GET poll to actual listening event",
+              "pass": true
+            },
+            {
+              "name": "selected Android transcript text remains exact",
+              "pass": true
+            },
+            {
+              "name": "returned alternative remains source provenance",
+              "pass": true
+            },
+            {
+              "name": "recognition alone creates no field commit",
+              "pass": true
+            },
+            {
+              "name": "explicit Retain admits speech through actual DOM readback",
+              "pass": true
+            },
+            {
+              "name": "all speech transport uses GET query without request body",
+              "pass": true
+            },
+            {
+              "name": "every native return preserves original synthetic field scope",
+              "pass": true
+            },
+            {
+              "name": "no real mic, speaker or semantic reply is claimed",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 11,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "guide",
+          "reportFile": "android-voice-guide.json",
+          "reportSHA256": "7f5c2fc698bb38f20bdf8658cb40f710a6feb73067d18ff327a10153fe442eb7",
+          "checks": [
+            {
+              "name": "appassets origin uses no automatic voice request",
+              "pass": true
+            },
+            {
+              "name": "actual browser mic permission is still denied",
+              "pass": true
+            },
+            {
+              "name": "availability checking progresses through GET poll to actual listening event",
+              "pass": true
+            },
+            {
+              "name": "Android TTS retains exact selected source and provider end event",
+              "pass": true
+            },
+            {
+              "name": "TTS End completes through fixture-derived stop acknowledgment",
+              "pass": true
+            },
+            {
+              "name": "all speech transport uses GET query without request body",
+              "pass": true
+            },
+            {
+              "name": "every native return preserves original synthetic field scope",
+              "pass": true
+            },
+            {
+              "name": "no real mic, speaker or semantic reply is claimed",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 9,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "late",
+          "reportFile": "android-voice-late.json",
+          "reportSHA256": "ef4654156c8c2a7513988fc8360e8aedb43b1296ea345d803dd5763851e77370",
+          "checks": [
+            {
+              "name": "appassets origin uses no automatic voice request",
+              "pass": true
+            },
+            {
+              "name": "actual browser mic permission is still denied",
+              "pass": true
+            },
+            {
+              "name": "availability checking progresses through GET poll to actual listening event",
+              "pass": true
+            },
+            {
+              "name": "late cancelled transcript is suppressed after End",
+              "pass": true
+            },
+            {
+              "name": "all speech transport uses GET query without request body",
+              "pass": true
+            },
+            {
+              "name": "every native return preserves original synthetic field scope",
+              "pass": true
+            },
+            {
+              "name": "no real mic, speaker or semantic reply is claimed",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 8,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "permission",
+          "reportFile": "android-voice-permission.json",
+          "reportSHA256": "29ad830db21f87ccd2bf0a533bc4494edd263b8e830273f045a7843996dd2d64",
+          "checks": [
+            {
+              "name": "appassets origin uses no automatic voice request",
+              "pass": true
+            },
+            {
+              "name": "actual browser mic permission is still denied",
+              "pass": true
+            },
+            {
+              "name": "permission-pending fixture does not claim listening",
+              "pass": true
+            },
+            {
+              "name": "End terminates pending permission without audio start",
+              "pass": true
+            },
+            {
+              "name": "all speech transport uses GET query without request body",
+              "pass": true
+            },
+            {
+              "name": "every native return preserves original synthetic field scope",
+              "pass": true
+            },
+            {
+              "name": "no real mic, speaker or semantic reply is claimed",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 8,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "denied",
+          "reportFile": "android-voice-denied.json",
+          "reportSHA256": "467b07e5a16bf9a907132e8887efa5af0100b6497c9a08dc8a0d11f57c121c06",
+          "checks": [
+            {
+              "name": "appassets origin uses no automatic voice request",
+              "pass": true
+            },
+            {
+              "name": "actual browser mic permission is still denied",
+              "pass": true
+            },
+            {
+              "name": "permission denial is returned as failed without claiming listening",
+              "pass": true
+            },
+            {
+              "name": "denied native permission still permits explicit End",
+              "pass": true
+            },
+            {
+              "name": "all speech transport uses GET query without request body",
+              "pass": true
+            },
+            {
+              "name": "every native return preserves original synthetic field scope",
+              "pass": true
+            },
+            {
+              "name": "no real mic, speaker or semantic reply is claimed",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 8,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "early",
+          "reportFile": "android-voice-early.json",
+          "reportSHA256": "b793ce758492429f388d568b05734205ea5250dd40d04db8015d94d23027c496",
+          "checks": [
+            {
+              "name": "appassets origin uses no automatic voice request",
+              "pass": true
+            },
+            {
+              "name": "actual browser mic permission is still denied",
+              "pass": true
+            },
+            {
+              "name": "End during asynchronous availability prevents native listen",
+              "pass": true
+            },
+            {
+              "name": "availability cancellation has a real fixture-derived final acknowledgment",
+              "pass": true
+            },
+            {
+              "name": "all speech transport uses GET query without request body",
+              "pass": true
+            },
+            {
+              "name": "every native return preserves original synthetic field scope",
+              "pass": true
+            },
+            {
+              "name": "no real mic, speaker or semantic reply is claimed",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 8,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "tombstone",
+          "reportFile": "android-voice-tombstone.json",
+          "reportSHA256": "d30576e907ff77149e3d2312fc7eb840722e63de9e5b51a414a14874a254024e",
+          "checks": [
+            {
+              "name": "appassets origin uses no automatic voice request",
+              "pass": true
+            },
+            {
+              "name": "actual browser mic permission is still denied",
+              "pass": true
+            },
+            {
+              "name": "early End preserves no-resource tombstone against late availability",
+              "pass": true
+            },
+            {
+              "name": "late availability cannot revive ended UI",
+              "pass": true
+            },
+            {
+              "name": "all speech transport uses GET query without request body",
+              "pass": true
+            },
+            {
+              "name": "every native return preserves original synthetic field scope",
+              "pass": true
+            },
+            {
+              "name": "no real mic, speaker or semantic reply is claimed",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 8,
+          "errors": 0,
+          "rendererExceptions": 0
+        },
+        {
+          "scenario": "unavailable",
+          "reportFile": "android-voice-unavailable.json",
+          "reportSHA256": "085600bc7ee0e9857c16c62d1813ce6e30f160d591366f8b3e64fc821d83b2a1",
+          "checks": [
+            {
+              "name": "appassets origin uses no automatic voice request",
+              "pass": true
+            },
+            {
+              "name": "actual browser mic permission is still denied",
+              "pass": true
+            },
+            {
+              "name": "API30 fixture is reported unavailable without fallback",
+              "pass": true
+            },
+            {
+              "name": "all speech transport uses GET query without request body",
+              "pass": true
+            },
+            {
+              "name": "every native return preserves original synthetic field scope",
+              "pass": true
+            },
+            {
+              "name": "no real mic, speaker or semantic reply is claimed",
+              "pass": true
+            },
+            {
+              "name": "no renderer exception",
+              "pass": true
+            }
+          ],
+          "passed": 7,
+          "errors": 0,
+          "rendererExceptions": 0
+        }
+      ]
+    }
+  },
+  "windowsNativeChecks": 38,
+  "androidSerializedFixtures": 14,
+  "androidFixtureSHA256": "e8d1f0301fd3ff70652c331803950f6279bd7761573521298043d3d2bf6f9615",
+  "actualMicrophoneAccess": false,
+  "actualSpeakerAccess": false,
+  "windowsCSharpCompiled": false,
+  "windowsSystemSpeechExecuted": false,
+  "androidDeviceVoiceExecuted": false,
+  "semantics": "Transcripts are source data; explicit Retain uses the shared DOM readback commit. Playback speaks retained replies or authored guide steps only. General guide reply generation remains unbound.",
+  "scope": [
+    "Linux Electron rendered the exact final shared assets for both isolated origins.",
+    "Windows path used the real native HTTPS route/manager, with injected System.Speech process callbacks; unsupported Linux availability was also observed.",
+    "Android path replayed Java-produced serializer fixture details, remapping only test correlation and selected source fields. This was not an Android device/runtime test.",
+    "Android unrelated capability/mapping routes were explicitly unavailable in the isolated voice harness.",
+    "The shared no-child End regression found in QA3 is fixed and all final QA5 flows pass.",
+    "No raw machine discovery metadata is included in this compact summary."
+  ]
+}

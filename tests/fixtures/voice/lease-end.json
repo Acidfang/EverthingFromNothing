@@ -1,0 +1,135 @@
+{
+  "schema": "field.homebase.voice.v1",
+  "sessionId": "synthetic-voice-fixture",
+  "scope": {
+    "address": "qa/guide",
+    "revision": 3,
+    "sourceId": "synthetic-guide-source"
+  },
+  "operationId": 3,
+  "status": "ended",
+  "language": "en-US",
+  "capabilities": {
+    "kind": "availability",
+    "recognitionAvailable": true,
+    "speechAvailable": true,
+    "recognizers": [
+      {
+        "id": "MS-1033-80-DESK",
+        "name": "Microsoft Speech Recognizer 8.0 for Windows",
+        "language": "en-US",
+        "provider": "microsoft-desktop-sapi",
+        "processing": "on-device"
+      }
+    ],
+    "voices": [
+      {
+        "id": "TTS_MS_EN-US_DAVID_11.0",
+        "name": "Microsoft David Desktop",
+        "language": "en-US",
+        "provider": "microsoft-desktop-sapi",
+        "processing": "on-device"
+      }
+    ],
+    "language": "en-US",
+    "evidence": "installed-engine-metadata",
+    "providerAttestation": false
+  },
+  "cursor": 8,
+  "nextCursor": 12,
+  "events": [
+    {
+      "id": "synthetic-voice-fixture/native/9",
+      "sequence": 9,
+      "parentEventId": "synthetic-voice-fixture/native/8",
+      "sessionId": "synthetic-voice-fixture",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 2,
+      "kind": "speech-ended",
+      "observedAt": 1760000000020,
+      "detail": {
+        "userHearingVerified": false,
+        "source": {
+          "address": "qa/guide-step",
+          "revision": 1,
+          "sourceId": "synthetic-step"
+        },
+        "text": "Synthetic authored guide step"
+      }
+    },
+    {
+      "id": "synthetic-voice-fixture/native/10",
+      "sequence": 10,
+      "parentEventId": "synthetic-voice-fixture/native/9",
+      "sessionId": "synthetic-voice-fixture",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 2,
+      "kind": "idle",
+      "observedAt": 1760000000021,
+      "detail": {
+        "reason": "provider-terminal",
+        "stoppedOperationId": 2,
+        "acknowledgment": "child-process-exited"
+      }
+    },
+    {
+      "id": "synthetic-voice-fixture/native/11",
+      "sequence": 11,
+      "parentEventId": "synthetic-voice-fixture/native/10",
+      "sessionId": "synthetic-voice-fixture",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 3,
+      "kind": "listen-requested",
+      "observedAt": 1760000000026,
+      "detail": {
+        "language": "en-US"
+      }
+    },
+    {
+      "id": "synthetic-voice-fixture/native/12",
+      "sequence": 12,
+      "parentEventId": "synthetic-voice-fixture/native/11",
+      "sessionId": "synthetic-voice-fixture",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 3,
+      "kind": "ended",
+      "observedAt": 1760000000027,
+      "detail": {
+        "reason": "application-unfocused",
+        "stoppedOperationId": 3,
+        "acknowledgment": "child-process-exited"
+      }
+    }
+  ],
+  "processing": "on-device",
+  "rawAudioRetained": false,
+  "externalUpload": false,
+  "applied": false,
+  "limits": {
+    "requestBytes": 49152,
+    "sessions": 32,
+    "operations": 128,
+    "events": 192,
+    "eventBatch": 8,
+    "sessionBytes": 524288,
+    "totalBytes": 2097152,
+    "sessionMs": 600000,
+    "leaseMs": 15000
+  }
+}

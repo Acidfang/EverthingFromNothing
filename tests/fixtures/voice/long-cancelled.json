@@ -1,0 +1,209 @@
+{
+  "schema": "field.homebase.voice.v1",
+  "sessionId": "synthetic-long-cancel",
+  "scope": {
+    "address": "qa/guide",
+    "revision": 3,
+    "sourceId": "synthetic-guide-source"
+  },
+  "operationId": 1,
+  "status": "cancelled",
+  "language": "en-US",
+  "capabilities": {
+    "kind": "availability",
+    "recognitionAvailable": true,
+    "speechAvailable": true,
+    "recognizers": [
+      {
+        "id": "MS-1033-80-DESK",
+        "name": "Microsoft Speech Recognizer 8.0 for Windows",
+        "language": "en-US",
+        "provider": "microsoft-desktop-sapi",
+        "processing": "on-device"
+      }
+    ],
+    "voices": [
+      {
+        "id": "TTS_MS_EN-US_DAVID_11.0",
+        "name": "Microsoft David Desktop",
+        "language": "en-US",
+        "provider": "microsoft-desktop-sapi",
+        "processing": "on-device"
+      }
+    ],
+    "language": "en-US",
+    "evidence": "installed-engine-metadata",
+    "providerAttestation": false
+  },
+  "cursor": 8,
+  "nextCursor": 16,
+  "events": [
+    {
+      "id": "synthetic-long-cancel/native/9",
+      "sequence": 9,
+      "parentEventId": "synthetic-long-cancel/native/8",
+      "sessionId": "synthetic-long-cancel",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 1,
+      "kind": "transcript",
+      "observedAt": 1760000000014,
+      "detail": {
+        "text": "Synthetic source 5",
+        "confidence": 0.5,
+        "provider": "microsoft-desktop-sapi"
+      }
+    },
+    {
+      "id": "synthetic-long-cancel/native/10",
+      "sequence": 10,
+      "parentEventId": "synthetic-long-cancel/native/9",
+      "sessionId": "synthetic-long-cancel",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 1,
+      "kind": "transcript",
+      "observedAt": 1760000000015,
+      "detail": {
+        "text": "Synthetic source 6",
+        "confidence": 0.5,
+        "provider": "microsoft-desktop-sapi"
+      }
+    },
+    {
+      "id": "synthetic-long-cancel/native/11",
+      "sequence": 11,
+      "parentEventId": "synthetic-long-cancel/native/10",
+      "sessionId": "synthetic-long-cancel",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 1,
+      "kind": "transcript",
+      "observedAt": 1760000000016,
+      "detail": {
+        "text": "Synthetic source 7",
+        "confidence": 0.5,
+        "provider": "microsoft-desktop-sapi"
+      }
+    },
+    {
+      "id": "synthetic-long-cancel/native/12",
+      "sequence": 12,
+      "parentEventId": "synthetic-long-cancel/native/11",
+      "sessionId": "synthetic-long-cancel",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 1,
+      "kind": "transcript",
+      "observedAt": 1760000000017,
+      "detail": {
+        "text": "Synthetic source 8",
+        "confidence": 0.5,
+        "provider": "microsoft-desktop-sapi"
+      }
+    },
+    {
+      "id": "synthetic-long-cancel/native/13",
+      "sequence": 13,
+      "parentEventId": "synthetic-long-cancel/native/12",
+      "sessionId": "synthetic-long-cancel",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 1,
+      "kind": "transcript",
+      "observedAt": 1760000000018,
+      "detail": {
+        "text": "Synthetic source 9",
+        "confidence": 0.5,
+        "provider": "microsoft-desktop-sapi"
+      }
+    },
+    {
+      "id": "synthetic-long-cancel/native/14",
+      "sequence": 14,
+      "parentEventId": "synthetic-long-cancel/native/13",
+      "sessionId": "synthetic-long-cancel",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 1,
+      "kind": "transcript",
+      "observedAt": 1760000000019,
+      "detail": {
+        "text": "Synthetic source 10",
+        "confidence": 0.5,
+        "provider": "microsoft-desktop-sapi"
+      }
+    },
+    {
+      "id": "synthetic-long-cancel/native/15",
+      "sequence": 15,
+      "parentEventId": "synthetic-long-cancel/native/14",
+      "sessionId": "synthetic-long-cancel",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 1,
+      "kind": "transcript",
+      "observedAt": 1760000000020,
+      "detail": {
+        "text": "Synthetic source 11",
+        "confidence": 0.5,
+        "provider": "microsoft-desktop-sapi"
+      }
+    },
+    {
+      "id": "synthetic-long-cancel/native/16",
+      "sequence": 16,
+      "parentEventId": "synthetic-long-cancel/native/15",
+      "sessionId": "synthetic-long-cancel",
+      "scope": {
+        "address": "qa/guide",
+        "revision": 3,
+        "sourceId": "synthetic-guide-source"
+      },
+      "operationId": 1,
+      "kind": "cancelled",
+      "observedAt": 1760000000021,
+      "detail": {
+        "reason": "explicit-cancel",
+        "stoppedOperationId": 1,
+        "acknowledgment": "child-process-exited"
+      }
+    }
+  ],
+  "processing": "on-device",
+  "rawAudioRetained": false,
+  "externalUpload": false,
+  "applied": false,
+  "limits": {
+    "requestBytes": 49152,
+    "sessions": 32,
+    "operations": 128,
+    "events": 192,
+    "eventBatch": 8,
+    "sessionBytes": 524288,
+    "totalBytes": 2097152,
+    "sessionMs": 600000,
+    "leaseMs": 15000
+  }
+}

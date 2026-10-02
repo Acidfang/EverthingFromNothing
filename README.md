@@ -146,3 +146,14 @@ declared-state replay, admitted glyph directions, and a finite completion barrie
 Inputs, expected and actual returns, source parents and remaining differences are
 inspectable. A repeated software result is not proof of source faithfulness or
 physical theory. See [the reproducibility gate](docs/REPRODUCIBILITY-GATE.md).
+
+## Guide voice
+
+The conversation workspace includes an explicit on-device voice session with
+Start, End, Mute and Listen. Final recognized text can be selected into the
+composer and retained through the existing source/readback path. Spoken output
+uses actual retained replies or available user-authored Guide steps.
+
+See [the voice contract](docs/GUIDE-VOICE-CONTRACT.md) for provider availability,
+source receipts, resource limits and verification boundaries. The general
+reply-generation mechanism remains unimplemented; no canned answer is supplied.

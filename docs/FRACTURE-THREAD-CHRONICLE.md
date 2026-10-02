@@ -133,6 +133,16 @@ The [React model layer](../src/EIModelLayer.tsx) owns the current ledger and con
 
 The current status overlay reports app-visible work and returned receipts. It is not telemetry about hidden assistant reasoning, unrelated processes or remote actions that the application has not observed.
 
+### 2 October 2026, 21:35 UTC / 3 October 2026, 10:35 NZDT — source-bound guide voice controls
+
+Shared release 0.1.13 adds **Voice with guide** to the addressed conversation. Its [voice contract](GUIDE-VOICE-CONTRACT.md), [shared controller](../src/model/ei-voice-call.ts) and [browser adapter](../src/model/ei-browser-voice.ts) bind an explicitly started foreground session to the selected source address, revision and source ID. The browser requires installed on-device recognition and local synthesis voices. It does not automatically download a language pack or select a remote recognition fallback. End, mute, closing the view, leaving the application or changing the source invalidates pending returns and stops the owned operation.
+
+Recognition returns remain source tickets until the user explicitly chooses a transcript into the composer and retains it through the existing rendered-readback transaction. Returned alternatives and original recognizer text preserve their provider provenance; recognition does not authorize arbitrary commands. Playback is limited to actual retained replies or available user-authored guide steps. The general reply engine remains unbound, and a speech-provider end callback does not prove that the user heard or understood it.
+
+The final source passed 719 model tests, including 28 focused voice tests, TypeScript, build and 12 audits. [The exact-asset renderer receipt](../qa/field-release-0.1.13-renderer.json) records 104 Linux Electron checks: 37 through the Windows carrier route and 67 through an isolated Android route replaying Java-produced synthetic fixtures. Those tests opened no physical microphone or speaker. The [release receipt](../qa/field-release-0.1.13.json) preserves the separate native checks and explicitly unverified Windows C# compilation and target-device audio behavior. These checks establish bounded client/provider return handling, not recognition quality or general conversational reasoning.
+
+The common bundle is based on public commit [5730ea52](https://github.com/Acidfang/EverthingFromNothing/commit/5730ea5292d8158455528c2a7f31393499176291). Its JavaScript is `index-Dd__ZlDF.js`, SHA-256 `2727aaba9aa72288cb70e7d47888be51f150f00358708a3ebb6e3eeaedbdcb51`. Android, Windows and Pages share these production assets; native permissions, installation and actual device execution still need their own receipts. Public discovery fixtures retain the labelled synthetic values introduced in 0.1.12. No private voice recording or user ledger is included in the public repository.
+
 ## What a fracture thread currently means
 
 A thread is a retained relation occurrence between addressed records, with its source and context preserved. The [source-fracture producer](../src/model/ei-source-fractures.ts) witnesses an actual unequal before/after text pair at one address. A new record is a baseline, not a difference against a fabricated prior value. This is the declared text-comparison grain; unsupplied semantic or physical differences are not inferred.

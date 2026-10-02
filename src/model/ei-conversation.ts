@@ -54,11 +54,11 @@ export type EIConversationOptions = Readonly<{
   ledger: EILedger; root: string; input: string; id: string; signal?: AbortSignal;
   /** Optional live state accessor rejects capture prepared from an obsolete snapshot. */
   currentLedger?: () => EILedger;
-  inputOrigin?: Readonly<{id:string;locator:string;text:string}>;
+  inputOrigin?: Readonly<{id:string;locator:string;text:string;realm?:'android-explicit-intent'|'local-speech-transcript'}>;
 }>
 type Metadata = Readonly<{
   format: typeof FORMAT; root: string; turn: number; role: 'user' | 'assistant';
-  inputOrigin?: Readonly<{id:string;locator:string}>; sourceRefs: readonly string[]; status: EIConversationStatus; provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence;
+  inputOrigin?: Readonly<{id:string;locator:string;realm?:'android-explicit-intent'|'local-speech-transcript'}>; sourceRefs: readonly string[]; status: EIConversationStatus; provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence;
 }>
 type Guard = { snapshot: string; signal: AbortSignal }
 const preparedGuards = new WeakMap<object, Guard>()
@@ -92,7 +92,7 @@ function readMetadata(record: EIRecord, root: string): Metadata | null {
   let decoded: unknown
   try { decoded = JSON.parse(captured.source.locator ?? '') } catch { fail(`missing or malformed conversation metadata at ${record.address}`) }
   const meta = plain(decoded, 'message metadata')
-  if(meta.inputOrigin!==undefined){const origin=plain(meta.inputOrigin,'input origin');checkedText(origin.id,'origin id',256,true);checkedText(origin.locator,'origin locator',100000,true)}
+  if(meta.inputOrigin!==undefined){const origin=plain(meta.inputOrigin,'input origin');checkedText(origin.id,'origin id',256,true);checkedText(origin.locator,'origin locator',100000,true);if(origin.realm!==undefined&&!['android-explicit-intent','local-speech-transcript'].includes(String(origin.realm)))fail('unknown input origin realm')}
   if (meta.format !== FORMAT) fail(`unsupported conversation metadata at ${record.address}`)
   if (meta.root !== root) return null
   for (const key of Object.keys(meta)) if (!['format', 'root', 'turn', 'role', 'sourceRefs', 'status', 'provenance', 'evidence', 'inputOrigin'].includes(key)) fail(`unexpected message metadata field: ${key}`)
@@ -145,7 +145,7 @@ export function readEIConversation(ledger: EILedger, root: string): EIConversati
     if(!reply){
       const origin=readMetadata(userRecord,root)?.inputOrigin
       if(!origin&&receipt.patches.length!==1)fail('capture-only turn must retain one addressed input patch')
-      if(origin){const address=`${user.address}/source`,sourceRecord=byAddress.get(address),sourceState=sourceRecord&&(sourceRecord.was[0]??sourceRecord.is);if(receipt.patches.length!==2||!user.sourceRefs.includes(address)||!sourceState||sourceState.source.realm!=='android-explicit-intent'||sourceState.source.id!==origin.id||sourceState.source.locator!==origin.locator||sourceState.value!==sourceState.source.text||!receipt.patches.some(patch=>patch.address===address&&patch.kind==='create'&&patch.value===sourceState.value&&JSON.stringify(patch.source)===JSON.stringify(sourceState.source)))fail('native input origin lacks its exact atomic source receipt')}
+      if(origin){const address=`${user.address}/source`,sourceRecord=byAddress.get(address),sourceState=sourceRecord&&(sourceRecord.was[0]??sourceRecord.is);if(receipt.patches.length!==2||!user.sourceRefs.includes(address)||!sourceState||sourceState.source.realm!==(origin.realm??'android-explicit-intent')||sourceState.source.id!==origin.id||sourceState.source.locator!==origin.locator||sourceState.value!==sourceState.source.text||!receipt.patches.some(patch=>patch.address===address&&patch.kind==='create'&&patch.value===sourceState.value&&JSON.stringify(patch.source)===JSON.stringify(sourceState.source)))fail('native input origin lacks its exact atomic source receipt')}
     }
     previous = reply ?? user
     previousRevision = userCapture.revision
@@ -293,9 +293,10 @@ export async function prepareEIConversationTurn(options: EIConversationOptions):
   const userAddress = checkedText(`${root}/turn/${turn}/user`, 'user address', 256, true)
   if (ledger.records.some(record => record.address === userAddress)) fail('next conversation address already belongs to another captured record')
   const originAddress=options.inputOrigin?checkedText(`${userAddress}/source`,'input source address',256,true):null
-  if(options.inputOrigin&&ledger.records.some(record=>{const state=record.was[0]??record.is;return state.source.realm==='android-explicit-intent'&&state.source.id===options.inputOrigin!.id}))fail('phone input occurrence is already retained')
+  if(options.inputOrigin?.realm!==undefined&&!['android-explicit-intent','local-speech-transcript'].includes(options.inputOrigin.realm))fail('unknown input origin realm')
+  if(options.inputOrigin&&ledger.records.some(record=>{const state=record.was[0]??record.is;return state.source.realm===(options.inputOrigin!.realm??'android-explicit-intent')&&state.source.id===options.inputOrigin!.id}))fail('input occurrence is already retained')
   const previous = conversation.turns.at(-1), userRefs = [...(previous ? [root, previous.address] : [root]),...(originAddress?[originAddress]:[])]
-  const user = makeMessage(userAddress, input, { format: FORMAT, root, turn, role: 'user', sourceRefs: userRefs, status: 'capture-only', ...(options.inputOrigin?{inputOrigin:{id:checkedText(options.inputOrigin.id,'origin id',256,true),locator:checkedText(options.inputOrigin.locator,'origin locator',100000,true)}}:{}) }, `${id}/user`)
+  const user = makeMessage(userAddress, input, { format: FORMAT, root, turn, role: 'user', sourceRefs: userRefs, status: 'capture-only', ...(options.inputOrigin?{inputOrigin:{id:checkedText(options.inputOrigin.id,'origin id',256,true),locator:checkedText(options.inputOrigin.locator,'origin locator',100000,true),...(options.inputOrigin.realm?{realm:options.inputOrigin.realm}:{})}}:{}) }, `${id}/user`)
   const context: EIInferenceContext = freeze({ ledger, conversation, userInput: { address: userAddress, text: input, source: user.source } })
   if (signal.aborted) return stopped('cancelled')
   if (options.currentLedger && exportEILedger(options.currentLedger()) !== snapshot) return stopped('stale')
@@ -305,7 +306,7 @@ export async function prepareEIConversationTurn(options: EIConversationOptions):
     // The issued proposal binds the entire ledger snapshot, including history,
     // relations and receipts. The patch records raw input without interpreting it.
     candidates: [{ id: 'capture-conversation-input', label: 'capture-only', owner: 'engine', source: definition, conditions: [], patches: [
-      ...(options.inputOrigin&&originAddress?[{kind:'create' as const,address:originAddress,value:checkedText(options.inputOrigin.text,'original input',EI_CONVERSATION_LIMITS.inputLength,true),source:{id:options.inputOrigin.id,text:options.inputOrigin.text,realm:'android-explicit-intent',locator:options.inputOrigin.locator},parents:[root],relations:[]}]:[]),
+      ...(options.inputOrigin&&originAddress?[{kind:'create' as const,address:originAddress,value:checkedText(options.inputOrigin.text,'original input',EI_CONVERSATION_LIMITS.inputLength,true),source:{id:options.inputOrigin.id,text:options.inputOrigin.text,realm:options.inputOrigin.realm??'android-explicit-intent',locator:options.inputOrigin.locator},parents:[root],relations:[]}]:[]),
       { kind: 'create', address: user.address, value: user.text, source: user.source, parents: userRefs, relations: userRefs.map(address => ({ relation: 'conversation-context', address })) },
     ] }],
   }
