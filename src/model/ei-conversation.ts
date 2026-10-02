@@ -54,10 +54,11 @@ export type EIConversationOptions = Readonly<{
   ledger: EILedger; root: string; input: string; id: string; signal?: AbortSignal;
   /** Optional live state accessor rejects capture prepared from an obsolete snapshot. */
   currentLedger?: () => EILedger;
+  inputOrigin?: Readonly<{id:string;locator:string;text:string}>;
 }>
 type Metadata = Readonly<{
   format: typeof FORMAT; root: string; turn: number; role: 'user' | 'assistant';
-  sourceRefs: readonly string[]; status: EIConversationStatus; provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence;
+  inputOrigin?: Readonly<{id:string;locator:string}>; sourceRefs: readonly string[]; status: EIConversationStatus; provenance?: EIInferenceProvenance; evidence?: EIConversationEvidence;
 }>
 type Guard = { snapshot: string; signal: AbortSignal }
 const preparedGuards = new WeakMap<object, Guard>()
@@ -91,9 +92,10 @@ function readMetadata(record: EIRecord, root: string): Metadata | null {
   let decoded: unknown
   try { decoded = JSON.parse(captured.source.locator ?? '') } catch { fail(`missing or malformed conversation metadata at ${record.address}`) }
   const meta = plain(decoded, 'message metadata')
+  if(meta.inputOrigin!==undefined){const origin=plain(meta.inputOrigin,'input origin');checkedText(origin.id,'origin id',256,true);checkedText(origin.locator,'origin locator',100000,true)}
   if (meta.format !== FORMAT) fail(`unsupported conversation metadata at ${record.address}`)
   if (meta.root !== root) return null
-  for (const key of Object.keys(meta)) if (!['format', 'root', 'turn', 'role', 'sourceRefs', 'status', 'provenance', 'evidence'].includes(key)) fail(`unexpected message metadata field: ${key}`)
+  for (const key of Object.keys(meta)) if (!['format', 'root', 'turn', 'role', 'sourceRefs', 'status', 'provenance', 'evidence', 'inputOrigin'].includes(key)) fail(`unexpected message metadata field: ${key}`)
   if (!Number.isSafeInteger(meta.turn) || (meta.turn as number) < 1) fail('message turn must be a positive safe integer')
   if (meta.role !== 'user' && meta.role !== 'assistant') fail('invalid conversation role')
   const expectedRealm = meta.role === 'user' ? USER_REALM : REPLY_REALM
@@ -104,7 +106,7 @@ function readMetadata(record: EIRecord, root: string): Metadata | null {
   const statuses = ['capture-only', 'captured', 'command-return', 'inference-unavailable', 'generated-unverified']
   if (!statuses.includes(meta.status as string) || (meta.role === 'user') !== (meta.status === 'captured' || meta.status === 'capture-only')) fail('invalid captured message status')
   if ((meta.status === 'generated-unverified') !== (meta.provenance !== undefined)) fail('generated content must retain adapter provenance without becoming verified authority')
-  return freeze({ format: FORMAT, root, turn: meta.turn as number, role: meta.role, sourceRefs, status: meta.status as EIConversationStatus, ...(meta.provenance === undefined ? {} : { provenance: provenance(meta.provenance) }), ...(meta.evidence === undefined ? {} : { evidence: readEvidence(meta.evidence) }) })
+  return freeze({ format: FORMAT, root, turn: meta.turn as number, role: meta.role, sourceRefs, status: meta.status as EIConversationStatus, ...(meta.inputOrigin===undefined?{}:{inputOrigin:meta.inputOrigin as {id:string;locator:string}}), ...(meta.provenance === undefined ? {} : { provenance: provenance(meta.provenance) }), ...(meta.evidence === undefined ? {} : { evidence: readEvidence(meta.evidence) }) })
 }
 
 /** Read full ordered dialogue from actual immutable ledger records, never a separate UI transcript. */
@@ -140,7 +142,11 @@ export function readEIConversation(ledger: EILedger, root: string): EIConversati
     }
     const receipt = ledger.receipts.find(receipt => receipt.status === 'committed' && receipt.producer === root && receipt.resultRevision === userCapture.revision && messages.every(message => receipt.patches.some(patch => patch.kind === 'create' && patch.address === message.address && patch.value === message.text && JSON.stringify(patch.source) === JSON.stringify(message.source))))
     if (!receipt || !byAddress.get(root)!.receiptIds.includes(receipt.id)) fail('conversation capture lacks its returned source receipt')
-    if (!reply && receipt.patches.length !== 1) fail('capture-only turn must retain one addressed input patch')
+    if(!reply){
+      const origin=readMetadata(userRecord,root)?.inputOrigin
+      if(!origin&&receipt.patches.length!==1)fail('capture-only turn must retain one addressed input patch')
+      if(origin){const address=`${user.address}/source`,sourceRecord=byAddress.get(address),sourceState=sourceRecord&&(sourceRecord.was[0]??sourceRecord.is);if(receipt.patches.length!==2||!user.sourceRefs.includes(address)||!sourceState||sourceState.source.realm!=='android-explicit-intent'||sourceState.source.id!==origin.id||sourceState.source.locator!==origin.locator||sourceState.value!==sourceState.source.text||!receipt.patches.some(patch=>patch.address===address&&patch.kind==='create'&&patch.value===sourceState.value&&JSON.stringify(patch.source)===JSON.stringify(sourceState.source)))fail('native input origin lacks its exact atomic source receipt')}
+    }
     previous = reply ?? user
     previousRevision = userCapture.revision
   }
@@ -286,8 +292,10 @@ export async function prepareEIConversationTurn(options: EIConversationOptions):
   const conversation = readEIConversation(ledger, root), snapshot = exportEILedger(ledger), turn = nextTurn(conversation)
   const userAddress = checkedText(`${root}/turn/${turn}/user`, 'user address', 256, true)
   if (ledger.records.some(record => record.address === userAddress)) fail('next conversation address already belongs to another captured record')
-  const previous = conversation.turns.at(-1), userRefs = previous ? [root, previous.address] : [root]
-  const user = makeMessage(userAddress, input, { format: FORMAT, root, turn, role: 'user', sourceRefs: userRefs, status: 'capture-only' }, `${id}/user`)
+  const originAddress=options.inputOrigin?checkedText(`${userAddress}/source`,'input source address',256,true):null
+  if(options.inputOrigin&&ledger.records.some(record=>{const state=record.was[0]??record.is;return state.source.realm==='android-explicit-intent'&&state.source.id===options.inputOrigin!.id}))fail('phone input occurrence is already retained')
+  const previous = conversation.turns.at(-1), userRefs = [...(previous ? [root, previous.address] : [root]),...(originAddress?[originAddress]:[])]
+  const user = makeMessage(userAddress, input, { format: FORMAT, root, turn, role: 'user', sourceRefs: userRefs, status: 'capture-only', ...(options.inputOrigin?{inputOrigin:{id:checkedText(options.inputOrigin.id,'origin id',256,true),locator:checkedText(options.inputOrigin.locator,'origin locator',100000,true)}}:{}) }, `${id}/user`)
   const context: EIInferenceContext = freeze({ ledger, conversation, userInput: { address: userAddress, text: input, source: user.source } })
   if (signal.aborted) return stopped('cancelled')
   if (options.currentLedger && exportEILedger(options.currentLedger()) !== snapshot) return stopped('stale')
@@ -297,6 +305,7 @@ export async function prepareEIConversationTurn(options: EIConversationOptions):
     // The issued proposal binds the entire ledger snapshot, including history,
     // relations and receipts. The patch records raw input without interpreting it.
     candidates: [{ id: 'capture-conversation-input', label: 'capture-only', owner: 'engine', source: definition, conditions: [], patches: [
+      ...(options.inputOrigin&&originAddress?[{kind:'create' as const,address:originAddress,value:checkedText(options.inputOrigin.text,'original input',EI_CONVERSATION_LIMITS.inputLength,true),source:{id:options.inputOrigin.id,text:options.inputOrigin.text,realm:'android-explicit-intent',locator:options.inputOrigin.locator},parents:[root],relations:[]}]:[]),
       { kind: 'create', address: user.address, value: user.text, source: user.source, parents: userRefs, relations: userRefs.map(address => ({ relation: 'conversation-context', address })) },
     ] }],
   }

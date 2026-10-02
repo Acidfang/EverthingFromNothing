@@ -1,0 +1,20 @@
+import {projectEIThreadDrawFrame} from './ei-thread-draw-frame.ts'
+import type {EIThreadDrawPlan} from './ei-thread-draw.ts'
+import type {EIAnimationRetained} from './ei-animation-cycle.ts'
+import type {projectEIFieldArray} from './ei-field-array-view.ts'
+export const EI_FIELD_NODE_PATH='M0 -23L-23 17L25 17ZM0 -23L2 4L-23 17M2 4L25 17'
+export type EISvgSceneGeometry=Readonly<{nodes:Readonly<Record<string,Readonly<{path:string;faces:readonly Readonly<{path:string;fill:string}>[];image?:Readonly<{href:string;x:number;y:number;width:number;height:number}>}>>>;viewBox:string;sceneTransform?:string}>
+export function createEISvgSceneGeometry(nodes:EISvgSceneGeometry['nodes'],viewBox:string,sceneTransform:string):EISvgSceneGeometry{return {nodes,viewBox,sceneTransform}}
+type Field=ReturnType<typeof projectEIFieldArray>
+/** Expected actual SVG primitives, not displayed-pixel or world-pose proof. */
+export function projectEISvgWitness(field:Field,plan:EIThreadDrawPlan,phase:number,retained:EIAnimationRetained,geometry:EISvgSceneGeometry):string{
+ const frame=projectEIThreadDrawFrame(plan,phase,{nodes:new Set(retained.nodes),edges:new Set(retained.edges)}),nodes=new Map(field.nodes.map(n=>[n.address,n]))
+ return JSON.stringify({viewBox:geometry.viewBox,sceneTransform:geometry.sceneTransform??null,nodes:frame.nodes.map(draw=>{const n=nodes.get(draw.address)!,shape=geometry.nodes[n.address];return {address:n.address,revision:n.revision,sourceId:n.sourceId,transform:`translate(${n.x} ${n.y})`,opacity:draw.visible?(draw.unreached?.25:1):0,hidden:!draw.visible,path:shape.path,faces:shape.faces,image:shape.image??null}}).sort((a,b)=>a.address.localeCompare(b.address)),edges:frame.edges.filter(e=>e.known).map(draw=>{const from=nodes.get(draw.drawFrom)!,to=nodes.get(draw.drawTo)!,prior=draw.retained||(frame.complete&&draw.status==='unreachable');return {id:draw.id,opacity:draw.visible?1:0,lines:[...(prior?[[from.x,from.y,to.x,to.y]]:[]),[from.x,from.y,from.x+(to.x-from.x)*draw.fraction,from.y+(to.y-from.y)*draw.fraction]]}}).sort((a,b)=>a.id.localeCompare(b.id))})
+}
+export function readEISvgWitness(svg:SVGSVGElement):string{
+ const number=(element:Element,name:string)=>{const raw=element.getAttribute(name);if(raw===null||!/^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/.test(raw)||!Number.isFinite(Number(raw)))throw new Error(`Missing rendered ${name}`);return Number(raw)}
+ const image=(node:Element)=>{const bitmap=node.querySelector('[data-modeler-image]');return bitmap?{href:bitmap.getAttribute('href'),x:number(bitmap,'x'),y:number(bitmap,'y'),width:number(bitmap,'width'),height:number(bitmap,'height')}:null}
+ const nodes=[...svg.querySelectorAll('[data-field-node]')].map(n=>({address:n.getAttribute('data-field-node')!,revision:number(n,'data-render-revision'),sourceId:n.getAttribute('data-render-source')!,transform:n.getAttribute('transform'),opacity:number(n,'opacity'),hidden:n.getAttribute('aria-hidden')==='true',path:n.querySelector('[data-world-outline]')?.getAttribute('d')??null,faces:[...n.querySelectorAll('[data-world-face]')].map(face=>({path:face.getAttribute('d'),fill:face.getAttribute('fill')})),image:image(n)})).sort((a,b)=>a.address.localeCompare(b.address))
+ const edges=[...svg.querySelectorAll('[data-thread-id]')].map(edge=>({id:edge.getAttribute('data-thread-id')!,opacity:number(edge,'opacity'),lines:[...edge.querySelectorAll('line')].map(line=>['x1','y1','x2','y2'].map(name=>number(line,name)))})).sort((a,b)=>a.id.localeCompare(b.id))
+ return JSON.stringify({viewBox:svg.getAttribute('viewBox'),sceneTransform:svg.querySelector('[data-observer-scene]')?.getAttribute('transform')??null,nodes,edges})
+}

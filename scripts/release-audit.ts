@@ -1,3 +1,4 @@
+import {verifyFieldSurface} from './verify-field-surface.ts'
 import { access, readFile } from "node:fs/promises"
 import { resolve } from "node:path"
 type AuditResult=Readonly<{requirement:string;status:"PASS"|"FAIL";evidence:string}>
@@ -5,6 +6,7 @@ const root=resolve(import.meta.dirname,"..")
 async function exists(path:string){try{await access(resolve(root,path));return true}catch{return false}}
 async function text(path:string){return readFile(resolve(root,path),"utf8")}
 async function audit():Promise<readonly AuditResult[]>{
+ const surface=await verifyFieldSurface()
  const packageJson=JSON.parse(await text("package.json"));const readme=await text("README.md");const limitations=await text("LIMITATIONS.md");const schema=JSON.parse(await text("schema/explorer-frame.schema.json"));const sourcePath="public/sym-ple-fied-source.json";const source=await exists(sourcePath)?JSON.parse(await text(sourcePath)):null
  return Object.freeze([
  {requirement:"Standalone specification",status:(await exists("SPEC.md"))&&!readme.includes("../PUBLIC-ARTIFACT-SPEC")?"PASS":"FAIL",evidence:"SPEC.md exists and README does not require the private parent workspace."},
@@ -15,7 +17,7 @@ async function audit():Promise<readonly AuditResult[]>{
  {requirement:"Visible limitations",status:/does not\s+establish/.test(limitations)&&/No generated level\s+is identified/.test(limitations)?"PASS":"FAIL",evidence:"LIMITATIONS.md rejects automatic physical identification."},
  {requirement:"Contribution provenance discipline",status:await exists("CONTRIBUTING.md")?"PASS":"FAIL",evidence:"CONTRIBUTING.md exists."},
  {requirement:"GitHub invariant workflow",status:await exists(".github/workflows/model.yml")?"PASS":"FAIL",evidence:".github/workflows/model.yml exists."},
- {requirement:"Graphical explorer",status:(await exists("src/App.tsx"))&&Boolean(packageJson.scripts?.build)?"PASS":"FAIL",evidence:"Requires src/App.tsx and a production build script."},
+ {requirement:"Mounted addressed field surface",status:Object.values(surface.checks).every(Boolean)?"PASS":"FAIL",evidence:`Rendered ${surface.actualAddresses} retained address controls before capture, with zoom/fit/search. Static surface check only; full field and browser interactions are not established by this audit.`},
  {requirement:"Retained browser QA",status:await exists("qa/verified.json")?"PASS":"FAIL",evidence:"A retained QA file exists; this check does not claim that it verifies the current SHA."},
  {requirement:"Sym-PLE-Fied source provenance",status:source?.sourceRepository==="Acidfang/Sym-PLE-Fied"&&source?.sourceRevision==="6693379ba669b8c40652706f005dd8e43cb1d7c8"&&source?.ingestionState==="SOURCE_BOUND"?"PASS":"FAIL",evidence:"Deployment must retain the exact Sym-PLE-Fied source address and revision."},
  {requirement:"Author-selected license",status:await exists("LICENSE")?"PASS":"FAIL",evidence:"Requires a LICENSE selected by the author."}
