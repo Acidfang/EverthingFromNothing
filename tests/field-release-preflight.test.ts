@@ -11,7 +11,7 @@ test('release guard follows actual mounted entry rather than unused component ex
 })
 test('actual server-rendered field contains addresses and controls before capture without claiming completed geometry',async()=>{
  const result=await verifyFieldSurface()
- assert.equal(result.scope,'static-mounted-field-surface');assert.equal(result.actualAddresses,10);assert.equal(result.retainedAddresses,137)
+ assert.equal(result.scope,'static-mounted-field-surface');assert.equal(result.actualAddresses,6);assert.equal(result.retainedAddresses,142)
  assert.equal(result.wholeFieldComplete,false);assert.ok(Object.values(result.checks).every(Boolean))
 })
 

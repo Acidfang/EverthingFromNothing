@@ -20,7 +20,8 @@ export interface EIWorldFace {
   /** Count summarized by this entire cluster, not a new part identity. */
   readonly cluster?: number
 }
-export type EIWorldForm = 'branching-tree' | 'tree-doorhouse' | 'lanternstone' | 'leaf-book'
+export type EIWorldPresentation = 'nature' | 'solar'
+export type EIWorldForm = 'branching-tree' | 'tree-doorhouse' | 'lanternstone' | 'leaf-book' | 'solar-star' | 'ringed-planet' | 'planet'
 export const EI_WORLD_MAPPING_SCOPE = 'authored-nature-presentation-of-retained-address' as const
 
 const palettes = [
@@ -35,7 +36,7 @@ function sourceHash(sourceId: string) {
   return hash >>> 0
 }
 
-export function deriveEIWorldObject(entity: EIWorldEntity) {
+function deriveEINatureObject(entity: EIWorldEntity) {
   if (!Number.isSafeInteger(entity.partCount) || entity.partCount < 0) throw new Error('World appearance needs a nonnegative actual part count')
   if (!Number.isSafeInteger(entity.revision) || entity.revision < 0) throw new Error('World appearance needs a retained revision')
   const hash = sourceHash(entity.sourceId), palette = palettes[hash % palettes.length]
@@ -125,7 +126,7 @@ export function deriveEIWorldObject(entity: EIWorldEntity) {
   }
 
   return Object.freeze({
-    kind: 'EI_AUTHORED_WORLD_OBJECT' as const,
+    kind: 'EI_AUTHORED_WORLD_OBJECT' as const, presentation: 'nature' as const,
     identity: Object.freeze({ address: entity.address, revision: entity.revision, sourceId: entity.sourceId }),
     form,
     vertices: Object.freeze(vertices.map(item => Object.freeze(item))),
@@ -137,12 +138,34 @@ export function deriveEIWorldObject(entity: EIWorldEntity) {
   })
 }
 
+/** Source identities drive membership; all celestial geometry is presentation. */
+export function deriveEISolarObject(entity: EIWorldEntity) {
+ if(!Number.isSafeInteger(entity.partCount)||entity.partCount<0||!Number.isSafeInteger(entity.revision)||entity.revision<0)throw new Error('Invalid retained solar entity')
+ const hash=sourceHash(entity.address),form=entity.root?'solar-star' as const:entity.partCount>0?'ringed-planet' as const:'planet' as const
+ const radius=entity.root?35:31,segments=16,rings=7,vertices:EIWorldVertex[]=[],faces:EIWorldFace[]=[]
+ const palette=entity.root?['#ffe49a','#f6c964','#eeb346']:['#71bfc8','#84b6a4','#a3a0d3','#cfac7f','#ba91a5']
+ const base=palette[entity.root?0:hash%palette.length]
+ const add=(x:number,y:number,z:number)=>{vertices.push({x,y,z});return vertices.length-1}
+ const top=add(0,radius,0),rows:number[][]=[]
+ for(let row=1;row<=rings;row++){const phi=Math.PI*row/(rings+1);rows.push(Array.from({length:segments},(_,i)=>{const theta=i*Math.PI*2/segments;return add(radius*Math.sin(phi)*Math.cos(theta),radius*Math.cos(phi),radius*Math.sin(phi)*Math.sin(theta))}))}
+ const bottom=add(0,-radius,0)
+ const face=(indices:number[],fill=base,role:EIWorldFace['role']='body')=>faces.push({vertices:indices,fill,role})
+ for(let i=0;i<segments;i++){const next=(i+1)%segments;face([top,rows[0][next],rows[0][i]]);for(let row=1;row<rings;row++)face([rows[row-1][i],rows[row-1][next],rows[row][next],rows[row][i]],entity.root?palette[row%3]:base);face([bottom,rows[rings-1][i],rows[rings-1][next]])}
+ if(form==='ringed-planet'){
+  const ringRows=[42,56].map(r=>Array.from({length:32},(_,i)=>{const theta=i*Math.PI*2/32;return add(Math.cos(theta)*r,Math.sin(theta)*r*.22,Math.sin(theta)*r*.9755)}))
+  for(let i=0;i<32;i++)face([ringRows[0][i],ringRows[1][i],ringRows[1][(i+1)%32],ringRows[0][(i+1)%32]],'#d9c899','decoration')
+ }
+ if(form==='solar-star')for(let i=0;i<16;i++){const a=i*Math.PI*2/16,b=a+.12;face([add(Math.cos(a-.12)*38,0,Math.sin(a-.12)*38),add(Math.cos(a)*49,0,Math.sin(a)*49),add(Math.cos(b)*38,0,Math.sin(b)*38)],'#e9c666','decoration')}
+ return Object.freeze({kind:'EI_AUTHORED_WORLD_OBJECT' as const,presentation:'solar' as const,identity:Object.freeze({address:entity.address,revision:entity.revision,sourceId:entity.sourceId}),form,vertices:Object.freeze(vertices.map(v=>Object.freeze(v))),faces:Object.freeze(faces.map(f=>Object.freeze({...f,vertices:Object.freeze(f.vertices)}))),mapping:Object.freeze({scope:'authored-solar-presentation-of-retained-address' as const,sourceGeometry:false as const,canonicalPosition:null,basis:entity.partCount>0?'actual-retained-parts' as const:'retained-value-leaf' as const,actualPartCount:entity.partCount,clusters:Object.freeze([] as {count:number}[]),formChoice:'stable-address-presentation' as const,valueInterpreted:false as const,modelAdvanced:false as const})})
+}
+export function deriveEIWorldObject(entity:EIWorldEntity,presentation:EIWorldPresentation='nature') {if(presentation==='nature')return deriveEINatureObject(entity);if(presentation==='solar')return deriveEISolarObject(entity);throw new Error('Unknown world presentation')}
+
 export type EIWorldObject = ReturnType<typeof deriveEIWorldObject>
 
 /** Orthographic observer projection. Depth order changes; identity never does. */
-export function projectEIWorldObject(entityOrObject: EIWorldEntity | EIWorldObject, yaw: number, pitch: number) {
+export function projectEIWorldObject(entityOrObject: EIWorldEntity | EIWorldObject, yaw: number, pitch: number, presentation:EIWorldPresentation='nature') {
   if (!Number.isFinite(yaw) || !Number.isFinite(pitch)) throw new Error('Invalid observer basis')
-  const object = 'vertices' in entityOrObject ? entityOrObject : deriveEIWorldObject(entityOrObject)
+  const object = 'vertices' in entityOrObject ? entityOrObject : deriveEIWorldObject(entityOrObject,presentation)
   const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch)
   const points = object.vertices.map(point => {
     const x = point.x * cy - point.z * sy, z = point.x * sy + point.z * cy
@@ -162,7 +185,7 @@ export function projectEIWorldObject(entityOrObject: EIWorldEntity | EIWorldObje
   }).sort((a, b) => a.depth - b.depth || a.index - b.index)
   return Object.freeze({
     identity: object.identity, form: object.form, mapping: object.mapping,
-    scope: EI_WORLD_MAPPING_SCOPE, projectionLineage:'src/model/directional-view.ts#projectInDirection', observerDirection:0, faces: Object.freeze(projectedFaces), path: projectedFaces.map(face => face.path).join(''),
+    scope: object.mapping.scope, projectionLineage:'src/model/directional-view.ts#projectInDirection', observerDirection:0, faces: Object.freeze(projectedFaces), path: projectedFaces.map(face => face.path).join(''),
     vertices: Object.freeze(points),
     bounds: Object.freeze({ left: Math.min(...points.map(point => point.x)), right: Math.max(...points.map(point => point.x)), top: Math.min(...points.map(point => point.y)), bottom: Math.max(...points.map(point => point.y)) }),
   })

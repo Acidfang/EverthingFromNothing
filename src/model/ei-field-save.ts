@@ -12,7 +12,7 @@ export type EIFieldPresentationSnapshot = Readonly<{
   zeroHistory: readonly string[]; selectedAddress: string; selectedRevision: number; grain: EIGrain;
   view: Readonly<{x: number; y: number; zoom: number}>;
   orientation: Readonly<{yaw: number; pitch: number; roll?:number}>;
-  animation: string; idle?: EIIdleState; improvement: string;
+  presentationMode?:'nature'|'solar'; animation: string; idle?: EIIdleState; improvement: string;
 }>
 export type EIFieldSave = Readonly<{sessionString: string; presentation: EIFieldPresentationSnapshot | null}>
 export const EI_FIELD_SAVE_LIMITS = Object.freeze({storedBytes: 16 * 1024 * 1024, animationBytes: 4 * 1024 * 1024})
@@ -176,7 +176,7 @@ function idle(value: unknown, cycle: EIAnimationCycle, records: ReadonlyMap<stri
 
 function presentation(value: unknown, root: string, ledger: EILedger): EIFieldPresentationSnapshot {
   const result = object(value)
-  fields(result, ['schema', 'canonicalRoot', 'observerZero', 'zeroHistory', 'selectedAddress', 'selectedRevision', 'grain', 'view', 'orientation', 'animation', 'improvement'], ['idle'])
+  fields(result, ['schema', 'canonicalRoot', 'observerZero', 'zeroHistory', 'selectedAddress', 'selectedRevision', 'grain', 'view', 'orientation', 'animation', 'improvement'], ['idle','presentationMode'])
   requireValue(result.schema === 'ei.field-presentation.v1' && result.canonicalRoot === root, 'presentation canonical root differs from session source')
   const records = new Map(ledger.records.map(record => [record.address, record]))
   for (const key of ['observerZero', 'selectedAddress'] as const) requireValue(typeof result[key] === 'string' && records.has(result[key]), `${key} is not a retained address`)
@@ -184,6 +184,7 @@ function presentation(value: unknown, root: string, ledger: EILedger): EIFieldPr
   retainedSource(records, result.selectedAddress as string, result.selectedRevision)
   requireValue(Array.isArray(result.zeroHistory) && result.zeroHistory.every(address => typeof address === 'string' && records.has(address)), 'ZERO history contains an unretained address')
   requireValue(EI_GRAINS.includes(result.grain as EIGrain), 'invalid presentation grain')
+  requireValue(result.presentationMode===undefined||result.presentationMode==='solar'||result.presentationMode==='nature','invalid field presentation')
   const view = object(result.view), orientation = object(result.orientation)
   fields(view, ['x', 'y', 'zoom']); fields(orientation, ['yaw', 'pitch'], ['roll'])
   requireValue(finite(view.x) && finite(view.y) && finite(view.zoom) && view.zoom > 0 && finite(1 / view.zoom), 'invalid presentation view')

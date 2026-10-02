@@ -5,6 +5,7 @@ import {execFileSync} from 'node:child_process'
 import ts from 'typescript'
 import {createElement} from 'react'
 import {renderToStaticMarkup} from 'react-dom/server'
+import {createEIDeviceFieldRecords} from '../src/model/ei-device-field.ts'
 import {createEIPublicFieldRecords} from '../src/model/ei-public-field.ts'
 export function entryMountsEIField(text:string):boolean{
   const main=ts.createSourceFile('main.tsx',text,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX)
@@ -40,10 +41,10 @@ export async function verifyFieldSurface(){
   const warnings:unknown[][]=[],original=console.error
   let html:string
   try{console.error=(...values:unknown[])=>{warnings.push(values)};html=renderToStaticMarkup(createElement(EIModelLayer,{open:true}))}finally{console.error=original}
-  const records=createEIPublicFieldRecords(),rootRecord=records.find(record=>record.address==='model/inventory-root')!,expected=new Set([rootRecord.address,...rootRecord.relations.filter(relation=>relation.relation==='CONTAINS').map(relation=>relation.address),...records.filter(record=>record.parents?.includes(rootRecord.address)).map(record=>record.address)]).size,actual=(html.match(/aria-label="Select model\//g)??[]).length
+  const records=[...createEIDeviceFieldRecords(),...createEIPublicFieldRecords()],rootRecord=records.find(record=>record.address==='device')!,expected=new Set([rootRecord.address,...rootRecord.relations.filter(relation=>relation.relation==='CONTAINS').map(relation=>relation.address),...records.filter(record=>record.parents?.includes(rootRecord.address)).map(record=>record.address)]).size,actual=(html.match(/aria-label="Select (?:model\/|device)/g)??[]).length
   const field=html.indexOf('aria-label="Addressed field array"'),capture=html.indexOf('Start a conversation')
-  const workspace=html.indexOf('class="ei-field-workspace" hidden=""'),workspaceSource=html.includes('data-field-address="model/inventory-root"')
-  const checks={primaryField:field>=0&&capture>field&&fieldContainsOperation(html,'Start a conversation'),fieldOnlyInitialSurface:workspace>field&&capture>workspace&&workspaceSource&&!html.includes('Capture a source to begin'),retainedAddressControls:actual===expected,wholeSourceRetained:html.includes(`data-retained-addresses="${records.length}"`),zoom:html.includes('aria-label="Zoom field in"')&&html.includes('aria-label="Zoom field out"'),fit:html.includes('Fit field')&&html.includes('Fit selected'),addressSelection:html.includes('aria-label="Select field address"'),cleanRender:warnings.length===0}
+  const workspace=html.indexOf('class="ei-field-workspace" hidden=""'),workspaceSource=html.includes('data-field-address="device"')
+  const checks={deviceCollections:['hardware','software','files','folders'].every(kind=>html.includes(`data-field-node="device/${kind}"`)),primaryField:field>=0&&capture>field&&fieldContainsOperation(html,'Start a conversation'),fieldOnlyInitialSurface:workspace>field&&capture>workspace&&workspaceSource&&!html.includes('Capture a source to begin'),retainedAddressControls:actual===expected,wholeSourceRetained:html.includes(`data-retained-addresses="${records.length}"`),zoom:html.includes('aria-label="Zoom field in"')&&html.includes('aria-label="Zoom field out"'),fit:html.includes('Fit field')&&html.includes('Fit selected'),addressSelection:html.includes('aria-label="Select field address"'),cleanRender:warnings.length===0}
   if(Object.values(checks).some(value=>!value))throw new Error(`Mounted field surface regression: ${JSON.stringify(checks)}`)
   return {scope:'static-mounted-field-surface' as const,checks,expectedAddresses:expected,actualAddresses:actual,retainedAddresses:records.length,wholeFieldComplete:false as const}
  }finally{await rm(directory,{recursive:true,force:true})}

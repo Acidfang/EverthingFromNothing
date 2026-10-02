@@ -30,3 +30,10 @@ export function createEIPinch(){
 export function panEIObserver(camera:PinchCamera,from:PinchPoint,to:PinchPoint,viewport:PinchViewport):PinchCamera{
  const a=unroll(offset(from,viewport),camera.roll),b=unroll(offset(to,viewport),camera.roll);return {...camera,x:camera.x-(b.x-a.x)/camera.zoom,y:camera.y-(b.y-a.y)/camera.zoom}
 }
+/** Wheel units belong to the observer input, not the source mechanism. */
+export function zoomEIObserverAt(camera:PinchCamera,point:PinchPoint,viewport:PinchViewport,deltaY:number,deltaMode:number,minimum:number):PinchCamera{
+ if(!Number.isFinite(deltaY)||![0,1,2].includes(deltaMode))throw new Error('Invalid wheel input')
+ const pixels=deltaY*(deltaMode===1?16:deltaMode===2?viewport.height:1),zoom=clampEIFieldZoom(camera.zoom*Math.exp(-Math.max(-500,Math.min(500,pixels))*.002),minimum),o=unroll(offset(point,viewport),camera.roll)
+ return {...camera,x:camera.x+o.x/camera.zoom-o.x/zoom,y:camera.y+o.y/camera.zoom-o.y/zoom,zoom}
+}
+export function eiMouseGesture(button:number,shift=false):'pan'|'orbit'|'ignore'{return button===2||button===0&&shift?'orbit':button===0||button===1?'pan':'ignore'}

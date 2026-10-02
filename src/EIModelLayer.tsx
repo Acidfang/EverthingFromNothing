@@ -1,3 +1,7 @@
+import {EIGuidance} from './EIGuidance'
+import {EIPublicSync} from './EIPublicSync'
+import {EIDeviceWorkspace} from './EIDeviceWorkspace'
+import {createEIDeviceFieldRecords,EI_DEVICE_ROOT} from './model/ei-device-field'
 import {EIPhoneMedia} from './EIPhoneMedia'
 import {proposeEIMediaRetention} from './model/ei-media-retention'
 import type {MediaSource} from './model/ei-phone-media'
@@ -33,8 +37,8 @@ export function EIModelLayer({open,onClose}:{open:boolean;onClose?:()=>void}){
   const [ledger,setLedger]=useState<EILedger|null>(null)
   const [presentationEpoch,setPresentationEpoch]=useState(0)
   const [presentation,setPresentation]=useState<EIFieldPresentationSnapshot|null>(null),presentationReader=useRef<(()=>EIFieldPresentationSnapshot)|null>(null)
-  const publicContext=useMemo(()=>createEILedger({records:createEIPublicFieldRecords()}),[])
-  const [publicAddress,setPublicAddress]=useState('model/inventory-root')
+  const publicContext=useMemo(()=>createEILedger({records:[...createEIDeviceFieldRecords(),...createEIPublicFieldRecords()]}),[])
+  const [publicAddress,setPublicAddress]=useState(EI_DEVICE_ROOT)
   const [workspaceOpen,setWorkspaceOpen]=useState(false)
   const [phoneInput,setPhoneInput]=useState<EIPhoneInput|null>(null),[captureOrigin,setCaptureOrigin]=useState<EIPhoneInput|null>(null)
   const [rootAddress,setRootAddress]=useState('EI/SOURCE'),[raw,setRaw]=useState(''),[includeModel,setIncludeModel]=useState(true)
@@ -109,7 +113,7 @@ export function EIModelLayer({open,onClose}:{open:boolean;onClose?:()=>void}){
     try{
     const abort=new AbortController();captureAbort.current=abort
     const id=`local-input/${++sequence.current}`
-    const next=createEILedger({records:[{address:rootAddress,value:raw,source:{id,text:raw,realm:'user-supplied-local-input',...(captureOrigin?{locator:phoneInputLocator(captureOrigin)}:{})},relations:includeModel?[{relation:'included-public-source',address:'model/inventory-root'}]:[]},...(includeModel?createEIPublicFieldRecords():[])]})
+    const next=createEILedger({records:[{address:rootAddress,value:raw,source:{id,text:raw,realm:'user-supplied-local-input',...(captureOrigin?{locator:phoneInputLocator(captureOrigin)}:{})},relations:[{relation:'included-device-workspace',address:EI_DEVICE_ROOT},...(includeModel?[{relation:'included-public-source',address:'model/inventory-root'}]:[])]},...createEIDeviceFieldRecords(),...(includeModel?createEIPublicFieldRecords():[])]})
     const firstTurn=await prepareEIConversationTurn({ledger:next,root:rootAddress,input:raw,id:`local-proposal/${++sequence.current}`,signal:abort.signal,...(captureOrigin?{inputOrigin:{id:captureOrigin.id,locator:phoneInputLocator(captureOrigin),text:captureOrigin.text}}:{})})
     setPreparingCapture(false)
     if(firstTurn.status!=='proposed')throw new Error(firstTurn.reason)
@@ -140,6 +144,14 @@ export function EIModelLayer({open,onClose}:{open:boolean;onClose?:()=>void}){
     liveOperation.current={...liveOperation.current,proposal:turn.proposal,execution:staged};chatTurn.current=turn;setProposal(turn.proposal);setExecution(staged);setNotice('Checking addressed input before retention')
   }
   const mediaScope=useRef({address:ledger?selected:publicAddress,revision:ledger?(selectedRevision??record?.is.revision??0):0});mediaScope.current={address:ledger?selected:publicAddress,revision:ledger?(selectedRevision??record?.is.revision??0):0}
+  const stageField=(next:ReturnType<typeof proposeEI>)=>{
+    if(historical)throw new Error('Select the current IS before choosing an operation')
+    if(savingNow.current||liveOperation.current.proposal||liveOperation.current.execution)throw new Error('Finish the current field operation first')
+    const base=active.current??publicContext,staged=executeEI(base,next,chooseEI(next,next.candidates[0].candidate.id))
+    if(staged.status!=='staged')throw new Error(staged.receipt.reasons.join('; '))
+    if(!active.current){setPresentation(presentationReader.current?.()??null);root.current=EI_DEVICE_ROOT;active.current=base;setLedger(base);setSelected(next.input.producer);setTarget(next.input.producer);setValue(base.records.find(record=>record.address===next.input.producer)!.is.value)}
+    chatTurn.current=null;liveOperation.current={...liveOperation.current,proposal:next,execution:staged};setProposal(next);setExecution(staged)
+  }
   const retainMedia=async(source:MediaSource)=>{
     if(source.address!==mediaScope.current.address||source.revision!==mediaScope.current.revision)throw new Error('Selected field changed before source retention')
     if(savingNow.current||liveOperation.current.proposal||liveOperation.current.execution)throw new Error('Finish the current field operation first')
@@ -148,7 +160,7 @@ export function EIModelLayer({open,onClose}:{open:boolean;onClose?:()=>void}){
     if(!next)return
     const staged=executeEI(base,next,chooseEI(next,next.candidates[0].candidate.id))
     if(staged.status!=='staged')throw new Error(staged.receipt.reasons.join('; '))
-    if(!active.current){setPresentation(presentationReader.current?.()??null);root.current='model/inventory-root';active.current=base;setLedger(base);setSelected(source.address);setTarget(source.address);setValue(base.records.find(record=>record.address===source.address)!.is.value)}
+    if(!active.current){setPresentation(presentationReader.current?.()??null);root.current=EI_DEVICE_ROOT;active.current=base;setLedger(base);setSelected(source.address);setTarget(source.address);setValue(base.records.find(record=>record.address===source.address)!.is.value)}
     chatTurn.current=null;liveOperation.current={...liveOperation.current,proposal:next,execution:staged};setProposal(next);setExecution(staged)
   }
   const filterField=()=>protect(async()=>{if(!ledger||!grainRegistry)return;const snapshot=ledger,request=++filterRequest.current;setFilterBusy(true);try{const result=await filterEIGrainAddresses(ledger,grainRegistry.entities.map(entity=>projectEIGrain(grainRegistry,entity.address,grain)),{kind:'exact-text-equality',equals:filterValue});if(active.current===snapshot&&filterRequest.current===request){filterOrigin.current=snapshot;setFilterResult(result)}}finally{setFilterBusy(false)}})
@@ -184,7 +196,10 @@ export function EIModelLayer({open,onClose}:{open:boolean;onClose?:()=>void}){
     if(event.key==='Escape'&&onClose){event.preventDefault();void dismiss()}
     if(event.key==='Tab'&&(onClose||workspaceOpen||execution||proposal)){const scope=panel.current!.querySelector<HTMLElement>('.ei-field-workspace:not([hidden])')??panel.current!;const list=[...scope.querySelectorAll<HTMLElement>('button,input,textarea,select,a[href],[tabindex],summary')].filter(e=>e.tabIndex>=0&&!e.hasAttribute('disabled')&&!e.closest('[hidden],[inert],fieldset[disabled]')&&e.getClientRects().length>0);if(list.length&&event.shiftKey&&(document.activeElement===list[0]||document.activeElement===scope)){event.preventDefault();list.at(-1)?.focus()}else if(list.length&&!event.shiftKey&&(document.activeElement===list.at(-1)||document.activeElement===scope)){event.preventDefault();list[0]?.focus()}}
   }}>
-    <EIFieldArray initialPresentation={presentation} onSnapshot={read=>{presentationReader.current=read}} key={`${ledger?root.current:'public-context'}:${presentationEpoch}`} ledger={ledger??publicContext} sourceAddress={ledger?root.current:'model/inventory-root'} address={ledger?selected:publicAddress} revision={ledger?selectedRevision:0} grain={grain} disabled={saving||!!execution||!!proposal} contextLabel={ledger?undefined:'Public source context'} workspaceOpen={workspaceOpen||!!execution||!!proposal} onCloseWorkspace={()=>setWorkspaceOpen(false)} onChooseZero={address=>{if(!ledger){setPublicAddress(address);return}setSelected(address);setTarget(address);setValue(ledger.records.find(item=>item.address===address)?.is.value??'')}} onReaddress={address=>{if(!ledger){setPublicAddress(address);return}if(address!==selected){setSelected(address);setTarget(address);setValue(ledger.records.find(item=>item.address===address)?.is.value??'')}}} onSelect={address=>{setWorkspaceOpen(true);if(!ledger){setPublicAddress(address);return}if(address!==selected){setSelected(address);setTarget(address);setValue(ledger.records.find(item=>item.address===address)?.is.value??'')}if(inspector.current)inspector.current.open=true}}>
+    <EIFieldArray activity={{state:execution?'checking return':proposal?'proposed':'idle',operation:execution?.proposal.candidates[0]?.candidate.label??proposal?.candidates[0]?.candidate.label??null,result:(ledger??publicContext).receipts.at(-1)?.status??null}} initialPresentation={presentation} onSnapshot={read=>{presentationReader.current=read}} key={`${ledger?root.current:EI_DEVICE_ROOT}:${presentationEpoch}`} ledger={ledger??publicContext} sourceAddress={ledger?root.current:EI_DEVICE_ROOT} address={ledger?selected:publicAddress} revision={ledger?selectedRevision:0} grain={grain} disabled={saving||!!execution||!!proposal} contextLabel={ledger?undefined:'Device encounter workspace'} workspaceOpen={workspaceOpen||!!execution||!!proposal} onCloseWorkspace={()=>setWorkspaceOpen(false)} onChooseZero={address=>{if(!ledger){setPublicAddress(address);return}setSelected(address);setTarget(address);setValue(ledger.records.find(item=>item.address===address)?.is.value??'')}} onReaddress={address=>{if(!ledger){setPublicAddress(address);return}if(address!==selected){setSelected(address);setTarget(address);setValue(ledger.records.find(item=>item.address===address)?.is.value??'')}}} onSelect={address=>{setWorkspaceOpen(true);if(!ledger){setPublicAddress(address);return}if(address!==selected){setSelected(address);setTarget(address);setValue(ledger.records.find(item=>item.address===address)?.is.value??'')}if(inspector.current)inspector.current.open=true}}>
+    <EIGuidance ledger={ledger??publicContext} address={ledger?selected:publicAddress} disabled={saving||!!execution||!!proposal||!!historical} onStage={stageField}/>
+    <EIPublicSync ledger={ledger??publicContext} address={ledger?selected:publicAddress} revision={ledger?(selectedRevision??record?.is.revision??0):0} disabled={saving||!!execution||!!proposal||!!historical} onStage={stageField}/>
+    <EIDeviceWorkspace onInspect={address=>{if(!ledger){setPublicAddress(address);return}setSelected(address);setTarget(address);setValue(ledger.records.find(record=>record.address===address)?.is.value??'')}} ledger={ledger??publicContext} address={ledger?selected:publicAddress} revision={ledger?(selectedRevision??record?.is.revision??0):0} disabled={saving||!!execution||!!proposal||!!historical} onStage={stageField}/>
     <EIPhoneInputControl address={ledger?selected:publicAddress} revision={ledger?(selectedRevision??record?.is.revision??0):0} sourceId={ledger?selectedState?.source.id:publicContext.records.find(record=>record.address===publicAddress)?.is.source.id} retained={(ledger?.records??[]).flatMap(record=>{const state=record.was[0]??record.is;if(state.source.realm!=='android-explicit-intent')return [];const receipt=ledger?.receipts.find(item=>item.status==='committed'&&item.patches.some(patch=>patch.kind==='create'&&patch.address===record.address&&patch.source.id===state.source.id&&patch.value===state.value));if(!receipt)return [];try{const metadata=JSON.parse(state.source.locator??'');return typeof metadata.utf8Sha256==='string'?[{id:state.source.id,utf8Sha256:metadata.utf8Sha256,receiptId:receipt.id}]:[]}catch{return []}})} used={(ledger?.records??[]).flatMap(record=>{const source=(record.was[0]??record.is).source;return source.realm==='android-explicit-intent'?[source.id]:[]})} disabled={saving||!!execution||!!proposal||!!phoneInput} onChoose={input=>{const at=ledger?selectedState:projectEIGrain(createEIGrainRegistry(publicContext),publicAddress,grain,0);setPhoneInput(Object.freeze({...input,fieldScope:Object.freeze({address:ledger?selected:publicAddress,revision:ledger?(selectedRevision??record?.is.revision??0):0,sourceId:ledger?selectedState?.source.id??'':at&&'state' in at?at.state.source.id:''})}))}}/>
     <EIPhoneOverlay address={ledger?selected:publicAddress} revision={ledger?(selectedRevision??record?.is.revision??0):0} disabled={saving||!!execution||!!proposal}/>
     <EIPhoneMedia address={ledger?selected:publicAddress} revision={ledger?(selectedRevision??record?.is.revision??0):0} disabled={saving||!!execution||!!proposal} retained={(ledger?.records??[]).map(record=>record.was[0]??record.is).filter(state=>state.source.realm==='android-explicit-media-descriptor').map(state=>state.source.id)} onRetain={retainMedia}/>

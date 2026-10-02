@@ -2,7 +2,7 @@ import { createAddressedDraw, mayAdvanceAfterDraw } from './addressed-draw.ts'
 import { projectInDirection } from './directional-view.ts'
 import { EI_FIELD_ACTION_GEOMETRY } from './ei-field-action.ts'
 import { SHARED_TETRAHEDRON_VERTICES, SHARED_ZERO, type Point3 } from './three-tetrahedron-drawing.ts'
-import type { EIWorldObject } from './ei-world-object.ts'
+import type { EIWorldObject, EIWorldPresentation } from './ei-world-object.ts'
 
 export type EIModelerPoint = Readonly<{ id: string; sourceId: string; point: Point3 }>
 export type EIModelerEdge = Readonly<{ id: string; sourceId: string; from: string; to: string; boundaryFaces?: readonly string[] }>
@@ -10,7 +10,7 @@ export type EIModelerFace = Readonly<{ id: string; sourceId: string; vertices: r
 export type EIModelerProvenance = Readonly<{
   geometryScope: 'authored-presentation-geometry'; blueprintSource: string
   binding: Readonly<{ address: string; revision: number; sourceId: string }>
-  actualPartCount: number; form: string; centreScope: 'authored-object-local-origin'
+  presentation?: EIWorldPresentation; actualPartCount: number; form: string; centreScope: 'authored-object-local-origin'
 }>
 export type EIModelerObject = Readonly<{
   id: string; sourceId: string; centre: EIModelerPoint
@@ -42,7 +42,7 @@ export const EI_RETAINED_MODELER_OBJECT: EIModelerObject = Object.freeze({
 /** Bind an already-authored mesh, without relabelling its form as source-derived. */
 export function bindEIWorldObjectToModeler(object: EIWorldObject): EIModelerObject {
   const blueprintSource = 'src/model/ei-world-object.ts#deriveEIWorldObject'
-  const id = `${object.identity.address}#authored-world/revision/${object.identity.revision}`
+  const id = `${object.identity.address}#authored-${object.presentation==='solar'?'solar':'world'}/revision/${object.identity.revision}`
   const vertices = object.vertices.map((point, index) => Object.freeze({ id: `${id}/vertices/${index}`, sourceId: blueprintSource, point }))
   const faces = object.faces.map((face, index) => Object.freeze({
     id: `${id}/faces/${index}`, sourceId: blueprintSource,
@@ -59,7 +59,7 @@ export function bindEIWorldObjectToModeler(object: EIWorldObject): EIModelerObje
     centre: Object.freeze({ id: `${id}/local-origin`, sourceId: blueprintSource, point: Object.freeze({ x: 0, y: 0, z: 0 }) }),
     vertices: Object.freeze(vertices), faces: Object.freeze(faces),
     edges: Object.freeze([...boundaryEdges].map(([key, edge]) => Object.freeze({ id: `${id}/edges/${key}`, sourceId: blueprintSource, ...edge, boundaryFaces: Object.freeze(edge.boundaryFaces) }))),
-    provenance: Object.freeze({ geometryScope: 'authored-presentation-geometry' as const, blueprintSource,
+    provenance: Object.freeze({ presentation:object.presentation, geometryScope: 'authored-presentation-geometry' as const, blueprintSource,
       binding: Object.freeze({ ...object.identity }), actualPartCount: object.mapping.actualPartCount,
       form: object.form, centreScope: 'authored-object-local-origin' as const }),
   })
@@ -160,7 +160,8 @@ export function createEIModelerObjectDraw(input: EIModelerObject, options: EIMod
     if (Math.abs(nz) < 1e-12) return []
     // Convert screen-space slope to observer units before applying view lighting.
     const normalLength = Math.hypot(nx * scale, ny * scale, nz)
-    const lighting = .77 + .23 * Math.abs((-.3 * nx * scale - .7 * ny * scale + .6 * nz) / normalLength)
+    const lit=Math.max(0,(-.4*nx*scale-.6*ny*scale+.7*nz)*(nz<0?-1:1)/(normalLength*Math.sqrt(1.01)))
+    const lighting = input.provenance?.presentation==='solar'?(input.provenance.form==='solar-star'?.8+.2*lit:.3+.7*lit):.77 + .23 * Math.abs((-.3 * nx * scale - .7 * ny * scale + .6 * nz) / normalLength)
     return [{ ...face, depthX: -nx / nz, depthY: -ny / nz, origin: a,
       left: Math.min(...face.points.map(p => p.x)), right: Math.max(...face.points.map(p => p.x)),
       top: Math.min(...face.points.map(p => p.y)), bottom: Math.max(...face.points.map(p => p.y)),
