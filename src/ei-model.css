@@ -31,7 +31,7 @@
 
 .ei-array-node>circle:first-of-type{fill:none}.ei-array-node.selected{filter:drop-shadow(0 0 3px #ffe79a)}
 
-.ei-model-layer .ei-field-action-trigger,.ei-model-layer .ei-field-action-inspect{border:0;background:transparent;padding:0;margin:0;box-shadow:none}.ei-world-dock{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:4;height:clamp(82px,20vh,150px);max-width:96%;display:flex;align-items:end}.ei-world-dock .ei-field-action{height:100%;max-width:350px}.ei-world-dock .ei-field-action-trigger,.ei-world-dock .ei-field-action-inputs,.ei-world-dock .ei-field-action-outputs{max-height:100%}.ei-world-dock .ei-field-action svg{max-height:clamp(70px,18vh,135px);width:auto}.ei-field-surface{height:calc(100vh - clamp(82px,20vh,150px));height:calc(100dvh - clamp(82px,20vh,150px))}.ei-field-visual{height:100vh;height:100dvh;background:radial-gradient(ellipse at 50% 65%,#416860 0%,#244553 38%,#18253d 75%,#131a30 100%)}.ei-field-tools-details{display:flex;flex-wrap:wrap}.ei-field-tools-details button{min-width:40px}.ei-field-array .ei-array-node text{font-size:9px}
+.ei-model-layer .ei-field-action-trigger,.ei-model-layer .ei-field-action-inspect{border:0;background:transparent;padding:0;margin:0;box-shadow:none}.ei-world-dock{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:4;height:clamp(82px,20vh,150px);max-width:96%;display:flex;align-items:end}.ei-world-dock .ei-field-action{height:100%;max-width:350px}.ei-world-dock .ei-field-action-trigger,.ei-world-dock .ei-field-action-inputs,.ei-world-dock .ei-field-action-outputs{max-height:100%}.ei-world-dock .ei-field-action svg{max-height:clamp(70px,18vh,135px);width:auto}.ei-field-surface{height:100%;background:transparent}.ei-field-visual{height:100vh;height:100dvh;background:#31584a}.ei-field-tools-details{display:flex;flex-wrap:wrap}.ei-field-tools-details button{min-width:40px}.ei-field-array .ei-array-node text{font-size:9px}
 .ei-media-actions{display:flex;flex-wrap:wrap;gap:8px}.ei-field-workspace video,.ei-field-workspace audio,.ei-field-workspace article>img{max-width:100%;max-height:260px}.ei-field-workspace article[data-native-media-source]{padding:8px;border-top:1px solid #52686a}.ei-field-workspace article[data-native-media-source]>small{display:block}
 .ei-field-activity{display:flex;flex-direction:column;gap:2px;max-width:min(38vw,320px);font-size:11px;pointer-events:none;color:#b7c6d4}.ei-field-activity strong{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ei-world-dock{max-width:calc(100% - 32px);box-sizing:border-box;overflow-wrap:anywhere}.ei-world-dock .ei-field-action{max-width:100%;box-sizing:border-box}
 
@@ -46,3 +46,8 @@
 .ei-field-visual{isolation:isolate}
 .ei-root-tree{z-index:6}
 .ei-root-tree>[role=tree]{max-height:calc(100vh - 170px - clamp(82px,20vh,150px));max-height:calc(100dvh - 170px - clamp(82px,20vh,150px))}
+
+/* The model environment fills the viewport behind the floating controls. */
+.ei-model-layer>.ei-field-array{border:0}.ei-world-dock{pointer-events:none}.ei-world-dock .ei-field-action{pointer-events:auto}
+
+.ei-world-dock[hidden]{display:none}

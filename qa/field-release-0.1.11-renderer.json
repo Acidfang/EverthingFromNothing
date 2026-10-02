@@ -1,0 +1,16 @@
+{
+  "version": "0.1.11",
+  "asset": "assets/index-BqrljnBE.js",
+  "sha256": "ff7ef03b2fd98a51227ebc844c3fa0e32756e0c5e550a596214f0e175ceff1b1",
+  "actualRendererChecks": 241,
+  "sowingContinuationOutcomeNegativeAndStaleChecks": 149,
+  "gestureLayoutChecks": 46,
+  "commitCancellationRegressionChecks": 46,
+  "viewports": [
+    "1280x800",
+    "720x540"
+  ],
+  "environment": "Electron on Linux",
+  "targetDeviceExecutionInferred": false,
+  "allPassed": true
+}
