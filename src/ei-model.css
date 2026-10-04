@@ -74,4 +74,4 @@
 .ei-world-dock .ei-field-action-trigger,.ei-world-dock .ei-field-action-inspect,.ei-world-dock .ei-field-action-zero,.ei-world-dock .ei-homebase-landmark,.ei-world-dock .ei-field-action-inspection{pointer-events:auto}
 .ei-world-dock[data-sowing-active="true"] .ei-field-action-inspect{pointer-events:none}
 
-.ei-model-layer>.mr-fix-it .fix-array li strong,.ei-model-layer>.mr-fix-it .fix-array li small{min-width:0;overflow-wrap:anywhere}@media(max-width:640px){.ei-model-layer>.mr-fix-it .fix-array li{grid-template-columns:28px minmax(76px,92px) minmax(0,1fr)}}
+.ei-model-layer>.mr-fix-it .fix-array li strong,.ei-model-layer>.mr-fix-it .fix-array li small{min-width:0;overflow-wrap:anywhere}@media(max-width:640px){.ei-model-layer>.mr-fix-it .fix-array li{grid-template-columns:28px minmax(0,1fr)}.ei-model-layer>.mr-fix-it .fix-array li small{grid-column:2}}
