@@ -1,0 +1,50 @@
+{
+  "schema": "ei.release-checkpoint.v1",
+  "release": "0.1.9",
+  "validatedAt": "2026-10-02T09:28:16Z",
+  "parentCommit": "4ccd22e9a6a90607dc72e250bf14875300f11017",
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 594,
+      "sha256": "46d79fe08cf342de7d4f135621f327c9cc1283181a6feedeefa64f2553158d5d"
+    },
+    {
+      "path": "assets/index-BpBLuLq4.js",
+      "bytes": 794946,
+      "sha256": "b701d73ec063b95415466bbfeb5e9fcc45f1205acc277791798753a9e13469a9"
+    },
+    {
+      "path": "assets/index-BRFE9pRI.css",
+      "bytes": 95099,
+      "sha256": "81da5269e88df0ca8233c718a099c2fe6e0cc662b0601156ec667c8a336cca2d"
+    }
+  ],
+  "validation": {
+    "modelTests": 577,
+    "failedTests": 0,
+    "typescript": true,
+    "productionBuild": true,
+    "releaseAudits": 12,
+    "electronSmoke": {
+      "normal": 10,
+      "stale": 7,
+      "invalid": 7,
+      "manualRetry": 12,
+      "consoleErrors": 0,
+      "scope": "Actual Linux Electron; Windows packaging separate. Synthetic stale/invalid responses labelled."
+    }
+  },
+  "scope": [
+    "observer horizon with frame readback",
+    "same-address eligible seed mirrors from declared prerequisites",
+    "one-shot HOMEBASE environment observation and receipted initialization",
+    "manual environment retry and retained stale return"
+  ],
+  "limits": [
+    "Expanded compiler and service protocol excluded",
+    "Observer horizon is a selected projection",
+    "Eligible seed mirrors preserve existing addresses and declared prerequisite evidence",
+    "Browser does not fabricate a HOMEBASE native observation"
+  ]
+}

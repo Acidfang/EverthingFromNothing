@@ -1,0 +1,81 @@
+{
+  "version": "0.1.13",
+  "sourceBase": "5730ea5292d8158455528c2a7f31393499176291",
+  "modelTests": 719,
+  "finiteOracleCasesWithinOneTest": 768,
+  "rawBinaryFileReplays": 10,
+  "typescript": "passed",
+  "build": "passed",
+  "releaseAudits": 12,
+  "renderer": {
+    "status": "passed",
+    "exactFinalAssetChecks": 104,
+    "windowsCarrierChecks": 37,
+    "androidFixtureReplayChecks": 67,
+    "androidScenarios": 8,
+    "environment": "Actual Electron44.5.1 on Linux; Windows local route and isolated Android appassets route with synthetic speech callbacks",
+    "physicalAudioOpened": false,
+    "evidence": "qa/field-release-0.1.13-renderer.json"
+  },
+  "portableCore": {
+    "hostAndSanitizer": "passed",
+    "target": "ATmega328P; UNO R3-class baseline assumption",
+    "flashBytes": 3714,
+    "staticSramBytes": 1401,
+    "physicalBoardRun": false,
+    "calledByJavaScript": false,
+    "evidence": "native/ei-core/size-report.json"
+  },
+  "scope": [
+    "source-bound byte-library execution and deterministic source-edit recompilation",
+    "immutable batch/child occurrence ingestion with exact provider scope",
+    "actual center-out field rendering before the next returned batch",
+    "saved-state recovery, stale/cancelled returns, source ownership and capacity stops",
+    "in-overlay proof document with actual receipts, tickets and quotas",
+    "lossless pending-return export and explicit continuation",
+    "same shared UI with truthful browser, Android capability and HOMEBASE discovery adapters",
+    "explicit foreground on-device voice session, mute, end and source/lifecycle cancellation",
+    "exact recognizer transcript and alternatives retained as source tickets, explicit composer admission",
+    "playback of actual retained replies and available user-authored guide steps",
+    "one client operation/cursor/stop loop with separately validated Windows and Android provider returns"
+  ],
+  "carrierCoverage": {
+    "web": "actual browser runtime/display metadata; existing explicit file/folder encounter",
+    "android": "existing OS capability metadata endpoint; deeper firmware/filesystem discovery not added",
+    "homebase": "runtime/system layers and selected-root metadata provider; Windows CIM/registry actual device run unverified"
+  },
+  "unimplemented": [
+    "full compiler self-hosting and general meaning/intent semantics",
+    "86 opaque retained clauses",
+    "external durable spool/reclamation beyond bounded working state",
+    "C core to host runtime bridge",
+    "source-derived complete tetrahedral geometry and physical intersection binding",
+    "authenticated private cross-device state transport",
+    "testable next-view prediction and broader avatar/guide realization",
+    "general generated conversational reply and speech meaning/intent reasoning",
+    "actual Windows System.Speech compilation and physical audio validation",
+    "actual Android/browser physical recognition and playback validation"
+  ],
+  "fullMechanismComplete": false,
+  "lifeClaimEstablished": false,
+  "remotePrivateStateTransport": false,
+  "physicalCompletionInferred": false,
+  "focusedVoiceTests": 28,
+  "voice": {
+    "generalReplyEngineImplemented": false,
+    "browser": "requires installed processLocally recognition and localService synthesis voices",
+    "windows": "fixed local System.Speech bridge; C# compile and Windows audio unverified",
+    "android": "API31+ on-device recognition, installed non-network TTS, explicit existing microphone grant; physical audio unverified",
+    "nativeFixtures": {
+      "homebase": 10,
+      "android": 14
+    },
+    "remoteAudioUpload": false,
+    "nativeChecks": {
+      "homebase": 38,
+      "android": 69
+    },
+    "androidCompile": "26 Java classes against Android35 passed",
+    "windowsCSharpCompile": "not run"
+  }
+}

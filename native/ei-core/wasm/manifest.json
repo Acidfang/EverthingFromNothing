@@ -1,0 +1,24 @@
+{
+  "format": "ei-core-wasm-build/v1",
+  "compiler": "Zig0.17.0 C compiler",
+  "compilerSource": "https://ziglang.org/download/0.17.0/zig-x86_64-linux-0.17.0.tar.xz",
+  "target": "wasm32-freestanding",
+  "sourceSha256": {
+    "ei_core.c": "531cd19ed66ce9d80348027bcf5bef5de8f4e83c4b192cc5bbbcf624a9d6206c",
+    "ei_core.h": "f75c573fbb012556c1c608e6cd4e227b91a1d134201f88c7740134cd782ce574",
+    "wasm/bridge.c": "f1fc205e163b852141e6f06aeac70e8e940183bab4c8472f148793c6d63812a9",
+    "wasm/memory.c": "24a0f1ee020360bdbd450f403df73b9b5cb901615e34a8f9e7676cbf8c562db2",
+    "wasm/include/string.h": "c8599af4a9cdcfb3e2176c8744bb64bf9e3e6200198f867fb9f21db937a69226"
+  },
+  "binarySha256": "9281d287649f165a047fe2c38b8896719ce3e7f9ae2c03a4cad4740081e18349",
+  "binaryBytes": 5022,
+  "imports": [],
+  "memoryBytes": 65536,
+  "profile": {
+    "nodes": 64,
+    "edges": 128,
+    "receipts": 255
+  },
+  "compilerSelfHostedByUserMechanism": false,
+  "physicalBoardTested": false
+}

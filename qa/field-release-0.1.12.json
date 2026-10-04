@@ -1,0 +1,53 @@
+{
+  "version": "0.1.12",
+  "sourceBase": "d06c048a3e305aa27672d883ca548d4d259c0452",
+  "modelTests": 691,
+  "finiteOracleCasesWithinOneTest": 768,
+  "rawBinaryFileReplays": 10,
+  "typescript": "passed",
+  "build": "passed",
+  "releaseAudits": 12,
+  "renderer": {
+    "exactFinalAssetChecks": 126,
+    "additionalObservedProofTextChecks": 2,
+    "priorCandidateFullSuiteChecks": 131,
+    "environment": "Actual Electron on Linux; Windows/Android target-device execution not inferred",
+    "evidence": "qa/field-release-0.1.12-renderer.json"
+  },
+  "portableCore": {
+    "hostAndSanitizer": "passed",
+    "target": "ATmega328P; UNO R3-class baseline assumption",
+    "flashBytes": 3714,
+    "staticSramBytes": 1401,
+    "physicalBoardRun": false,
+    "calledByJavaScript": false,
+    "evidence": "native/ei-core/size-report.json"
+  },
+  "scope": [
+    "source-bound byte-library execution and deterministic source-edit recompilation",
+    "immutable batch/child occurrence ingestion with exact provider scope",
+    "actual center-out field rendering before the next returned batch",
+    "saved-state recovery, stale/cancelled returns, source ownership and capacity stops",
+    "in-overlay proof document with actual receipts, tickets and quotas",
+    "lossless pending-return export and explicit continuation",
+    "same shared UI with truthful browser, Android capability and HOMEBASE discovery adapters"
+  ],
+  "carrierCoverage": {
+    "web": "actual browser runtime/display metadata; existing explicit file/folder encounter",
+    "android": "existing OS capability metadata endpoint; deeper firmware/filesystem discovery not added",
+    "homebase": "runtime/system layers and selected-root metadata provider; Windows CIM/registry actual device run unverified"
+  },
+  "unimplemented": [
+    "full compiler self-hosting and general meaning/intent semantics",
+    "86 opaque retained clauses",
+    "external durable spool/reclamation beyond bounded working state",
+    "C core to host runtime bridge",
+    "source-derived complete tetrahedral geometry and physical intersection binding",
+    "authenticated private cross-device state transport",
+    "testable next-view prediction and broader avatar/guide realization"
+  ],
+  "fullMechanismComplete": false,
+  "lifeClaimEstablished": false,
+  "remotePrivateStateTransport": false,
+  "physicalCompletionInferred": false
+}

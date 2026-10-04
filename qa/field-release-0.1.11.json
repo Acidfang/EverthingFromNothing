@@ -1,0 +1,22 @@
+{
+  "version": "0.1.11",
+  "sourceBase": "003dfe11eb4116f6fa8a49a0fbf43dd05db79b9a",
+  "modelTests": 664,
+  "typescript": "passed",
+  "build": "passed",
+  "releaseAudits": 12,
+  "actualSowingRendererChecks": 134,
+  "rendererEnvironment": "Electron on Linux; target Windows and Android execution not inferred",
+  "scope": [
+    "single continuous sky/ground environment behind floating controls",
+    "direct object opening; selection, ZERO, pan, orbit and pinch retained",
+    "explicit ZERO drag into supplied addressed sowing environment",
+    "unmet environment requirements retained without fabricated observations",
+    "explicit source-linked nurture after actual requirements match",
+    "reported output linked to its exact sow and guide attempt"
+  ],
+  "physicalActionAutomaticallyExecuted": false,
+  "physicalCompletionInferred": false,
+  "fullMechanismComplete": false,
+  "remotePrivateStateTransport": false
+}

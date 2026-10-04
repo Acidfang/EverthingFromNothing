@@ -1,0 +1,52 @@
+{
+  "schema": "field.homebase.capabilities.v1",
+  "requestId": "linux-probe",
+  "address": "device",
+  "revision": 0,
+  "observationId": "homebase-observation/a43bd44a-fdc2-42fa-8856-4079938d97cd",
+  "observedAt": "2026-10-02T08:16:27.119Z",
+  "state": "returned",
+  "code": "native-metadata-returned",
+  "provenance": "actual-running-process-and-os-api",
+  "foreground": false,
+  "platform": {
+    "os": "linux",
+    "osType": "Linux",
+    "osRelease": "6.18.44",
+    "architecture": "x64"
+  },
+  "runtime": {
+    "application": "HOMEBASE",
+    "applicationVersion": "unavailable",
+    "electron": "unavailable",
+    "chromium": "unavailable",
+    "node": "24.19.0"
+  },
+  "cpu": {
+    "logicalCount": 9,
+    "models": [
+      {
+        "model": "INTEL(R) XEON(R) PLATINUM 8573C",
+        "logicalCount": 9
+      }
+    ],
+    "truncated": false
+  },
+  "memory": {
+    "totalBytes": 10451460096,
+    "freeBytesAtObservation": 9133154304
+  },
+  "displays": null,
+  "diagnostics": [
+    {
+      "field": "displays",
+      "code": "unavailable"
+    }
+  ],
+  "contentRead": false,
+  "personalFilesEnumerated": false,
+  "userIdentityRead": false,
+  "geographicLocationRead": false,
+  "credentialsRead": false,
+  "applied": false
+}

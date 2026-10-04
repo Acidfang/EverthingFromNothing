@@ -1,0 +1,14 @@
+{
+  "version": "0.1.14-candidate",
+  "tests": 730,
+  "focusedSpoolTests": 11,
+  "typescript": "passed",
+  "build": "passed",
+  "indexedDbChecks": 65,
+  "spoolUiChecks": 29,
+  "rootSwitchComponentChecks": 7,
+  "groundGestureChecks": 60,
+  "groundPlantingRegression": "pending",
+  "published": false,
+  "portableCoreHostBridge": false
+}

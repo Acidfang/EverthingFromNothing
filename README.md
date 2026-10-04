@@ -114,3 +114,62 @@ The graphical surface is rendered directly from the same exact scene graph
 exported by the model. Desktop and narrow-screen verification evidence is
 retained in [`qa/verified.json`](qa/verified.json). The complete public behavior
 and publication gates are defined in [`SPEC.md`](SPEC.md).
+
+## Technical chronicle
+
+[Fracture threads and overlay services](docs/FRACTURE-THREAD-CHRONICLE.md) records
+the author’s comparative model, addressed state and receipts, shared overlay releases,
+public GitHub sync, verification evidence and remaining service/3D-mapping work.
+
+## Mechanism proof and coverage
+
+Open **Mechanism proof · sources, tickets, receipts and quotas** inside the field workspace.
+The [claim and evidence](docs/MECHANISM-CLAIM-EVIDENCE.md),
+[executable coverage](docs/MECHANISM-EXECUTION-COVERAGE.md), and
+[raw binary library manifest](public/mechanism-libraries/v1/manifest.json)
+record what runs, its source, verification receipts and remaining limits.
+
+## Fracture field inventory
+
+[NOTHING through WAS / IS / NEXT](docs/FRACTURE-FIELD-INVENTORY.md) inventories the
+source-backed fields, relations, action terms, receipts, selected projections and
+open dependencies. Each entry retains parents, support, source, status and gap.
+The [JSON companion](docs/FRACTURE-FIELD-INVENTORY.json) preserves the same inventory
+and exact binary source relations for addressed reuse.
+
+### Bounded reproducibility checks
+
+Open **Inspect addresses → Pattern layer · reproducible checks** to filter the
+127-entry source inventory by linked runnable checks, successful execution, or
+matching repeated runs. Four fixed synthetic checks exercise graph integrity,
+declared-state replay, admitted glyph directions, and a finite completion barrier.
+Inputs, expected and actual returns, source parents and remaining differences are
+inspectable. A repeated software result is not proof of source faithfulness or
+physical theory. See [the reproducibility gate](docs/REPRODUCIBILITY-GATE.md).
+
+## Guide voice
+
+The conversation workspace includes an explicit on-device voice session with
+Start, End, Mute and Listen. Final recognized text can be selected into the
+composer and retained through the existing source/readback path. Spoken output
+uses actual retained replies or available user-authored Guide steps.
+
+See [the voice contract](docs/GUIDE-VOICE-CONTRACT.md) for provider availability,
+source receipts, resource limits and verification boundaries. The general
+reply-generation mechanism remains unimplemented; no canned answer is supplied.
+
+## Paged source retention and grounded navigation
+
+With local retention selected, exact provider returns can continue into a
+user-rooted IndexedDB spool after the working field reaches capacity. Stored
+pages remain inspectable and exportable; storage acknowledgments do not claim
+engine admission. See [the external spool contract](docs/EXTERNAL-SPOOL-CONTRACT.md).
+
+The single low horizon stays fixed in the viewport. The well and state buckets
+share a ground-contact plane, and the HOMEBASE landmark opens the existing user
+root. See [the ground-view contract](docs/GROUND-VIEW-CONTRACT.md).
+
+
+### Shared mechanism release 0.1.14
+
+[Release scope and final evidence](docs/RELEASE-0.1.14.md) · [source-linked bridge coverage](docs/SHARED-MECHANISM-014.md) · [deterministic OS target](docs/OS-TARGET-COVERAGE.md)

@@ -72,3 +72,16 @@ Rewind is therefore not invented certainty: it is the best reconstruction suppor
 3. Record the canonical successor address.
 4. Remove it from the live surface only if its information is represented by the successor.
 5. Preserve Git history as the exact prior receipt.
+
+## Folded completion fracture — 1 October 2026
+
+The DCA/VB/fullscreen-overlay continuation is not a new Root or a set of standalone subsystems. It is folded into the existing field as an addressed fracture projection:
+
+```text
+STATED_ADDRESS -> DIFFERENCE/FRACTURE -> EXISTING_OWNER -> ACT -> RETURNED_EVIDENCE -> RECEIPT_ADDRESS
+INTENT != QUEUED != EXECUTED != VERIFIED
+```
+
+Canonical executable projection: `src/model/completion-fracture.ts`.
+
+The projection retains the two-answer learning loop, durable recovery/no-duplicate-send requirement, guided helpfulness, recipient feedback, visible live status, and fullscreen-overlay verification as fractures of the same addressed field. `QUEUED_ONLY` cannot become `VERIFIED` without the evidence required by that fracture. Static Pages may display retained state but cannot itself verify native Windows overlay behaviour. Recipient feedback is not inferred from send/delivery. This fold is additive and does not permanently finish the evolving mechanism.

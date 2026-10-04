@@ -1,0 +1,39 @@
+import {proposeEI,type EILedger} from './ei-engine.ts'
+import {createEIDeviceFieldRecords} from './ei-device-field.ts'
+import {readBoundedPublicText} from './ei-public-sync-return.ts'
+import type {HomebaseCapabilities} from './ei-homebase-capabilities-types.ts'
+export const EI_ENVIRONMENT_ADDRESS='device/current-environment'
+const received=new WeakSet<object>(),count=(v:unknown)=>Number.isSafeInteger(v)&&Number(v)>=0,text=(v:unknown)=>typeof v==='string'&&v.length<=160
+function fields(value:unknown,names:string[]){requireValue(value&&typeof value==='object'&&!Array.isArray(value));requireValue(Object.keys(value).length===names.length&&names.every(name=>Object.hasOwn(value,name)))}
+function freeze<T>(value:T):T{if(value&&typeof value==='object'&&!Object.isFrozen(value)){Object.values(value).forEach(freeze);Object.freeze(value)}return value}
+function requireValue(v:unknown):asserts v{if(!v)throw new Error('Invalid HOMEBASE environment return')}
+export function validateHomebaseEnvironment(input:unknown,requestId:string,scope:{address:string;revision:number}):HomebaseCapabilities{
+ requireValue(input&&typeof input==='object'&&!Array.isArray(input));const v=input as HomebaseCapabilities
+ fields(v,['schema','requestId','address','revision','observationId','observedAt','state','code','provenance','foreground','platform','runtime','cpu','memory','displays','diagnostics','contentRead','personalFilesEnumerated','userIdentityRead','geographicLocationRead','credentialsRead','applied'])
+ requireValue(v.schema==='field.homebase.capabilities.v1'&&v.requestId===requestId&&v.address===scope.address&&v.revision===scope.revision&&text(v.observationId)&&typeof v.observedAt==='string'&&Number.isFinite(Date.parse(v.observedAt))&&['returned','unavailable'].includes(v.state)&&['native-metadata-returned','native-metadata-unavailable'].includes(v.code)&&v.provenance==='actual-running-process-and-os-api'&&typeof v.foreground==='boolean')
+ for(const name of ['contentRead','personalFilesEnumerated','userIdentityRead','geographicLocationRead','credentialsRead','applied'] as const)requireValue(v[name]===false)
+ fields(v.runtime,['application','applicationVersion','electron','chromium','node']);requireValue(v.runtime&&v.runtime.application==='HOMEBASE'&&[v.runtime.applicationVersion,v.runtime.electron,v.runtime.chromium,v.runtime.node].every(text))
+ if(v.platform!==null)fields(v.platform,['os','osType','osRelease','architecture']);if(v.platform!==null)requireValue(v.platform&&[v.platform.os,v.platform.osType,v.platform.osRelease,v.platform.architecture].every(text))
+ if(v.cpu!==null){fields(v.cpu,['logicalCount','models','truncated']);requireValue(v.cpu&&count(v.cpu.logicalCount)&&Array.isArray(v.cpu.models)&&v.cpu.models.length<=16&&typeof v.cpu.truncated==='boolean');for(const row of v.cpu.models){fields(row,['model','logicalCount']);requireValue(row&&text(row.model)&&count(row.logicalCount))}}
+ if(v.memory!==null)fields(v.memory,['totalBytes','freeBytesAtObservation']);if(v.memory!==null)requireValue(v.memory&&count(v.memory.totalBytes)&&count(v.memory.freeBytesAtObservation)&&v.memory.freeBytesAtObservation<=v.memory.totalBytes)
+ if(v.displays!==null){fields(v.displays,['units','items','truncated']);requireValue(v.displays&&v.displays.units==='device-independent-pixels'&&Array.isArray(v.displays.items)&&v.displays.items.length<=8&&typeof v.displays.truncated==='boolean');for(const d of v.displays.items){fields(d,['index','primary','width','height','workAreaWidth','workAreaHeight','scaleFactor','rotation','refreshHz']);requireValue(d&&count(d.index)&&typeof d.primary==='boolean'&&[d.width,d.height,d.workAreaWidth,d.workAreaHeight].every(count)&&typeof d.scaleFactor==='number'&&Number.isFinite(d.scaleFactor)&&d.scaleFactor>0&&typeof d.rotation==='number'&&Number.isFinite(d.rotation)&&(d.refreshHz===null||typeof d.refreshHz==='number'&&Number.isFinite(d.refreshHz)&&d.refreshHz>=0))}}
+ requireValue(Array.isArray(v.diagnostics)&&v.diagnostics.length<=16&&v.diagnostics.every(d=>d&&['platform','cpu','memory','displays'].includes(d.field)&&['unavailable','bounded','partial'].includes(d.code)))
+ return freeze(v)
+}
+export async function readHomebaseEnvironment(scope:{address:string;revision:number},origin:string,requestId:string,request:typeof fetch=fetch){
+ if(origin!=='https://homebase.local'||!/^[A-Za-z0-9._:-]{1,128}$/.test(requestId)||!scope.address||scope.address.length>256||/[\x00-\x1f\x7f]/.test(scope.address)||!count(scope.revision))throw new Error('HOMEBASE environment source unavailable')
+ const query=new URLSearchParams({requestId,address:scope.address,revision:String(scope.revision)}),raw=await readBoundedPublicText(await request(`${origin}/EverthingFromNothing/__native/homebase-capabilities.json?${query}`,{credentials:'omit',cache:'no-store',redirect:'error'}),32768),value=validateHomebaseEnvironment(JSON.parse(raw),requestId,scope)
+ const result=Object.freeze({scope:Object.freeze({...scope}),raw,value});received.add(result);return result
+}
+export function proposeHomebaseEnvironment(ledger:EILedger,receipt:Awaited<ReturnType<typeof readHomebaseEnvironment>>,id:string){
+ if(!received.has(receipt))throw new Error('Environment has no correlated native return')
+ const at=ledger.records.find(r=>r.address===receipt.scope.address);if(!at||at.is.revision!==receipt.scope.revision)throw new Error('Environment initialization scope changed')
+ const current=ledger.records.find(r=>r.address===EI_ENVIRONMENT_ADDRESS),source={id:receipt.value.observationId,text:receipt.raw,realm:'homebase-runtime-observation',locator:JSON.stringify({origin:'https://homebase.local',requestId:receipt.value.requestId,address:receipt.scope.address,revision:receipt.scope.revision,scope:'native-runtime-metadata'})},value=`Current environment\n${receipt.raw}`
+ if(current?.is.source.id===source.id&&current.is.value===value)return null
+ if(current&&current.is.source.realm!=='homebase-runtime-observation')throw new Error('Environment address has a different retained source; preserve it')
+ const missing=createEIDeviceFieldRecords().filter(record=>!ledger.records.some(r=>r.address===record.address)),patches=missing.map(record=>({...record,kind:'create' as const,...(record.address==='device'?{parents:[at.address]}:{})}))
+ const fields=['platform','runtime','cpu','memory','displays'] as const
+ const parts=fields.map(field=>{const address=`${EI_ENVIRONMENT_ADDRESS}/${field}`,old=ledger.records.find(record=>record.address===address);if(old&&old.is.source.realm!=='homebase-runtime-observation')throw new Error('Environment part has a different retained source; preserve it');return {address,value:`${field[0].toUpperCase()+field.slice(1)}\n${JSON.stringify(receipt.value[field])}`,source:{...source,id:`${source.id}#/${field}`,locator:JSON.stringify({origin:'https://homebase.local',requestId:receipt.value.requestId,pointer:`/${field}`,wholeAddress:EI_ENVIRONMENT_ADDRESS})},kind:old?'update' as const:'create' as const,...(!old?{parents:[EI_ENVIRONMENT_ADDRESS]}:{})}})
+ const rule={id:'user-requested-local-environment-initialization',text:'take in the computers information it is allowed, and emerge as the EI?',realm:'user-requested-startup-rule',locator:'local-runtime-metadata-only'}
+ return proposeEI(ledger,{id,producer:at.address,input:source,candidates:[{id:`${id}/initialize`,label:'Retain observed local environment',owner:'engine',source:rule,conditions:[{address:at.address,equals:at.is.value},...(current?[{address:current.address,equals:current.is.value}]:[]),...parts.flatMap(part=>{const old=ledger.records.find(record=>record.address===part.address);return old?[{address:old.address,equals:old.is.value}]:[]})],patches:[...patches,{kind:current?'update':'create',address:EI_ENVIRONMENT_ADDRESS,value,source,...(!current?{parents:['device/hardware','device/software'],relations:[{relation:'observed-from',address:at.address}]}:{})},...parts]}]})
+}

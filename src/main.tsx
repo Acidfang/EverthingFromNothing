@@ -1,10 +1,10 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
-import { InfinityApp } from "./InfinityApp.tsx"
+import { EIModelLayer } from "./EIModelLayer.tsx"
 import "./styles.css"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <InfinityApp />
+    <EIModelLayer open />
   </StrictMode>,
 )

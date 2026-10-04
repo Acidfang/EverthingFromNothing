@@ -1,0 +1,142 @@
+{
+  "format": "ei-native-core-build-evidence/v1",
+  "date_utc": "2026-10-02",
+  "target": "ATmega328P",
+  "board_baseline": "UNO R3 class; explicit assumption, board unspecified",
+  "scope": "Full public C core API plus deterministic two-address cyclic provider fixture; no dead-code stripping",
+  "profile": {
+    "address_bytes": 16,
+    "value_bytes": 16,
+    "nodes": 8,
+    "edges": 16,
+    "child_root_occurrences": 8
+  },
+  "toolchain": {
+    "package": "avr-gcc 7.3.0-atmel3.6.1-arduino7",
+    "compiler": "avr-gcc (GCC) 7.3.0",
+    "official_index": "https://downloads.arduino.cc/packages/package_index.json",
+    "archive_url": "https://downloads.arduino.cc/tools/avr-gcc-7.3.0-atmel3.6.1-arduino7-x86_64-pc-linux-gnu.tar.bz2",
+    "archive_sha256": "bd8c37f6952a2130ac9ee32c53f6a660feb79bee8353c8e289eb60fdcefed91e",
+    "archive_checksum_verified": true
+  },
+  "reproduce": "make test sanitize; make avr AVR_PREFIX=/path/to/avr/bin/avr-",
+  "compile_flags": "-std=c11 -mmcu=atmega328p -DF_CPU=16000000UL -Os -Wall -Wextra -Werror -fstack-usage",
+  "sections": {
+    ".data": 168,
+    ".text": 3546,
+    ".bss": 1233,
+    ".comment": 17,
+    ".note.gnu.avr.deviceinfo": 64,
+    ".debug_aranges": 96,
+    ".debug_info": 2037,
+    ".debug_abbrev": 1502,
+    ".debug_line": 410,
+    ".debug_str": 520
+  },
+  "flash_bytes": 3714,
+  "static_sram_bytes": 1401,
+  "target_sram_bytes": 2048,
+  "bootloader_reserved_flash_bytes": 512,
+  "target_application_flash_bytes": 32256,
+  "stack": {
+    "compiler_frames": {
+      "read_demo": {
+        "bytes": 4,
+        "kind": "static"
+      },
+      "next_demo": {
+        "bytes": 5,
+        "kind": "static"
+      },
+      "main": {
+        "bytes": 46,
+        "kind": "static"
+      },
+      "valid_address": {
+        "bytes": 2,
+        "kind": "static"
+      },
+      "ei_address_set": {
+        "bytes": 9,
+        "kind": "static"
+      },
+      "ei_value_set": {
+        "bytes": 5,
+        "kind": "static"
+      },
+      "ei_address_equal": {
+        "bytes": 6,
+        "kind": "static"
+      },
+      "valid_state": {
+        "bytes": 15,
+        "kind": "static"
+      },
+      "ei_find": {
+        "bytes": 8,
+        "kind": "static"
+      },
+      "ei_init": {
+        "bytes": 44,
+        "kind": "static"
+      },
+      "ei_complete": {
+        "bytes": 4,
+        "kind": "static"
+      },
+      "ei_step": {
+        "bytes": 69,
+        "kind": "static"
+      },
+      "ei_revisit": {
+        "bytes": 6,
+        "kind": "static"
+      },
+      "ei_occurrence_at": {
+        "bytes": 10,
+        "kind": "static"
+      },
+      "ei_read_occurrence": {
+        "bytes": 6,
+        "kind": "static"
+      },
+      "ei_status_name": {
+        "bytes": 2,
+        "kind": "static"
+      }
+    },
+    "reviewed_fixture_call_chain": [
+      "main",
+      "ei_step",
+      "valid_state",
+      "ei_address_equal",
+      "valid_address"
+    ],
+    "reviewed_chain_bytes": 138,
+    "conservative_reserve_bytes": 256,
+    "sram_remaining_after_reserve": 391,
+    "basis": "Nonrecursive fixture; compiler .su frames plus inspected leaf memcmp/memcpy/memmove assembly; fixture enables no interrupts and has no heap. A different provider/framework requires a new budget."
+  },
+  "verification": {
+    "native_tests": "passed, 7 scenario groups",
+    "native_firmware_fixture": "passed",
+    "address_undefined_sanitizers": "passed",
+    "leak_sanitizer": "disabled: ptrace execution environment; core has no heap",
+    "avr_compile": "passed",
+    "physical_board_execution": "not performed",
+    "avr_simulator_execution": "not performed",
+    "external_durable_spool": "not implemented"
+  },
+  "source_sha256": {
+    "ei_core.h": "f75c573fbb012556c1c608e6cd4e227b91a1d134201f88c7740134cd782ce574",
+    "ei_core.c": "531cd19ed66ce9d80348027bcf5bef5de8f4e83c4b192cc5bbbcf624a9d6206c",
+    "firmware.c": "f4038661220721033f65177508f719f8eaed979f65000142dfd3f88a2e7346cd",
+    "test_core.c": "d5ce73891e281e5e9d3d32d408fb99c239bcf162af3d8eaba8d854f462a29170",
+    "test_limits.c": "812265824b147388e0bc41ccf144e7c4fd22987c06f713c5567a1217d66486ab",
+    "Makefile": "0ff96a968550baa8302ab2654fc01f6a1df3f6ee28e8e17453ddeb011454a2f8"
+  },
+  "artifact_sha256": {
+    "firmware.elf": "0ea9abddc0b412a7b40b3f34b8c735926f70b4b23180b89a68ac6ac4fa8bdaf4",
+    "firmware.hex": "b61acf522d79aa7d6df23075b89582ab2393b0fa4d3f3afb0b366a124b6f2b0b"
+  }
+}

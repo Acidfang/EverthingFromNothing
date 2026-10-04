@@ -1,0 +1,8 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {chooseMediaDiscard,confirmMediaDiscard} from '../src/model/ei-media-discard.ts'
+import type {MediaSource} from '../src/model/ei-phone-media.ts'
+const source:MediaSource={id:'media-fixture',kind:'voice',mime:'audio/mp4',sha256:'a'.repeat(64),bytes:25,address:'root',revision:3,retainedOriginal:true,nativeAvailable:true,contentUrl:'__native/media-content?sourceId=media-fixture',metadata:{}}
+test('selection alone has no delete command; separate confirmation binds exact original',()=>{const choice=chooseMediaDiscard(source);assert.equal(choice.description,'retained original');assert.equal('params' in choice,false);const confirmed=confirmMediaDiscard(choice,[source]);assert.deepEqual(confirmed,{scope:{address:'root',revision:3},params:{sourceId:source.id,sourceSha256:source.sha256,confirm:'delete-original'}});assert.equal(source.nativeAvailable,true)})
+test('cancelled/missing/stale confirmation cannot produce deletion parameters',()=>{assert.throws(()=>confirmMediaDiscard(null,[source]));const choice=chooseMediaDiscard(source);assert.throws(()=>confirmMediaDiscard(choice,[]));for(const change of [{sha256:'b'.repeat(64)},{revision:4},{address:'other'}])assert.throws(()=>confirmMediaDiscard(choice,[{...source,...change}]))})
+test('derived frame is labeled separately and does not select its parent original',()=>{const frame={...source,id:'frame',kind:'video-frame' as const,retainedOriginal:false,metadata:{parentSourceId:source.id}};const choice=chooseMediaDiscard(frame);assert.equal(choice.description,'derived frame');assert.equal(confirmMediaDiscard(choice,[source,frame]).params.sourceId,'frame')})

@@ -1,0 +1,7 @@
+import {test} from 'node:test'
+import assert from 'node:assert/strict'
+import {createEISeedDrag,type EISeedDropTarget} from '../src/model/ei-seed-drag.ts'
+const target:EISeedDropTarget={id:'mirror',seedAddress:'seed',seedRevision:1,seedSourceId:'source',environmentAddress:'ground',environmentRevision:2,screenToLocal:[.5,0,0,.5,-100,-150],radius:20}
+test('explicit ZERO drag resolves only one supplied transformed ground target',()=>{const d=createEISeedDrag();assert.equal(d.start(1,{x:10,y:10},'state/view',[target]),true);assert.equal(d.move(1,{x:200,y:300},'state/view'),true);assert.deepEqual(d.finish(1,{x:200,y:300},'state/view'),target);assert.equal(d.active,false)})
+test('click, outside, ambiguous, cancellation and stale state/view do not plant',()=>{for(const kind of ['click','outside','ambiguous','cancel','stale']){const d=createEISeedDrag();d.start(1,{x:200,y:300},'a',kind==='ambiguous'?[target,{...target,id:'other'}]:[target]);if(kind==='cancel')d.cancel();assert.equal(d.finish(1,kind==='outside'?{x:900,y:900}:kind==='click'?{x:202,y:300}:{x:220,y:300},kind==='stale'?'b':'a'),null)}})
+test('pointer joining cannot restart planting; stale move cancels and invalid geometry rejects',()=>{const d=createEISeedDrag();d.start(1,{x:0,y:0},'a',[target]);assert.equal(d.start(2,{x:0,y:0},'a',[target]),false);assert.equal(d.finish(2,{x:200,y:300},'a'),null);assert.equal(d.move(1,{x:1,y:1},'b'),false);assert.equal(d.active,false);assert.throws(()=>d.start(1,{x:0,y:0},'a',[{...target,screenToLocal:[NaN,0,0,1,0,0]}]))})

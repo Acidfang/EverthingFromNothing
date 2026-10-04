@@ -1,0 +1,174 @@
+[
+  {
+    "schema": "field.homebase.discovery.v1",
+    "requestId": "discovery-fixture",
+    "address": "device",
+    "revision": 0,
+    "scanId": "discovery/synthetic-linux-fixture",
+    "kind": "system",
+    "status": "running",
+    "sequence": 0,
+    "nextCursor": 1,
+    "startedAt": "2026-01-01T00:00:00.000Z",
+    "observedAt": "2026-01-01T00:00:00.000Z",
+    "platform": "linux",
+    "root": null,
+    "observations": [
+      {
+        "key": "system/platform",
+        "parentKey": null,
+        "kind": "platform",
+        "label": "Operating system",
+        "metadata": {
+          "os": "linux",
+          "osType": "Linux",
+          "osRelease": "synthetic-linux-kernel",
+          "architecture": "x64"
+        },
+        "source": "node-os",
+        "observedAt": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "key": "system/runtime",
+        "parentKey": null,
+        "kind": "runtime",
+        "label": "HOMEBASE runtime",
+        "metadata": {
+          "application": "HOMEBASE",
+          "applicationVersion": "synthetic-fixture",
+          "electron": "synthetic-fixture",
+          "chromium": "synthetic-fixture",
+          "node": "synthetic-fixture"
+        },
+        "source": "electron-runtime",
+        "observedAt": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "key": "system/cpu",
+        "parentKey": null,
+        "kind": "cpu",
+        "label": "Processor",
+        "metadata": {
+          "logicalCount": 2,
+          "models": [
+            {
+              "model": "Synthetic Linux fixture CPU",
+              "logicalCount": 2
+            }
+          ],
+          "truncated": false
+        },
+        "source": "node-os",
+        "observedAt": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "key": "system/memory",
+        "parentKey": null,
+        "kind": "memory",
+        "label": "Memory",
+        "metadata": {
+          "totalBytes": 2147483648,
+          "freeBytesAtObservation": 1073741824
+        },
+        "source": "node-os",
+        "observedAt": "2026-01-01T00:00:00.000Z"
+      }
+    ],
+    "progress": {
+      "visited": 4,
+      "returned": 4,
+      "skipped": 0,
+      "queued": 0
+    },
+    "limits": {
+      "batchSize": 16,
+      "maxEntries": 1024,
+      "maxDepth": 6,
+      "maxSeconds": 120
+    },
+    "diagnostics": [
+      {
+        "code": "displays-unavailable",
+        "count": 1
+      }
+    ],
+    "contentRead": false,
+    "credentialsRead": false,
+    "externalUpload": false,
+    "applied": false
+  },
+  {
+    "schema": "field.homebase.discovery.v1",
+    "requestId": "discovery-fixture",
+    "address": "device",
+    "revision": 0,
+    "scanId": "discovery/synthetic-linux-fixture",
+    "kind": "system",
+    "status": "limited",
+    "sequence": 1,
+    "nextCursor": null,
+    "startedAt": "2026-01-01T00:00:00.000Z",
+    "observedAt": "2026-01-01T00:00:00.000Z",
+    "platform": "linux",
+    "root": null,
+    "observations": [
+      {
+        "key": "system/kernel",
+        "parentKey": null,
+        "kind": "kernel",
+        "label": "Linux kernel",
+        "metadata": {
+          "type": "Linux",
+          "release": "synthetic-linux-kernel",
+          "architecture": "x86_64"
+        },
+        "source": "node-os",
+        "observedAt": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "key": "system/os",
+        "parentKey": null,
+        "kind": "os",
+        "label": "Linux",
+        "metadata": {
+          "platform": "linux",
+          "type": "Linux",
+          "release": "synthetic-linux-kernel",
+          "architecture": "x86_64"
+        },
+        "source": "node-os",
+        "observedAt": "2026-01-01T00:00:00.000Z"
+      }
+    ],
+    "progress": {
+      "visited": 6,
+      "returned": 6,
+      "skipped": 0,
+      "queued": 0
+    },
+    "limits": {
+      "batchSize": 16,
+      "maxEntries": 1024,
+      "maxDepth": 6,
+      "maxSeconds": 120
+    },
+    "diagnostics": [
+      {
+        "code": "displays-unavailable",
+        "count": 1
+      },
+      {
+        "code": "layers-firmware-unavailable",
+        "count": 1
+      },
+      {
+        "code": "software-unsupported-platform",
+        "count": 1
+      }
+    ],
+    "contentRead": false,
+    "credentialsRead": false,
+    "externalUpload": false,
+    "applied": false
+  }
+]

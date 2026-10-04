@@ -1,0 +1,63 @@
+{
+  "schema": "field.homebase.capabilities.v1",
+  "requestId": "test-1",
+  "address": "device",
+  "revision": 0,
+  "observationId": "homebase-observation/00000000-0000-4000-8000-000000000001",
+  "observedAt": "2026-10-02T00:00:00.000Z",
+  "state": "returned",
+  "code": "native-metadata-returned",
+  "provenance": "actual-running-process-and-os-api",
+  "foreground": true,
+  "platform": {
+    "os": "win32",
+    "osType": "Windows_NT",
+    "osRelease": "fixture-10.0.0",
+    "architecture": "x64"
+  },
+  "runtime": {
+    "application": "HOMEBASE",
+    "applicationVersion": "0.1.9-fixture",
+    "electron": "44.5.1",
+    "chromium": "152.0.7977.130",
+    "node": "24.21.0"
+  },
+  "cpu": {
+    "logicalCount": 4,
+    "models": [
+      {
+        "model": "Synthetic fixture CPU",
+        "logicalCount": 4
+      }
+    ],
+    "truncated": false
+  },
+  "memory": {
+    "totalBytes": 17179869184,
+    "freeBytesAtObservation": 8589934592
+  },
+  "displays": {
+    "units": "device-independent-pixels",
+    "items": [
+      {
+        "index": 0,
+        "primary": true,
+        "width": 1920,
+        "height": 1080,
+        "workAreaWidth": 1920,
+        "workAreaHeight": 1040,
+        "scaleFactor": 1,
+        "rotation": 0,
+        "refreshHz": 60
+      }
+    ],
+    "truncated": false
+  },
+  "diagnostics": [],
+  "contentRead": false,
+  "personalFilesEnumerated": false,
+  "userIdentityRead": false,
+  "geographicLocationRead": false,
+  "credentialsRead": false,
+  "applied": false
+}
