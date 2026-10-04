@@ -11,7 +11,7 @@ export function mobileFractureTips(centre:string){
  return FRACTURE_TIP_LABELS.map((label,index)=>({kind:'tip-relation' as const,label,owner:centre,index,states:Object.entries(FRACTURE_ORDERS).map(([orientation,roles])=>mobileTipState(centre,`${centre}::${orientation}:${roles[index]}`)!)}))
 }
 export const FRACTURE_DIRECTIONS=['+X','-X','+Y','-Y','+Z','-Z'] as const
-/** Operators keep their former addresses, but are not contained things or zeros.
+/** Operators keep their addresses without automatically creating contained wholes in this view.
  * No endpoint or physical movement is inferred from a direction name. */
 export function mobileFractureOperators(centre:string){
  return Object.keys(FRACTURE_ORDERS).flatMap(orientation=>[...FRACTURE_DIRECTIONS,'PROCEED'].map(relation=>({address:`${centre}::${orientation}:${relation}`,kind:relation==='PROCEED'?'continuation' as const:'direction' as const,orientation,relation,from:centre,to:null,status:'unresolved-endpoint' as const,source:'src/model/mobile-fracture.ts'})))
