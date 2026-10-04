@@ -3,3 +3,5 @@
 .mobile-fracture .ei-field-visual{height:60svh;min-height:400px}.mobile-fracture .ei-field-address{max-width:155px;overflow-wrap:anywhere}.mobile-fracture .ei-field-scope{display:none}
 .mobile-grain-summary{display:block;padding:8px;overflow-wrap:anywhere;min-height:38px;color:#dfeceb}.mobile-fracture[data-grain="address"] .ei-array-node text{font-size:7px}.mobile-fracture[data-grain="pixel"] .ei-array-node text{font-family:monospace}.mobile-fracture>p[role="status"]{margin:8px;overflow-wrap:anywhere}
 .mobile-receipt{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;max-height:240px;overflow:auto}
+
+.mobile-tips{display:grid;gap:.5rem;padding:.75rem}.mobile-tips>div{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}.mobile-tips strong{min-width:5rem}.mobile-fracture .ei-relation-node path[data-world-outline]{fill:#152f38;stroke:#9fe0d3;stroke-width:2}

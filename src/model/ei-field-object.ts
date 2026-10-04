@@ -15,5 +15,5 @@ export function projectEIFieldTetrahedron(yaw:number,pitch:number){
  const points=SHARED_TETRAHEDRON_VERTICES.map(p=>{const x=p.x*Math.cos(yaw)-p.z*Math.sin(yaw),z=p.x*Math.sin(yaw)+p.z*Math.cos(yaw);return {x:x*19,y:-(p.y*Math.cos(pitch)-z*Math.sin(pitch))*19,z:p.y*Math.sin(pitch)+z*Math.cos(pitch)}})
  const edges=points.flatMap((a,i)=>points.slice(i+1).map(b=>`M${a.x} ${a.y}L${b.x} ${b.y}`)).join('')
  const faces=[[0,1,2],[0,1,3],[0,2,3],[1,2,3]].map(indices=>({depth:indices.reduce((sum,i)=>sum+points[i].z,0)/3,points:indices.map(i=>`${points[i].x},${points[i].y}`).join(' ')})).sort((a,b)=>a.depth-b.depth)
- return Object.freeze({path:edges,faces:Object.freeze(faces.map(face=>face.points)),scope:'observer-projection-of-retained-3d-vertices' as const})
+ return Object.freeze({points:Object.freeze(points),path:edges,faces:Object.freeze(faces.map(face=>face.points)),scope:'observer-projection-of-retained-3d-vertices' as const})
 }
