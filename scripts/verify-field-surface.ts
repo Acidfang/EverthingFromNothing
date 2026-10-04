@@ -15,6 +15,7 @@ export function entryMountsEIField(text:string):boolean{
   const containsMountedField=(node:ts.Node):boolean=>{
    if(ts.isJsxSelfClosingElement(node)){const attrs=node.attributes.properties;return node.tagName.getText(main)===local&&attrs.length===1&&ts.isJsxAttribute(attrs[0])&&attrs[0].name.getText(main)==='open'&&!attrs[0].initializer}
    if(ts.isJsxElement(node))return node.openingElement.tagName.getText(main)==='StrictMode'&&node.children.some(child=>containsMountedField(child))
+   if(ts.isJsxExpression(node)&&node.expression&&ts.isConditionalExpression(node.expression)){const branch=node.expression;return branch.condition.getText(main)==="new URLSearchParams(location.search).get('view')==='fracture'"&&ts.isJsxSelfClosingElement(branch.whenTrue)&&branch.whenTrue.tagName.getText(main)==='MobileFracture'&&containsMountedField(branch.whenFalse)}
    if(ts.isJsxFragment(node))return node.children.some(child=>containsMountedField(child))
    return false
   }
@@ -36,7 +37,7 @@ export async function verifyFieldSurface(){
  try{
   const entryMounted=entryMountsEIField(await readFile(join(root,'src/main.tsx'),'utf8'))
   if(!entryMounted)throw new Error('The actual main entry no longer directly mounts the verified field surface; review its replacement before release')
-  execFileSync(join(root,'node_modules/.bin/vite'),['build','--ssr','src/EIModelLayer.tsx','--outDir',directory,'--configLoader','runner'],{cwd:root,stdio:'pipe'})
+  execFileSync(process.execPath,[join(root,'node_modules/vite/bin/vite.js'),'build','--ssr','src/EIModelLayer.tsx','--outDir',directory,'--configLoader','runner'],{cwd:root,stdio:'pipe'})
   const {EIModelLayer}=await import(pathToFileURL(join(directory,'EIModelLayer.js')).href)
   const warnings:unknown[][]=[],original=console.error
   let html:string
@@ -56,7 +57,7 @@ export async function verifyFieldWorkspace(){
  try{
   const entry=join(directory,'entry.ts')
   await writeFile(entry,"export {EIFieldArray} from '../src/EIFieldArray';export {createEILedger} from '../src/model/ei-engine';")
-  execFileSync(join(root,'node_modules/.bin/vite'),['build','--ssr',entry,'--outDir',join(directory,'output'),'--configLoader','runner'],{cwd:root,stdio:'pipe'})
+  execFileSync(process.execPath,[join(root,'node_modules/vite/bin/vite.js'),'build','--ssr',entry,'--outDir',join(directory,'output'),'--configLoader','runner'],{cwd:root,stdio:'pipe'})
   const {EIFieldArray,createEILedger}=await import(pathToFileURL(join(directory,'output/entry.js')).href)
   const ledger=createEILedger({records:createEIPublicFieldRecords()}),before=JSON.stringify(ledger)
   const props={ledger,sourceAddress:'model/inventory-root',address:'model/inventory-root',revision:0,grain:'state',disabled:false,onSelect:()=>{},onCloseWorkspace:()=>{}}
@@ -67,3 +68,4 @@ export async function verifyFieldWorkspace(){
   return checks
  }finally{await rm(directory,{recursive:true,force:true})}
 }
+
