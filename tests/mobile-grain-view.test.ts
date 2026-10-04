@@ -20,3 +20,5 @@ test('reload restores grain and complete parent route, rejecting unrelated or in
  assert.deepEqual(legacy.route,[root,`${root}::T1:IS`]);assert.match(legacy.routeDifference!,/direction operator in this view/)
  assert.equal(readMobileGrainRoute(new URLSearchParams({grain:'invented'})).grain,'node')
 })
+
+test('IS is retained at the fourth tip and shared centre without duplicating its identity',()=>{const address='USER/example',view=mobileGrainView(mobileFractureGrain(address),address,'node');assert.equal(view.tripleTetrahedron.isPositions.centre.address,address);assert.equal(view.tripleTetrahedron.isPositions.tip.address,address);assert.equal(view.tripleTetrahedron.isPositions.tip.vertex,3);assert.equal(view.tripleTetrahedron.isPositions.centre.role,'IS');assert.equal(view.tripleTetrahedron.isPositions.tip.role,'IS NEXT');assert.equal(view.tripleTetrahedron.isPositions.previousTip.role,'WAS');assert.equal(view.tripleTetrahedron.isPositions.previousTip.address,null)})
