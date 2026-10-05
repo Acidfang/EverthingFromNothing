@@ -1,3 +1,4 @@
+import {localField} from './crackheadverse/field-relations.mjs'
 import {createEILedger,type EISeedRecord} from './ei-engine.ts'
 import {THREE_TETRAHEDRON_ORDERS} from './three-tetrahedron-drawing.ts'
 export const FRACTURE_ROOT='EI/SOURCE'
@@ -20,8 +21,8 @@ export function mobileFractureOperators(centre:string){
 export function mobileFractureGrain(centre:string,ancestors:readonly string[]=[]){
  const records:EISeedRecord[]=[]
  for(const [i,address] of [...ancestors,centre].entries()){const parent=i?ancestors[i-1]!:null,tip=parent?mobileTipState(parent,address):null;records.push({address,value:tip?`${tip.tip} · ${tip.phase}`:'Local zero',parents:parent?[parent]:[],relations:tip?[{relation:'LOCAL_ZERO',address:parent!}]:[],source:tip?{id:'derived-tip-state',text:`${tip.tip} · ${tip.orientation} · ${tip.phase}`,locator:'src/model/mobile-fracture.ts'}:{id:'retained-zero',text:address,locator:address}})}
- for(const [orientation,roles] of Object.entries(FRACTURE_ORDERS))for(const relation of roles){
-  const address=`${centre}::${orientation}:${relation}`
+ for(const field of localField(centre,'node').orientations)for(const role of field.roles){
+  const orientation=field.orientation,relation=role.role,address=role.address
   const tip=mobileTipState(centre,address)!
   records.push({address,value:`${tip.tip} · ${relation}`,parents:[centre],relations:[{relation:'LOCAL_ZERO',address:centre}],source:{id:'derived-tip-state',text:`${tip.tip} · ${orientation} · ${relation}`,locator:'src/model/mobile-fracture.ts'}})
  }
