@@ -11,3 +11,5 @@
 .mobile-past-paths{display:flex;gap:.4rem;flex-wrap:wrap}.mobile-past-paths button{display:flex;flex-direction:column;align-items:center;font-size:.8rem;flex:1;min-width:90px}.mobile-past-paths button svg{display:block}
 
 .mobile-visibility{padding:.65rem .75rem}.mobile-visibility fieldset{display:flex;flex-wrap:wrap;gap:.7rem;border:0;padding:.7rem 0}.mobile-visibility label{display:flex;align-items:center;gap:.35rem}.mobile-visibility input{width:20px;height:20px}
+
+.mobile-fracture[data-label-mode="quiet"] .ei-field-activity,.mobile-fracture[data-label-mode="quiet"] .mobile-grain-summary,.mobile-fracture[data-label-mode="quiet"] .ei-field-action-hint,.mobile-fracture[data-label-mode="quiet"] .ei-field-action-zero-status{display:none}.mobile-fracture[data-label-mode="quiet"] .ei-field-hud{justify-content:flex-end}.mobile-fracture[data-label-mode="quiet"] .ei-field-address{min-width:44px;width:44px;max-width:44px}
