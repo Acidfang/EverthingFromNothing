@@ -27,3 +27,11 @@ export function mobileFractureGrain(centre:string,ancestors:readonly string[]=[]
  }
  return createEILedger({records})
 }
+
+/** Finite illustrative expansion of the existing local-field operator. */
+export function mobileFractureFrames(centre:string,levels:number){
+ if(!Number.isInteger(levels)||levels<1||levels>3)throw new Error('Choose one to three illustrated levels')
+ const frames:Array<{address:string;parent:string|null;tipIndex:number|null;depth:number;path:string[];scale:number}>=[{address:centre,parent:null,tipIndex:null,depth:0,path:[],scale:1}]
+ for(let index=0;index<frames.length;index++){const frame=frames[index]!;if(frame.depth+1>=levels)continue;const local=mobileFractureGrain(frame.address);for(const record of local.records.filter(record=>record.parents.includes(frame.address))){const tip=mobileTipState(frame.address,record.address)!;frames.push({address:record.address,parent:frame.address,tipIndex:tip.tipIndex,depth:frame.depth+1,path:[...frame.path,record.address],scale:frame.scale*.32})}}
+ return frames
+}

@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import {mobileFractureGrain,mobileFractureOperators,mobileFractureTips} from '../src/model/mobile-fracture.ts'
+import {mobileFractureGrain,mobileFractureOperators,mobileFractureTips,mobileFractureFrames} from '../src/model/mobile-fracture.ts'
 import {deriveEIFieldObject} from '../src/model/ei-field-object.ts'
 test('selected user root owns the local field without changing its address',()=>{
  const root='USER/example',ledger=mobileFractureGrain(root)
@@ -24,3 +24,5 @@ test('direction and continuation addresses identify operators without automatic 
 })
 
 test('each modal tip retains its complete temporal triad at the shared centre',()=>{const tips=mobileFractureTips('USER/example');assert.deepEqual(tips.map(tip=>tip.label),['will be','can be',"won't be"]);for(const tip of tips){assert.deepEqual(tip.states.map(state=>state.phase).sort(),['IS','NEXT','WAS']);assert.ok(tip.states.every(state=>state.owner==='USER/example'&&state.tipIndex===tip.index))}})
+
+test('recursive layers preserve local tip ownership and connected routes without rebinding source',()=>{const root='USER/example',before=JSON.stringify(mobileFractureGrain(root));for(const [levels,count] of [[1,1],[2,10],[3,91]]){const frames=mobileFractureFrames(root,levels),byAddress=new Map(frames.map(frame=>[frame.address,frame]));assert.equal(frames.length,count);assert.equal(byAddress.size,count);for(const frame of frames.slice(1)){assert.ok(byAddress.has(frame.parent!));assert.equal(frame.path.at(-1),frame.address);assert.equal(frame.path.length,frame.depth);assert.ok(mobileFractureGrain(frame.parent!).records.some(record=>record.address===frame.address&&record.parents.includes(frame.parent!)))}}assert.equal(JSON.stringify(mobileFractureGrain(root)),before);assert.throws(()=>mobileFractureFrames(root,4))})
