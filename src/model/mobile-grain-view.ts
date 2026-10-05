@@ -18,5 +18,6 @@ export function readMobileGrainRoute(params:URLSearchParams){
  try{const candidate=JSON.parse(params.get('route')??'null');if(Array.isArray(candidate)&&candidate.length>=1&&candidate.length<=5&&candidate[0]===root){for(let index=1;index<candidate.length;index++){const address=candidate[index],parent=route.at(-1)!;if(typeof address!=='string'||address.length>256||!address.startsWith(`${parent}::`))break;const relation=address.slice(parent.length+2);if(/^T[123]:(WAS|IS|NEXT)$/.test(relation)){route.push(address);continue}const operator=mobileFractureOperators(parent).find(operator=>operator.address===address);if(operator)routeDifference=`${address} is a ${operator.kind} operator in this view. No connected endpoint was supplied; its parent view is retained.`;break}}}catch{/* Invalid route is not admitted. */}
  const requestedPath=params.get('past'),pastPath=['DID','COULD HAVE','WOULD HAVE'].includes(requestedPath??'')?requestedPath!:'DID'
  const requestedLevels=Number(params.get('levels')??2),levels=Number.isInteger(requestedLevels)&&requestedLevels>=1&&requestedLevels<=3?requestedLevels:2
- return {root,grain,route,routeDifference,pastPath,levels}
+ const visibility={mapping:params.get('showMapping')==='1',nodes:params.get('showNodes')!=='0',paths:params.get('showPaths')!=='0',connections:params.get('showConnections')!=='0',labels:params.get('showLabels')!=='0'}
+ return {root,grain,route,routeDifference,pastPath,levels,visibility}
 }
