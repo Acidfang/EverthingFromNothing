@@ -15,3 +15,23 @@
 .mobile-fracture[data-label-mode="quiet"] .ei-field-activity,.mobile-fracture[data-label-mode="quiet"] .mobile-grain-summary,.mobile-fracture[data-label-mode="quiet"] .ei-field-action-hint,.mobile-fracture[data-label-mode="quiet"] .ei-field-action-zero-status{display:none}.mobile-fracture[data-label-mode="quiet"] .ei-field-hud{justify-content:flex-end}.mobile-fracture[data-label-mode="quiet"] .ei-field-address{min-width:44px;width:44px;max-width:44px}
 
 .mobile-fracture[data-label-mode="quiet"] .mobile-tips{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:8px}.mobile-fracture[data-label-mode="quiet"] .mobile-tips>div{flex-wrap:nowrap;gap:3px}.mobile-fracture[data-label-mode="quiet"] .mobile-tips strong{min-width:16px}.mobile-fracture[data-label-mode="quiet"] .mobile-tips button{min-width:44px;padding:6px}.mobile-fracture[data-label-mode="quiet"] .ei-field-array{min-height:46svh}.mobile-fracture[data-label-mode="quiet"] .ei-field-visual{height:46svh;min-height:300px}
+
+/* The field owns the viewport; controls overlay without resizing it. */
+.mobile-fracture[data-label-mode="quiet"]{position:fixed;inset:0;overflow:hidden;padding:0}
+.mobile-fracture[data-label-mode="quiet"]>.ei-field-array{position:absolute;inset:0;height:100%;margin:0;border-radius:0}
+.mobile-fracture[data-label-mode="quiet"] .ei-field-visual{height:100dvh;min-height:0}
+.mobile-fracture[data-label-mode="quiet"]>header{position:absolute;left:8px;top:8px;z-index:15;background:transparent;border:0;padding:0}
+.mobile-fracture[data-label-mode="quiet"]>header a{display:grid;place-items:center;width:44px;height:44px;background:#102832dd;border-radius:8px;text-decoration:none}
+.mobile-fracture[data-label-mode="quiet"]>.mobile-selection-controls{position:absolute;right:8px;top:8px;z-index:16;margin:0;background:#102832eb;border-radius:8px;padding:8px;max-height:55dvh;overflow:auto}
+.mobile-fracture[data-label-mode="quiet"]>.mobile-selection-controls[open]{width:min(380px,calc(100% - 16px))}
+.mobile-fracture[data-label-mode="quiet"]>.mobile-selection-controls summary{min-width:28px;min-height:28px;cursor:pointer;list-style:none}
+.mobile-fracture[data-label-mode="quiet"]>.mobile-tips{position:absolute;bottom:calc(58px + env(safe-area-inset-bottom));left:8px;right:8px;z-index:12;background:#102832cc;border-radius:8px;max-width:400px;margin:auto;pointer-events:auto}
+.mobile-fracture[data-label-mode="quiet"]>.mobile-past-paths{position:absolute;left:8px;right:8px;bottom:env(safe-area-inset-bottom);z-index:12;max-width:400px;margin:auto;padding:4px}
+.mobile-fracture[data-label-mode="quiet"]>.mobile-inspection{position:absolute;left:8px;top:60px;z-index:17;margin:0;padding:8px;background:#102832eb;border-radius:8px;max-width:calc(100% - 16px);max-height:55dvh;overflow:auto}
+.mobile-fracture[data-label-mode="quiet"]>.mobile-inspection summary{cursor:pointer;list-style:none}
+.mobile-fracture[data-label-mode="quiet"]>.mobile-saved,.mobile-fracture[data-label-mode="quiet"]>.mobile-directions{display:none}
+.mobile-fracture[data-label-mode="quiet"]>p[role="status"]{position:absolute;top:65px;right:8px;max-width:50%;z-index:14;background:#102832cc;font-size:12px}
+.mobile-fracture[data-label-mode="quiet"] .ei-field-hud{top:8px;right:60px}
+.mobile-fracture[data-label-mode="quiet"] .ei-world-dock{bottom:184px}
+
+.mobile-fracture[data-label-mode="quiet"] .ei-world-dock{top:calc(100% - 350px)!important;bottom:auto}
